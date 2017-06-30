@@ -4,7 +4,6 @@ require 'tempfile'
 require 'erb'
 
 class CfObsBinaryBuilder
-  OBS_PROJECT="home:DKarakasilis"
 
   def self.build(binary, version, checksum)
     puts 'Create the package on OBS using "osc"'
@@ -14,7 +13,7 @@ class CfObsBinaryBuilder
     checkout_obs_package("#{binary}-#{version}")
 
     puts 'Change working directory'
-    Dir.chdir("#{OBS_PROJECT}/#{binary}-#{version}")
+    Dir.chdir("#{obs_project}/#{binary}-#{version}")
 
     puts 'Download the source and put them in the package dir'
     fetch_sources(binary, version)
@@ -34,7 +33,7 @@ class CfObsBinaryBuilder
 
   def self.create_obs_package(package_name)
     package_meta_template = <<EOF
-<package project="#{OBS_PROJECT}" name="#{package_name}">
+<package project="#{obs_project}" name="#{package_name}">
   <title>#{package_name}</title>
   <description>
     Automatic build of #{package_name} binary for the use in buildpacks in SCF.
@@ -46,12 +45,12 @@ EOF
       file.write(package_meta_template)
       file.close
 
-      `osc meta pkg #{OBS_PROJECT} #{package_name} -F #{file.path}`
+      `osc meta pkg #{obs_project} #{package_name} -F #{file.path}`
     end
   end
 
   def self.checkout_obs_package(package_name)
-    `osc checkout #{OBS_PROJECT}/#{package_name}`
+    `osc checkout #{obs_project}/#{package_name}`
   end
 
   def self.render_spec_template(binary, version)
@@ -63,6 +62,10 @@ EOF
   def self.commit_obs_package(binary, version)
     `osc addremove`
     `osc commit -m "Commiting files"`
+  end
+
+  def self.obs_project
+    ENV["OBS_PROJECT"] || raise("no OBS_PROJECT environment variable set")
   end
 end
 
