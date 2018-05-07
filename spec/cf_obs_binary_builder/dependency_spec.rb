@@ -1,5 +1,5 @@
 describe CfObsBinaryBuilder::Dependency, '#obs_project' do
-  let(:dependency) { CfObsBinaryBuilder::Dependency.new }
+  let(:dependency) { CfObsBinaryBuilder::Dependency.new('1.2.3', '12345') }
 
   context "when OBS_PROJECT env variable is not set" do
     it "exits with error" do

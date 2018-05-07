@@ -1,0 +1,77 @@
+#
+# spec file for package yarn
+#
+# Copyright (c) 2017 Miquel Sabaté Solà <msabate@suse.com>
+#
+# All modifications and additions to the file contributed by third parties
+# remain the property of their copyright owners, unless otherwise agreed
+# upon. The license for this file, and modifications and additions to the
+# file, is the same license as for the pristine package itself (unless the
+# license for the pristine package is not an Open Source License, in which
+# case the license is the MIT License). An "Open Source License" is a
+# license that conforms to the Open Source Definition (Version 1.9)
+# published by the Open Source Initiative.
+
+# Please submit bugfixes or comments via http://bugs.opensuse.org/
+#
+
+Name:           yarn
+Version:        <%= version %>
+Release:        0
+License:        BSD-2-Clause
+Summary:        Fast, reliable, and secure dependency management
+Url:            https://yarnpkg.com/en/
+Group:          Development/Languages/NodeJS
+Source0:        %{name}-%{version}.tar.xz
+Source1:        node_modules.tar.gz
+
+BuildRequires:  npm6
+
+# Installing nodejs is only a recommendation because the user might already have
+# nvm in place.
+Recommends:     nodejs6
+
+PreReq:         %fillup_prereq
+BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+
+%description
+Yarn is a package manager for your code. It allows you to use and share code
+with other developers from around the world. Yarn does this quickly, securely,
+and reliably so you don’t ever have to worry.
+
+Yarn allows you to use other developers’ solutions to different problems, making
+it easier for you to develop your software. If you have problems, you can report
+issues or contribute back, and when the problem is fixed, you can use Yarn to
+keep it all up to date.
+
+Code is shared through something called a package (sometimes referred to as a
+module). A package contains all the code being shared as well as a package.json
+file which describes the package.
+
+%prep
+%setup -q -n %{name}-%{version}
+%setup -q -T -D -a 1
+
+%build
+# This will produce the `lib` directory as expected by yarn.
+npm run build
+
+%install
+# Install the node_modules for which yarn depends on.
+mkdir -p %{buildroot}%{_libdir}/node_modules/%{name}
+cp -r src bin package.json node_modules lib %{buildroot}%{_libdir}/node_modules/%{name}
+
+# Produce the yarn and yarnpkg binaries as links to the yarn.js file.
+mkdir -p %{buildroot}%{_bindir}
+ln -sf %{_libdir}/node_modules/%{name}/bin/yarn.js %{buildroot}%{_bindir}/yarn
+ln -sf %{_libdir}/node_modules/%{name}/bin/yarn.js %{buildroot}%{_bindir}/yarnpkg
+
+%files
+%defattr(-,root,root,-)
+%doc LICENSE README.md
+%{_bindir}/yarn
+%{_bindir}/yarnpkg
+%dir %{_libdir}/node_modules/
+%{_libdir}/node_modules/%{name}/
+
+%changelog

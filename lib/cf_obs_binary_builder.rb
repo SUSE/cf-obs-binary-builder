@@ -7,10 +7,12 @@ require 'erb'
 module CfObsBinaryBuilder end
 require 'cf_obs_binary_builder/dependency'
 require 'cf_obs_binary_builder/bundler'
+require 'cf_obs_binary_builder/yarn'
 
 module CfObsBinaryBuilder
   DEPENDENCIES = {
-    "bundler" => Bundler
+    "bundler" => Bundler,
+    "yarn" => Yarn
   }
 
   LOG_LEVELS = {

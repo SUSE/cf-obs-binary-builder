@@ -1,5 +1,28 @@
 class CfObsBinaryBuilder::Dependency
-  def create_obs_package(package_name)
+  attr_reader :version, :checksum, :dependency, :package_name
+
+  def initialize(version, checksum)
+    @version = version
+    @checksum = checksum
+    @package_name = "#{dependency}-#{version}"
+  end
+
+  def run
+    create_obs_package
+    checkout_obs_package
+    Dir.chdir("#{obs_project}/#{package_name}")
+    prepare_files
+    commit_obs_package
+    log 'Done!'
+  end
+
+  def render_spec_template
+    spec_template = File.read(
+      File.expand_path(File.dirname(__FILE__) + "/templates/#{dependency}.spec.erb"))
+    ERB.new(spec_template).result(binding)
+  end
+
+  def create_obs_package
     log 'Creating the package on OBS using "osc"...'
 
     package_meta_template = <<EOF
@@ -19,12 +42,12 @@ EOF
     end
   end
 
-  def checkout_obs_package(package_name)
+  def checkout_obs_package
     log 'Checking out the package with osc...'
     `osc checkout #{obs_project}/#{package_name}`
   end
 
-  def commit_obs_package(binary, version)
+  def commit_obs_package
     log 'Commit the changes on OBS'
     log `osc addremove`
     log `osc commit -m "Commiting files"`
