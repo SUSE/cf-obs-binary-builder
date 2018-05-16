@@ -19,21 +19,6 @@ class CfObsBinaryBuilder::Dependency
     log 'Done!'
   end
 
-  def render_spec_template
-    spec_template = File.read(
-      File.expand_path(File.dirname(__FILE__) + "/templates/#{dependency}.spec.erb"))
-    ERB.new(spec_template).result(binding)
-  end
-
-  def validate_checksum
-    sha256 = Digest::SHA256.file File.basename(source)
-    actual_checksum = sha256.hexdigest
-
-    if actual_checksum != checksum
-      raise "Checksum mismatch #{actual_checksum} vs. #{checksum}"
-    end
-  end
-
   def create_obs_package
     log 'Creating the package on OBS using "osc"...'
 
@@ -57,6 +42,32 @@ EOF
   def checkout_obs_package
     log 'Checking out the package with osc...'
     `osc checkout #{obs_project}/#{package_name}`
+  end
+
+  def prepare_files
+    log 'Render the spec template and put it in the package dir'
+    File.write("#{dependency}.spec", render_spec_template)
+    fetch_sources
+  end
+
+  def render_spec_template
+    spec_template = File.read(
+      File.expand_path(File.dirname(__FILE__) + "/templates/#{dependency}.spec.erb"))
+    ERB.new(spec_template).result(binding)
+  end
+
+  def fetch_sources
+    log 'Downloading the sources in the package directory...'
+    File.write(File.basename(source), open(source).read)
+  end
+
+  def validate_checksum
+    sha256 = Digest::SHA256.file File.basename(source)
+    actual_checksum = sha256.hexdigest
+
+    if actual_checksum != checksum
+      raise "Checksum mismatch #{actual_checksum} vs. #{checksum}"
+    end
   end
 
   def commit_obs_package
