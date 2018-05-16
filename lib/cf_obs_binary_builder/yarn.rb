@@ -3,8 +3,8 @@ class CfObsBinaryBuilder::Yarn < CfObsBinaryBuilder::NonBuildDependency
     super(
       "yarn",
       version,
-      checksum,
       "https://yarnpkg.com/downloads/#{version}/yarn-v#{version}.tar.gz",
+      checksum,
       "BSD-2-Clause"
     )
   end

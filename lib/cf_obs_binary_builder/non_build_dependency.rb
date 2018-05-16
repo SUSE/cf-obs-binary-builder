@@ -1,11 +1,10 @@
 class CfObsBinaryBuilder::NonBuildDependency < CfObsBinaryBuilder::Dependency
-  attr_reader :license, :source
+  attr_reader :license
 
-  def initialize(dependency, version, checksum, source, license)
-    @source = source
+  def initialize(dependency, version, source, checksum, license)
     @license = license
 
-    super(dependency, version, checksum)
+    super(dependency, version, source, checksum)
   end
 
   def prepare_files

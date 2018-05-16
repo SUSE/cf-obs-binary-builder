@@ -3,7 +3,7 @@ require 'erb'
 
 class CfObsBinaryBuilder::Bundler < CfObsBinaryBuilder::Dependency
   def initialize(version, checksum)
-    super("bundler", version, checksum)
+    super("bundler", version, "http://rubygems.org/gems/bundler-#{version}.gem", checksum)
   end
 
   def prepare_files
@@ -14,6 +14,6 @@ class CfObsBinaryBuilder::Bundler < CfObsBinaryBuilder::Dependency
 
   def fetch_sources
     log 'Downloading the sources in the package directory...'
-    `curl http://rubygems.org/gems/#{dependency}-#{version}.gem -o #{dependency}-#{version}.gem`
+    `curl #{source} -o #{dependency}-#{version}.gem`
   end
 end

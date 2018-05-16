@@ -3,6 +3,7 @@
 require 'tempfile'
 require 'erb'
 require 'open-uri'
+require 'digest'
 
 # Define the parent module before requiring the namespaced classes
 module CfObsBinaryBuilder end

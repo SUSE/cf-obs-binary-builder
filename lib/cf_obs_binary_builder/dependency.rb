@@ -1,9 +1,10 @@
 class CfObsBinaryBuilder::Dependency
-  attr_reader :version, :checksum, :dependency, :package_name
+  attr_reader :version, :checksum, :dependency, :package_name, :source
 
-  def initialize(dependency, version, checksum)
+  def initialize(dependency, version, source, checksum)
     @dependency = dependency
     @version = version
+    @source = source
     @checksum = checksum
     @package_name = "#{dependency}-#{version}"
   end
@@ -13,6 +14,7 @@ class CfObsBinaryBuilder::Dependency
     checkout_obs_package
     Dir.chdir("#{obs_project}/#{package_name}")
     prepare_files
+    validate_checksum
     commit_obs_package
     log 'Done!'
   end
@@ -21,6 +23,15 @@ class CfObsBinaryBuilder::Dependency
     spec_template = File.read(
       File.expand_path(File.dirname(__FILE__) + "/templates/#{dependency}.spec.erb"))
     ERB.new(spec_template).result(binding)
+  end
+
+  def validate_checksum
+    sha256 = Digest::SHA256.file File.basename(source)
+    actual_checksum = sha256.hexdigest
+
+    if actual_checksum != checksum
+      raise "Checksum mismatch #{actual_checksum} vs. #{checksum}"
+    end
   end
 
   def create_obs_package
