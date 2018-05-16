@@ -26,8 +26,7 @@ License:        MIT
 Group:          Cloud/Platform/scf
 Url:            http://bundler.io
 Source:         http://rubygems.org/gems/%{mod_full_name}.gem
-BuildRequires:  %{ruby >= 1.8.7}
-BuildRequires:  %{rubygem gem2rpm}
+BuildRequires:  ruby2.3
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 %description
@@ -35,7 +34,8 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 %prep
 export GEM_HOME=$PWD
 export GEM_PATH=$PWD
-unset RUBYOPT; gem install %{_sourcedir}/%{mod_full_name}.gem --no-ri --no-rdoc --env-shebang --no-format-executable
+unset RUBYOPT; gem.ruby2.3 install %{_sourcedir}/%{mod_full_name}.gem --no-ri --no-rdoc --env-shebang --no-format-executable
+sed -i 's/ruby\.ruby2\.3/ruby/' bin/bundle*
 
 rm -f bundler-%{version}.gem
 rm -rf cache/bundler-%{version}.gem
