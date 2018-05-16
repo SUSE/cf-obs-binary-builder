@@ -3,8 +3,7 @@ require 'erb'
 
 class CfObsBinaryBuilder::Bundler < CfObsBinaryBuilder::Dependency
   def initialize(version, checksum)
-    @dependency = "bundler"
-    super(version, checksum)
+    super("bundler", version, checksum)
   end
 
   def prepare_files

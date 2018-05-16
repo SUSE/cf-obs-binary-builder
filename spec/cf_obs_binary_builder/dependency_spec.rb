@@ -1,5 +1,5 @@
 describe CfObsBinaryBuilder::Dependency, '#obs_project' do
-  let(:dependency) { CfObsBinaryBuilder::Dependency.new('1.2.3', '12345') }
+  let(:dependency) { CfObsBinaryBuilder::Dependency.new('bundler', '1.2.3', '12345') }
 
   context "when OBS_PROJECT env variable is not set" do
     before(:each) do
