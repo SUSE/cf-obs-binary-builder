@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
 
-require 'cf_obs_binary_builder'
+require_relative '../lib/cf_obs_binary_builder'
 
 CfObsBinaryBuilder.run *ARGV
