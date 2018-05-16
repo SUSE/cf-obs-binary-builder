@@ -30,7 +30,7 @@ class CfObsBinaryBuilder::Dependency
 <package project="#{obs_project}" name="#{package_name}">
   <title>#{package_name}</title>
   <description>
-    Automatic build of #{package_name} binary for the use in buildpacks in SCF.
+    Automatic build of #{package_name} for the use in buildpacks in SCF.
   </description>
 </package>
 EOF
