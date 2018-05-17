@@ -15,6 +15,7 @@ class CfObsBinaryBuilder::Dependency
     Dir.chdir("#{obs_project}/#{package_name}")
     prepare_files
     validate_checksum
+    write_sources_yaml
     commit_obs_package
     log 'Done!'
   end
@@ -50,6 +51,10 @@ EOF
     fetch_sources
   end
 
+  def write_sources_yaml
+    File.write("sources.yml", self.to_yaml)
+  end
+
   def render_spec_template
     spec_template = File.read(
       File.expand_path(File.dirname(__FILE__) + "/templates/#{dependency}.spec.erb"))
@@ -82,5 +87,14 @@ EOF
 
   def log(*args)
     CfObsBinaryBuilder::log(*args)
+  end
+
+  protected
+
+  def to_yaml
+    {
+      'url'    => @source,
+      'sha256' => @checksum
+    }.to_yaml
   end
 end

@@ -25,7 +25,8 @@ Summary: This is the node binary used in buildpacks in SUSE CloudFoundry (SCF)
 License:        MIT
 Group:          Cloud/Platform/scf
 Url:            https://nodejs.org/
-Source:         <%= source %>
+Source0:        <%= source %>
+Source1:        sources.yml
 BuildRequires:  python
 BuildRequires:  gcc-c++
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -39,10 +40,13 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 python configure --prefix=/
 
 %install
-make install DESTDIR=%{_builddir} PORTABLE=1
+DESTDIR=/tmp/%{name}/%{name}-v%{version}-linux-x64
+mkdir -p ${DESTDIR}
+cp %{SOURCE1} /tmp/
 
-cd %{_builddir}
-tar czvf /home/abuild/rpmbuild/OTHER/%{mod_full_name}.tgz . --owner=0 --group=0
+make install %{?_smp_mflags} DESTDIR=${DESTDIR} PORTABLE=1
+
+tar czvf /home/abuild/rpmbuild/OTHER/%{mod_full_name}.tgz -C /tmp/%{name} . --owner=0 --group=0
 
 %post
 %postun
