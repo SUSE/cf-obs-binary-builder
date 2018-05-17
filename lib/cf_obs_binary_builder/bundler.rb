@@ -1,6 +1,3 @@
-require 'tempfile'
-require 'erb'
-
 class CfObsBinaryBuilder::Bundler < CfObsBinaryBuilder::Dependency
   def initialize(version, checksum)
     super(

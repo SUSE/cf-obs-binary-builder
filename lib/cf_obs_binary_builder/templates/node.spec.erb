@@ -1,0 +1,54 @@
+#
+# spec file for package node
+#
+# Copyright (c) 2017 SUSE LINUX GmbH, Nuernberg, Germany.
+#
+# All modifications and additions to the file contributed by third parties
+# remain the property of their copyright owners, unless otherwise agreed
+# upon. The license for this file, and modifications and additions to the
+# file, is the same license as for the pristine package itself (unless the
+# license for the pristine package is not an Open Source License, in which
+# case the license is the MIT License). An "Open Source License" is a
+# license that conforms to the Open Source Definition (Version 1.9)
+# published by the Open Source Initiative.
+
+# Please submit bugfixes or comments via http://bugs.opensuse.org/
+#
+
+
+Name:           node
+Version:        <%= version %>
+Release:        1
+%define mod_name %{name}
+%define mod_full_name %{mod_name}-%{version}
+Summary: This is the node binary used in buildpacks in SUSE CloudFoundry (SCF)
+License:        MIT
+Group:          Cloud/Platform/scf
+Url:            https://nodejs.org/
+Source:         <%= source %>
+BuildRequires:  python
+BuildRequires:  gcc-c++
+BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+
+%description
+
+%prep
+%setup -q -n %{name}-v%{version}
+
+%build
+python configure --prefix=/
+
+%install
+make install DESTDIR=%{_builddir} PORTABLE=1
+
+cd %{_builddir}
+tar czvf /home/abuild/rpmbuild/OTHER/%{mod_full_name}.tgz . --owner=0 --group=0
+
+%post
+%postun
+
+%files
+%defattr(-,root,root)
+
+%changelog
+
