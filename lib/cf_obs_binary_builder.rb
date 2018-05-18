@@ -14,10 +14,12 @@ require_relative 'cf_obs_binary_builder/bundler'
 require_relative 'cf_obs_binary_builder/yarn'
 require_relative 'cf_obs_binary_builder/rubygems'
 require_relative 'cf_obs_binary_builder/node'
+require_relative 'cf_obs_binary_builder/jruby'
 
 module CfObsBinaryBuilder
   DEPENDENCIES = {
     "bundler" => Bundler,
+    "jruby" => Jruby,
     "node" => Node,
     "rubygems" => Rubygems,
     "yarn" => Yarn
