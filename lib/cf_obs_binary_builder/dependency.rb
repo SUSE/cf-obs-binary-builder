@@ -92,9 +92,11 @@ EOF
   protected
 
   def to_yaml
-    {
-      'url'    => @source,
-      'sha256' => @checksum
-    }.to_yaml
+    [
+      {
+        'url'    => @source,
+        'sha256' => @checksum
+      }
+    ].to_yaml
   end
 end
