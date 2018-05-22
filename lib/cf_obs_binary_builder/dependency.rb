@@ -12,7 +12,7 @@ class CfObsBinaryBuilder::Dependency
   def run
     create_obs_package
     checkout_obs_package
-    Dir.chdir("#{obs_project}/#{package_name}")
+    Dir.chdir(package_name)
     prepare_files
     validate_checksum
     write_sources_yaml
@@ -42,7 +42,7 @@ EOF
 
   def checkout_obs_package
     log 'Checking out the package with osc...'
-    `osc checkout #{obs_project}/#{package_name}`
+    `osc checkout #{obs_project}/#{package_name} -o #{package_name}`
   end
 
   def prepare_files
