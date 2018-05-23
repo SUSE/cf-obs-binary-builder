@@ -1,7 +1,7 @@
 class CfObsBinaryBuilder::Dependency
   attr_reader :version, :checksum, :dependency, :package_name, :source
 
-  def initialize(dependency, version, source, checksum)
+  def initialize(dependency, version, source = nil, checksum = nil)
     @dependency = dependency
     @version = version
     @source = source

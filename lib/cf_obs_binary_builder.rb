@@ -16,6 +16,7 @@ require_relative 'cf_obs_binary_builder/rubygems'
 require_relative 'cf_obs_binary_builder/node'
 require_relative 'cf_obs_binary_builder/jruby'
 require_relative 'cf_obs_binary_builder/ruby'
+require_relative 'cf_obs_binary_builder/openjdk'
 
 module CfObsBinaryBuilder
   DEPENDENCIES = {
@@ -24,7 +25,8 @@ module CfObsBinaryBuilder
     "node" => Node,
     "ruby" => Ruby,
     "rubygems" => Rubygems,
-    "yarn" => Yarn
+    "yarn" => Yarn,
+    "openjdk" => Openjdk
   }
 
   LOG_LEVELS = {
@@ -37,7 +39,7 @@ module CfObsBinaryBuilder
   TMP_DIR_SUFFIX = "cf_binary_build"
 
   def self.run(*args)
-    if args.length != 3
+    if args.length < 2
       abort "Wrong number of arguments, please specify: dependency, version and checksum"
     end
     abort "Dependency #{args[0]} not supported!" unless DEPENDENCIES[args[0]]

@@ -1,0 +1,72 @@
+#
+# spec file for package openjdk
+#
+# Copyright (c) 2017 SUSE LINUX GmbH, Nuernberg, Germany.
+#
+# All modifications and additions to the file contributed by third parties
+# remain the property of their copyright owners, unless otherwise agreed
+# upon. The license for this file, and modifications and additions to the
+# file, is the same license as for the pristine package itself (unless the
+# license for the pristine package is not an Open Source License, in which
+# case the license is the MIT License). An "Open Source License" is a
+# license that conforms to the Open Source Definition (Version 1.9)
+# published by the Open Source Initiative.
+
+# Please submit bugfixes or comments via http://bugs.opensuse.org/
+#
+
+
+Name:           openjdk
+Version:        <%= "#{minor_version}.#{update_version}b#{build_number}" %>
+Release:        1
+%define mod_name %{name}
+%define mod_full_name %{mod_name}-%{version}
+Summary: This is the openjdk binary used in buildpacks in SUSE CloudFoundry (SCF)
+License:        GPL-2.0-with-classpath-exception
+Group:          Cloud/Platform/scf
+Url:            http://openjdk.java.net/
+Source0:        <%= version %>.tar.xz
+BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+BuildRequires:  unzip
+BuildRequires:  zip
+BuildRequires:  java-1_8_0-openjdk-devel
+BuildRequires:  gcc-c++
+BuildRequires:  xorg-x11-devel
+BuildRequires:  cups-devel
+BuildRequires:  freetype2-devel
+BuildRequires:  alsa-lib-devel
+BuildRequires:  java-ca-certificates
+BuildRequires:	-post-build-checks
+
+%description
+
+%prep
+%setup -q -n jdk8u
+
+./configure \
+  --disable-debug-symbols \
+  --disable-zip-debug-info \
+  --enable-unlimited-crypto \
+  --with-build-number=<%= build_number %> \
+  --with-freetype-include=/usr/include/freetype2 \
+  --with-freetype-lib=/usr/lib64 \
+  --with-milestone=fcs \
+  --with-update-version=<%= update_version %>
+
+%build
+export LANG=en_US.UTF-8
+COMPANY_NAME="SUSE LINUX GmbH" make images
+
+%install
+chmod -R a+r build/linux-x86_64-normal-server-release/images
+tar czvf /home/abuild/rpmbuild/OTHER/openjdk-jdk.tar.gz -C build/linux-x86_64-normal-server-release/images/j2sdk-image . --owner=0 --group=0
+tar czvf /home/abuild/rpmbuild/OTHER/openjdk.tar.gz -C build/linux-x86_64-normal-server-release/images/j2re-image . -C ../j2sdk-image ./lib/tools.jar ./bin/jcmd ./bin/jmap ./bin/jstack ./man/man1/jcmd.1 ./man/man1/jmap.1 ./man/man1/jstack.1 -C ./jre ./lib/amd64/libattach.so --owner=0 --group=0
+
+%post
+%postun
+
+%files
+%defattr(-,root,root)
+
+%changelog
+
