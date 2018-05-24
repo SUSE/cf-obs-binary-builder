@@ -24,15 +24,18 @@ class CfObsBinaryBuilder::Openjdk < CfObsBinaryBuilder::Dependency
   def prepare_files
     super
 
-    log "Cloning the openjdk repository..."
-    `hg clone http://hg.openjdk.java.net/jdk8u/jdk8u`
+    log "Download ca bundle..."
+    system("curl -L https://curl.haxx.se/ca/cacert.pem  > cacerts.pem")
 
+    log "Cloning the openjdk repository..."
+    system("hg clone http://hg.openjdk.java.net/jdk8u/jdk8u")
     Dir.chdir "jdk8u" do
-      `chmod +x common/bin/hgforest.sh configure get_source.sh`
-      `./get_source.sh`
-      `./common/bin/hgforest.sh checkout #{version}`
+      system("chmod +x common/bin/hgforest.sh configure get_source.sh")
+      system("./get_source.sh")
+      system("./common/bin/hgforest.sh checkout #{version}")
     end
 
-    `tar cfJ #{version}.tar.xz jdk8u --exclude=\.hg`
+    log "Creating tarball..."
+    system("tar cfJ #{version}.tar.xz jdk8u --exclude=\.hg")
   end
 end

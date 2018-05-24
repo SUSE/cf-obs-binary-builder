@@ -15,7 +15,6 @@
 # Please submit bugfixes or comments via http://bugs.opensuse.org/
 #
 
-
 Name:           openjdk
 Version:        <%= "#{minor_version}.#{update_version}b#{build_number}" %>
 Release:        1
@@ -26,6 +25,7 @@ License:        GPL-2.0-with-classpath-exception
 Group:          Cloud/Platform/scf
 Url:            http://openjdk.java.net/
 Source0:        <%= version %>.tar.xz
+Source1:        cacerts.pem
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildRequires:  unzip
 BuildRequires:  zip
@@ -35,19 +35,27 @@ BuildRequires:  xorg-x11-devel
 BuildRequires:  cups-devel
 BuildRequires:  freetype2-devel
 BuildRequires:  alsa-lib-devel
-BuildRequires:  java-ca-certificates
 BuildRequires:	-post-build-checks
 
 %description
 
 %prep
-%setup -q -n jdk8u
+# Set up keystore
+mkdir -p cacerts
+awk '/-----BEGIN CERTIFICATE-----/,/-----END CERTIFICATE-----/{ print $0; }' %{SOURCE1} | csplit -n 3 -s -f cacerts/ - '/-----BEGIN CERTIFICATE-----/' {*}
+rm cacerts/000
 
+for PEM in $(find cacerts -type f | sort); do
+  keytool -importcert -noprompt -keystore cacerts.jks -storepass changeit -file $PEM -alias $(basename $PEM)
+done
+
+%setup -q -n jdk8u
 ./configure \
   --disable-debug-symbols \
   --disable-zip-debug-info \
   --enable-unlimited-crypto \
   --with-build-number=<%= build_number %> \
+  --with-cacerts-file=$(pwd)/../cacerts.jks \
   --with-freetype-include=/usr/include/freetype2 \
   --with-freetype-lib=/usr/lib64 \
   --with-milestone=fcs \
