@@ -22,7 +22,7 @@ class CfObsBinaryBuilder::Jruby < CfObsBinaryBuilder::Dependency
       `tetra init jruby "#{working_dir}/jruby-src-#{jruby_version}.tar.gz"`
 
       Dir.chdir "jruby" do
-        log `tetra dry-run -c 'cd src/jruby-#{jruby_version}; mvn -P \!truffle -Djruby.default.ruby.version=2.3'`
+        log `tetra dry-run -s 'cd src/jruby-#{jruby_version}; mvn -P \!truffle -Djruby.default.ruby.version=2.3'`
         Dir.chdir "src/jruby-#{jruby_version}" do
           log `tetra generate-all`
         end
