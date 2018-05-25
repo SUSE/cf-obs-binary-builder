@@ -36,7 +36,7 @@ module CfObsBinaryBuilder
     "debug" => 3,
   }
 
-  TMP_DIR_SUFFIX = "cf_binary_build"
+  TMP_DIR_SUFFIX = "cf_obs_binary_builder"
 
   def self.run(*args)
     if args.length < 2
