@@ -89,8 +89,6 @@ EOF
     CfObsBinaryBuilder::log(*args)
   end
 
-  protected
-
   def to_yaml
     [
       {

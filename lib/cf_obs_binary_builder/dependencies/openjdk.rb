@@ -1,4 +1,4 @@
-class CfObsBinaryBuilder::Openjdk < CfObsBinaryBuilder::Dependency
+class CfObsBinaryBuilder::Openjdk < CfObsBinaryBuilder::SCMDependency
   attr_reader :minor_version, :update_version, :build_number
 
   def initialize(version, checksum)
@@ -7,18 +7,6 @@ class CfObsBinaryBuilder::Openjdk < CfObsBinaryBuilder::Dependency
       "openjdk",
       version
     )
-  end
-
-  def fetch_sources
-    # noop - the sources are fetched from the hg repository
-  end
-
-  def write_sources_yaml
-    # noop - the sources are fetched from the hg repository
-  end
-
-  def validate_checksum
-    # noop - the sources are fetched from the hg repository
   end
 
   def prepare_files

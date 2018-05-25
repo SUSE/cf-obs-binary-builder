@@ -11,6 +11,7 @@ module CfObsBinaryBuilder end
 
 require_relative 'cf_obs_binary_builder/dependency'
 require_relative 'cf_obs_binary_builder/non_build_dependency'
+require_relative 'cf_obs_binary_builder/scm_dependency'
 
 dependencies_glob = File.join(File.dirname(__FILE__), "cf_obs_binary_builder/dependencies/*")
 Dir.glob(File.join(dependencies_glob)).each do |f|
