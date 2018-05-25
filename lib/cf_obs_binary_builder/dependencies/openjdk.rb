@@ -5,13 +5,16 @@ class CfObsBinaryBuilder::Openjdk < CfObsBinaryBuilder::SCMDependency
     @minor_version, @update_version, @build_number = version.match(/jdk(\d)u(\d+)-b(\d+)/).captures
     super(
       "openjdk",
-      version
+      version,
+      {
+        scm_type: "mercurial",
+        url: "http://hg.openjdk.java.net/jdk8u/jdk8u",
+        tag: version
+      }
     )
   end
 
-  def prepare_files
-    super
-
+  def prepare_sources
     log "Download ca bundle..."
     system("curl -L https://curl.haxx.se/ca/cacert.pem  > cacerts.pem")
 

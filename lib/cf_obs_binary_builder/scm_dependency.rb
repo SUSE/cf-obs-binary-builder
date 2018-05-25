@@ -6,7 +6,7 @@ class CfObsBinaryBuilder::SCMDependency < CfObsBinaryBuilder::Dependency
     super(dependency, version)
   end
 
-  def fetch_sources
+  def prepare_sources
     # noop - the sources are fetched from the hg repository
   end
 

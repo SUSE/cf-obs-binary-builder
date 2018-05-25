@@ -13,7 +13,8 @@ class CfObsBinaryBuilder::Dependency
     create_obs_package
     checkout_obs_package
     Dir.chdir(package_name)
-    prepare_files
+    render_spec_template
+    prepare_sources
     validate_checksum
     write_sources_yaml
     commit_obs_package
@@ -45,10 +46,7 @@ EOF
     `osc checkout #{obs_project}/#{package_name} -o #{package_name}`
   end
 
-  def prepare_files
-    log 'Render the spec template and put it in the package dir'
-    File.write("#{dependency}.spec", render_spec_template)
-    fetch_sources
+  def render_spec_template
   end
 
   def write_sources_yaml
@@ -56,12 +54,13 @@ EOF
   end
 
   def render_spec_template
+    log 'Render the spec template and put it in the package dir'
     spec_template = File.read(
       File.expand_path(File.dirname(__FILE__) + "/templates/#{dependency}.spec.erb"))
-    ERB.new(spec_template).result(binding)
+    File.write("#{dependency}.spec", ERB.new(spec_template).result(binding))
   end
 
-  def fetch_sources
+  def prepare_sources
     log 'Downloading the sources in the package directory...'
     File.write(File.basename(source), open(source).read)
   end
@@ -76,7 +75,7 @@ EOF
   end
 
   def commit_obs_package
-    log 'Commit the changes on OBS'
+    log 'Commiting the changes on OBS..'
     log `osc addremove`
     log `osc commit -m "Commiting files"`
   end
