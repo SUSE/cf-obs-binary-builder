@@ -1,8 +1,11 @@
+# non-build dependencies are simple dependencies where the source artifact is
+# simply copied without any compilation or transformation steps.
 class CfObsBinaryBuilder::NonBuildDependency < CfObsBinaryBuilder::Dependency
-  attr_reader :license
+  attr_reader :license, :url
 
-  def initialize(dependency, version, source, checksum, license)
+  def initialize(dependency, version, source, checksum, license, url)
     @license = license
+    @url = url
 
     super(dependency, version, source, checksum)
   end

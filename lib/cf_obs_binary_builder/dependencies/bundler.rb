@@ -4,7 +4,8 @@ class CfObsBinaryBuilder::Bundler < CfObsBinaryBuilder::Dependency
       "bundler",
       version,
       "http://rubygems.org/gems/bundler-#{version}.gem",
-      checksum
+      checksum,
+      "https://bundler.io"
     )
   end
 end

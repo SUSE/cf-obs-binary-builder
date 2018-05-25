@@ -13,7 +13,7 @@ class CfObsBinaryBuilder::Dependency
   def run
     obs_package.create
     obs_package.checkout do
-      render_spec_template
+      write_spec_file
       prepare_sources
       validate_checksum
       write_sources_yaml
@@ -26,11 +26,15 @@ class CfObsBinaryBuilder::Dependency
     File.write("sources.yml", self.to_yaml)
   end
 
-  def render_spec_template
+  def write_spec_file
     log 'Render the spec template and put it in the package dir'
+    File.write("#{dependency}.spec", render_spec_template)
+  end
+
+  def render_spec_template
     spec_template = File.read(
       File.expand_path(File.dirname(__FILE__) + "/templates/#{dependency}.spec.erb"))
-    File.write("#{dependency}.spec", ERB.new(spec_template).result(binding))
+    ERB.new(spec_template).result(binding)
   end
 
   def prepare_sources
