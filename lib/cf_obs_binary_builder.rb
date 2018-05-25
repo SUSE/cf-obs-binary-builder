@@ -8,15 +8,14 @@ require 'yaml'
 
 # Define the parent module before requiring the namespaced classes
 module CfObsBinaryBuilder end
+
 require_relative 'cf_obs_binary_builder/dependency'
 require_relative 'cf_obs_binary_builder/non_build_dependency'
-require_relative 'cf_obs_binary_builder/bundler'
-require_relative 'cf_obs_binary_builder/yarn'
-require_relative 'cf_obs_binary_builder/rubygems'
-require_relative 'cf_obs_binary_builder/node'
-require_relative 'cf_obs_binary_builder/jruby'
-require_relative 'cf_obs_binary_builder/ruby'
-require_relative 'cf_obs_binary_builder/openjdk'
+
+dependencies_glob = File.join(File.dirname(__FILE__), "cf_obs_binary_builder/dependencies/*")
+Dir.glob(File.join(dependencies_glob)).each do |f|
+  require_relative f
+end
 
 module CfObsBinaryBuilder
   DEPENDENCIES = {
