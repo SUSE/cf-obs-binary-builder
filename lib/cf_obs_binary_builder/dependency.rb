@@ -1,5 +1,5 @@
 class CfObsBinaryBuilder::Dependency
-  attr_reader :version, :checksum, :dependency, :package_name, :source
+  attr_reader :version, :checksum, :dependency, :package_name, :source, :obs_package
 
   def initialize(dependency, version, source = nil, checksum = nil)
     @dependency = dependency
@@ -7,46 +7,19 @@ class CfObsBinaryBuilder::Dependency
     @source = source
     @checksum = checksum
     @package_name = "#{dependency}-#{version}"
+    @obs_package = CfObsBinaryBuilder::ObsPackage.new(package_name)
   end
 
   def run
-    create_obs_package
-    checkout_obs_package
-    Dir.chdir(package_name)
-    render_spec_template
-    prepare_sources
-    validate_checksum
-    write_sources_yaml
-    commit_obs_package
-    log 'Done!'
-  end
-
-  def create_obs_package
-    log 'Creating the package on OBS using "osc"...'
-
-    package_meta_template = <<EOF
-<package project="#{obs_project}" name="#{package_name}">
-  <title>#{package_name}</title>
-  <description>
-    Automatic build of #{package_name} for the use in buildpacks in SCF.
-  </description>
-</package>
-EOF
-
-    Tempfile.open("package_meta_template") do |file|
-      file.write(package_meta_template)
-      file.close
-
-      `osc meta pkg #{obs_project} #{package_name} -F #{file.path}`
+    obs_package.create
+    obs_package.checkout do
+      render_spec_template
+      prepare_sources
+      validate_checksum
+      write_sources_yaml
+      obs_package.commit
     end
-  end
-
-  def checkout_obs_package
-    log 'Checking out the package with osc...'
-    `osc checkout #{obs_project}/#{package_name} -o #{package_name}`
-  end
-
-  def render_spec_template
+    log 'Done!'
   end
 
   def write_sources_yaml
@@ -72,20 +45,6 @@ EOF
     if actual_checksum != checksum
       raise "Checksum mismatch #{actual_checksum} vs. #{checksum}"
     end
-  end
-
-  def commit_obs_package
-    log 'Commiting the changes on OBS..'
-    log `osc addremove`
-    log `osc commit -m "Commiting files"`
-  end
-
-  def obs_project
-    ENV["OBS_PROJECT"] || raise("no OBS_PROJECT environment variable set")
-  end
-
-  def log(*args)
-    CfObsBinaryBuilder::log(*args)
   end
 
   def to_yaml
