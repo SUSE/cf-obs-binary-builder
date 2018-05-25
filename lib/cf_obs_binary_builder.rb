@@ -18,16 +18,6 @@ Dir.glob(File.join(dependencies_glob)).each do |f|
 end
 
 module CfObsBinaryBuilder
-  DEPENDENCIES = {
-    "bundler" => Bundler,
-    "jruby" => Jruby,
-    "node" => Node,
-    "ruby" => Ruby,
-    "rubygems" => Rubygems,
-    "yarn" => Yarn,
-    "openjdk" => Openjdk
-  }
-
   LOG_LEVELS = {
     "error" => 0,
     "warning" => 1,
@@ -41,11 +31,12 @@ module CfObsBinaryBuilder
     if args.length < 2
       abort "Wrong number of arguments, please specify: dependency, version and checksum"
     end
-    abort "Dependency #{args[0]} not supported!" unless DEPENDENCIES[args[0]]
+    dependency = get_dependency(args[0])
+    abort "Dependency #{args[0]} not supported!" unless dependency
 
     Dir.mktmpdir(TMP_DIR_SUFFIX) do |tmpdir|
       Dir.chdir tmpdir
-      DEPENDENCIES[args[0]].new(args[1],args[2]).run
+      dependency.new(args[1],args[2]).run
     end
   end
 
@@ -57,5 +48,11 @@ module CfObsBinaryBuilder
     if user_setting && user_setting >= LOG_LEVELS[level]
       puts message
     end
+  end
+
+  def self.get_dependency(dependency)
+    const_get(dependency.capitalize)
+  rescue NameError
+    nil
   end
 end
