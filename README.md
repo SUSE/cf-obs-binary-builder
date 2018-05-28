@@ -17,7 +17,7 @@ export OBS_PROJECT=the:project
 Then create a bundler package
 
 ```
-ruby -Ilib ./bin/cf-obs-binary-builder bundler 1.15.1 the_checksum_of_the_sources
+bin/cf-obs-binary-builder bundler 1.15.1 the_checksum_of_the_sources
 ```
 
 After the package has been built you can download the binaries incl. the tarball using
