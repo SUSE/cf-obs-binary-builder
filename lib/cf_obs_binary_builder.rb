@@ -40,10 +40,21 @@ module CfObsBinaryBuilder
   TMP_DIR_SUFFIX = "cf_obs_binary_builder"
 
   def self.run(*args)
+    type = args.shift
+    if type == "dependency"
+      build_dependency(args)
+    elsif type == "buildpack"
+      build_buildpack(args)
+    else
+      print_usage
+    end
+  end
+
+  def self.build_dependency(args)
     if args.length < 2
       abort "Wrong number of arguments, please specify: dependency, version and checksum"
     end
-    dependency = get_dependency(args[0])
+    dependency = get_build_target(args[0])
     abort "Dependency #{args[0]} not supported!" unless dependency
 
     Dir.mktmpdir(TMP_DIR_SUFFIX) do |tmpdir|
@@ -52,9 +63,28 @@ module CfObsBinaryBuilder
     end
   end
 
-  def self.get_dependency(dependency)
+  def self.build_buildpack(args)
+    if args.length < 2
+      abort "Wrong number of arguments, please specify: buildpack and path"
+    end
+    buildpack = get_build_target(args[0] + "Buildpack")
+    abort "Buildpack #{args[0]} not supported!" unless buildpack
+
+    Dir.mktmpdir(TMP_DIR_SUFFIX) do |tmpdir|
+      Dir.chdir tmpdir
+      buildpack.new(args[1],args[2]).run
+    end
+  end
+
+  def self.get_build_target(dependency)
     const_get(dependency.capitalize)
   rescue NameError
     nil
+  end
+
+  def self.print_usage
+    puts "USAGE:"
+    puts "  #{File.basename($0)} dependency <dependency> <version> <checksum>"
+    puts "  #{File.basename($0)} buildpack <buildpack> <path>"
   end
 end
