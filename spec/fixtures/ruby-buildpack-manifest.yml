@@ -1,0 +1,60 @@
+---
+language: ruby
+default_versions:
+- name: ruby
+  version: 2.4.x
+pre_package: scripts/build.sh
+url_to_dependency_map: []
+dependency_deprecation_dates:
+- version_line: 4.x
+  name: node
+  date: 2018-04-01
+  link: https://github.com/nodejs/LTS
+- version_line: 6.x
+  name: node
+  date: 2019-04-18
+  link: https://github.com/nodejs/LTS
+- version_line: 2.2.x
+  name: ruby
+  date: 2018-04-01
+  link: https://www.ruby-lang.org/en/news/2017/04/01/support-of-ruby-2-1-has-ended/
+dependencies:
+- name: bundler
+  version: 1.16.2
+  uri: https://buildpacks.cloudfoundry.org/dependencies/bundler/bundler-1.16.2.tgz
+  sha256: b490a416e785b4ecadc567a5a42aeb21c5fa6b4c7328483a627befd39eb32fc3
+  cf_stacks:
+  - cflinuxfs2
+- name: jruby
+  version: ruby-2.3.3-jruby-9.1.17.0
+  uri: https://buildpacks.cloudfoundry.org/dependencies/jruby/jruby-9.1.17.0_ruby-2.3.4-linux-x64-a254edad.tgz
+  sha256: a254edad1a2fbbff765e314b095ef84a317f48fbe38220106f92653a58354bed
+  cf_stacks:
+  - cflinuxfs2
+- name: jruby
+  version: ruby-2.5.0-jruby-9.2.0.0
+  uri: https://buildpacks.cloudfoundry.org/dependencies/jruby/jruby-9.2.0.0_ruby-2.5.0-linux-x64-33e9965c.tgz
+  sha256: 33e9965c148267d93c3a1b96370eb276098a2a69114d5db20fb608af3c8e8541
+  cf_stacks:
+  - cflinuxfs2
+- name: node
+  version: 4.9.1
+  uri: https://buildpacks.cloudfoundry.org/dependencies/node/node-4.9.1-linux-x64-2eccbf91.tgz
+  sha256: 2eccbf917e3418f59b6f74f859436b14347b83a5ac8b5a53c4c45ddebad47134
+  cf_stacks:
+  - cflinuxfs2
+include_files:
+- CHANGELOG
+- CONTRIBUTING.md
+- ISSUE_TEMPLATE
+- LICENSE
+- NOTICE
+- PULL_REQUEST_TEMPLATE
+- README.md
+- VERSION
+- bin/compile
+- bin/detect
+- bin/finalize
+- bin/release
+- bin/supply
+- manifest.yml
