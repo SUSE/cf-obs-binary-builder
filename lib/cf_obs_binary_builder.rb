@@ -9,9 +9,9 @@ require 'yaml'
 # Define the parent module before requiring the namespaced classes
 module CfObsBinaryBuilder end
 
-require_relative 'cf_obs_binary_builder/dependency'
-require_relative 'cf_obs_binary_builder/non_build_dependency'
-require_relative 'cf_obs_binary_builder/scm_dependency'
+require_relative 'cf_obs_binary_builder/dependencies/dependency'
+require_relative 'cf_obs_binary_builder/dependencies/non_build_dependency'
+require_relative 'cf_obs_binary_builder/dependencies/scm_dependency'
 require_relative 'cf_obs_binary_builder/obs_package'
 
 dependencies_glob = File.join(File.dirname(__FILE__), "cf_obs_binary_builder/dependencies/*")
@@ -64,8 +64,8 @@ module CfObsBinaryBuilder
   end
 
   def self.build_buildpack(args)
-    if args.length < 2
-      abort "Wrong number of arguments, please specify: buildpack and path"
+    if args.length != 3
+      abort "Wrong number of arguments, please specify: buildpack, version and path"
     end
     buildpack = get_build_target(args[0] + "Buildpack")
     abort "Buildpack #{args[0]} not supported!" unless buildpack
