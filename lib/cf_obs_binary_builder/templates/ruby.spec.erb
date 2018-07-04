@@ -16,7 +16,7 @@
 #
 
 
-Name:           ruby
+Name:           ruby-<%= version %>
 Version:        <%= version %>
 Release:        1
 %define mod_name %{name}
@@ -36,7 +36,7 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 %description
 
 %prep
-%setup -q
+%setup -q -n ruby-%{version}
 
 %build
 ./configure --enable-load-relative --disable-install-doc debugflags=-g --prefix=%{prefix_path} --without-gmp

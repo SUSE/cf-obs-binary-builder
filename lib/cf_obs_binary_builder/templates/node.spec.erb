@@ -16,7 +16,7 @@
 #
 
 
-Name:           node
+Name:           node-<%= version %>
 Version:        <%= version %>
 Release:        1
 %define mod_name %{name}
@@ -34,7 +34,7 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 %description
 
 %prep
-%setup -q -n %{name}-v%{version}
+%setup -q -n node-v%{version}
 
 %build
 python configure --prefix=/

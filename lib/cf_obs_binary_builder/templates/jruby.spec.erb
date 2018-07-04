@@ -16,7 +16,7 @@
 #
 
 
-Name:           <%= dependency %>
+Name:           <%= dependency %>-<%= jruby_version %>
 Version:        <%= jruby_version %>
 Release:        1
 %define mod_name %{name}
@@ -36,7 +36,7 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 %description
 
 %prep
-%setup -q
+%setup -q -n jruby-<%= jruby_version %>
 tar xfv %{SOURCE2}
 
 %build

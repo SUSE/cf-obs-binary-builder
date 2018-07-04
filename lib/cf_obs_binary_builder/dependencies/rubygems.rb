@@ -5,7 +5,8 @@ class CfObsBinaryBuilder::Rubygems < CfObsBinaryBuilder::NonBuildDependency
       version,
       "https://rubygems.org/rubygems/rubygems-#{version}.tgz",
       checksum,
-      "Ruby"
+      "Ruby",
+      "https://rubygems.org"
     )
   end
 end
