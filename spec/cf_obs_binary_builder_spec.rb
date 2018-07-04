@@ -21,10 +21,10 @@ describe CfObsBinaryBuilder do
   describe ".get_dependency" do
     it "returns the proper classes" do
       {
-        "ruby" => described_class::Ruby,
-        "bundler" => described_class::Bundler,
-        "openjdk" => described_class::Openjdk,
-        "foo" => nil
+        "Ruby" => described_class::Ruby,
+        "Bundler" => described_class::Bundler,
+        "Openjdk" => described_class::Openjdk,
+        "Foo" => nil
       }.each do |name, klass|
         expect(described_class.get_build_target(name)).to eq(klass)
       end

@@ -1,5 +1,5 @@
 describe CfObsBinaryBuilder::Buildpack do
-  let(:buildpack) { described_class.new("foo", "1.0.0", "/tmp") }
+  let(:buildpack) { described_class.new("foo", "1.0.0") }
 
   describe "#manifest_dependencies" do
     before(:each) do
@@ -10,10 +10,10 @@ describe CfObsBinaryBuilder::Buildpack do
 
     it "returns the list of dependencies" do
       expected = [
-        "bundler-1.16.2",
-        "jruby-ruby-2.3.3-jruby-9.1.17.0",
-        "jruby-ruby-2.5.0-jruby-9.2.0.0",
-        "node-4.9.1"
+        { name: "bundler", version: "1.16.2" },
+        { name: "jruby", version: "9.1.17.0" },
+        { name: "jruby", version: "9.2.0.0" },
+        { name: "node", version: "4.9.1" }
       ]
 
       expect(buildpack.manifest_dependencies).to match_array(expected)

@@ -33,7 +33,7 @@ class CfObsBinaryBuilder::Dependency
 
   def render_spec_template
     spec_template = File.read(
-      File.expand_path(File.dirname(__FILE__) + "/templates/#{dependency}.spec.erb"))
+      File.expand_path(File.dirname(__FILE__) + "/../templates/#{dependency}.spec.erb"))
     ERB.new(spec_template).result(binding)
   end
 
