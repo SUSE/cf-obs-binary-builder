@@ -1,8 +1,9 @@
 class CfObsBinaryBuilder::ObsPackage
-  attr_reader :name
+  attr_reader :name, :obs_project
 
-  def initialize(name)
+  def initialize(name, obs_project)
     @name = name
+    @obs_project = obs_project
   end
 
   def create
@@ -36,9 +37,5 @@ EOF
     log 'Commiting the changes on OBS..'
     log `osc addremove`
     log `osc commit -m "Commiting files"`
-  end
-
-  def obs_project
-    ENV["OBS_PROJECT"] || raise("no OBS_PROJECT environment variable set")
   end
 end

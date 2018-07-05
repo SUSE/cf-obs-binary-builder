@@ -7,7 +7,8 @@ class CfObsBinaryBuilder::BaseDependency
     @source = source
     @checksum = checksum
     @package_name = "#{dependency}-#{version}"
-    @obs_package = CfObsBinaryBuilder::ObsPackage.new(package_name)
+    obs_project = ENV["OBS_DEPENDENCY_PROJECT"] || raise("no OBS_DEPENDENCY_PROJECT environment variable set")
+    @obs_package = CfObsBinaryBuilder::ObsPackage.new(package_name, obs_project)
   end
 
   def run

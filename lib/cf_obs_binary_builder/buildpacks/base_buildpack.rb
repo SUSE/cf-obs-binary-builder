@@ -6,7 +6,8 @@ class CfObsBinaryBuilder::BaseBuildpack
     @version = version
 
     package_name = "#{name}-buildpack-#{version}"
-    @obs_package = CfObsBinaryBuilder::ObsPackage.new(package_name)
+    obs_project = ENV["OBS_BUILDPACK_PROJECT"] || raise("no OBS_BUILDPACK_PROJECT environment variable set")
+    @obs_package = CfObsBinaryBuilder::ObsPackage.new(package_name, obs_project)
   end
 
   def run
