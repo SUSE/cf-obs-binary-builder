@@ -1,7 +1,7 @@
-require_relative "../spec_helper"
+require_relative "../../spec_helper"
 
-describe CfObsBinaryBuilder::Dependency do
-  let(:dependency) { CfObsBinaryBuilder::Dependency.new('bundler', '1.2.3', 'http://example.com/file.tgz', '12345') }
+describe CfObsBinaryBuilder::BaseDependency do
+  let(:dependency) { CfObsBinaryBuilder::BaseDependency.new('bundler', '1.2.3', 'http://example.com/file.tgz', '12345') }
 
   describe "#validate_checksum" do
     it "raises an exception if the checksum does not match" do

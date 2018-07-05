@@ -1,4 +1,4 @@
-class CfObsBinaryBuilder::Jruby < CfObsBinaryBuilder::Dependency
+class CfObsBinaryBuilder::Jruby < CfObsBinaryBuilder::BaseDependency
   attr_reader :jruby_version, :ruby_version
 
   def initialize(version, checksum)
@@ -19,7 +19,7 @@ class CfObsBinaryBuilder::Jruby < CfObsBinaryBuilder::Dependency
     log "Caching maven dependencies..."
     working_dir = Dir.pwd
     Dir.mktmpdir do |dir|
-      `tetra init jruby "#{working_dir}/jruby-src-#{jruby_version}.tar.gz"`
+      log `tetra init jruby "#{working_dir}/jruby-src-#{jruby_version}.tar.gz"`
 
       Dir.chdir "jruby" do
         log `tetra dry-run -s 'cd src/jruby-#{jruby_version}; mvn -P \!truffle -Djruby.default.ruby.version=2.3'`

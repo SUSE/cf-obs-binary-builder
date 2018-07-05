@@ -1,4 +1,4 @@
-class CfObsBinaryBuilder::Ruby < CfObsBinaryBuilder::Dependency
+class CfObsBinaryBuilder::Ruby < CfObsBinaryBuilder::BaseDependency
   attr_reader :minor_version
 
   def initialize(version, checksum)

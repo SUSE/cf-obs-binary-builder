@@ -1,6 +1,6 @@
 # scm dependencies are dependencies where the sources are not downloaded as a
 # tarball but taken from a scm like git or mercurial instead
-class CfObsBinaryBuilder::SCMDependency < CfObsBinaryBuilder::Dependency
+class CfObsBinaryBuilder::SCMDependency < CfObsBinaryBuilder::BaseDependency
   attr_reader :scm_options
 
   def initialize(dependency, version, scm_options)

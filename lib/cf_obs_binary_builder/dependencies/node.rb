@@ -1,4 +1,4 @@
-class CfObsBinaryBuilder::Node < CfObsBinaryBuilder::Dependency
+class CfObsBinaryBuilder::Node < CfObsBinaryBuilder::BaseDependency
   def initialize(version, checksum)
     super(
       "node",

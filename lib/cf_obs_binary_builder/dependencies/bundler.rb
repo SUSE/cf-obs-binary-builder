@@ -1,4 +1,4 @@
-class CfObsBinaryBuilder::Bundler < CfObsBinaryBuilder::Dependency
+class CfObsBinaryBuilder::Bundler < CfObsBinaryBuilder::BaseDependency
   def initialize(version, checksum)
     super(
       "bundler",

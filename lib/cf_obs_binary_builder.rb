@@ -9,8 +9,8 @@ require 'yaml'
 # Define the parent module before requiring the namespaced classes
 module CfObsBinaryBuilder end
 
-require_relative 'cf_obs_binary_builder/buildpacks/buildpack'
-require_relative 'cf_obs_binary_builder/dependencies/dependency'
+require_relative 'cf_obs_binary_builder/buildpacks/base_buildpack'
+require_relative 'cf_obs_binary_builder/dependencies/base_dependency'
 require_relative 'cf_obs_binary_builder/dependencies/non_build_dependency'
 require_relative 'cf_obs_binary_builder/dependencies/scm_dependency'
 require_relative 'cf_obs_binary_builder/obs_package'

@@ -1,4 +1,4 @@
-describe CfObsBinaryBuilder::Buildpack do
+describe CfObsBinaryBuilder::BaseBuildpack do
   let(:buildpack) { described_class.new("foo", "1.0.0") }
 
   describe "#manifest_dependencies" do

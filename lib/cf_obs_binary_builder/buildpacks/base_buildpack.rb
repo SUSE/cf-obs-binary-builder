@@ -1,4 +1,4 @@
-class CfObsBinaryBuilder::Buildpack
+class CfObsBinaryBuilder::BaseBuildpack
   attr_reader :name, :version, :obs_package
 
   def initialize(name, version)
@@ -22,18 +22,7 @@ class CfObsBinaryBuilder::Buildpack
   def manifest_dependencies
     parsed_manifest["dependencies"]
       .select { |dep| dep["cf_stacks"].include?("cflinuxfs2") }
-      .map { |dep|
-        version = if dep["name"] == "jruby"
-          dep["version"].match(/jruby-(.*)/)[1]
-        else
-          dep["version"]
-        end
-
-        {
-          name: dep["name"],
-          version: version
-        }
-      }
+      .map { |dep| parse_dependency(dep) }
   end
 
   private
@@ -56,5 +45,18 @@ class CfObsBinaryBuilder::Buildpack
 
   def parsed_manifest
     YAML.load_file("manifest.yml")
+  end
+
+  def parse_dependency(dep)
+    version = if dep["name"] == "jruby"
+      dep["version"].match(/jruby-(.*)/)[1]
+    else
+      dep["version"]
+    end
+
+    {
+      name: dep["name"],
+      version: version
+    }
   end
 end
