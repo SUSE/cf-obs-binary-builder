@@ -19,8 +19,6 @@
 Name:           node-<%= version %>
 Version:        <%= version %>
 Release:        1
-%define mod_name %{name}
-%define mod_full_name %{mod_name}-%{version}
 Summary: This is the node binary used in buildpacks in SUSE CloudFoundry (SCF)
 License:        MIT
 Group:          Cloud/Platform/scf
@@ -46,7 +44,7 @@ cp %{SOURCE1} /tmp/
 
 make install %{?_smp_mflags} DESTDIR=${DESTDIR} PORTABLE=1
 
-tar czvf /home/abuild/rpmbuild/OTHER/%{mod_full_name}.tgz -C /tmp/%{name} . --owner=0 --group=0
+tar czvf /home/abuild/rpmbuild/OTHER/%{name}.tgz -C /tmp/%{name} . --owner=0 --group=0
 
 %post
 %postun
