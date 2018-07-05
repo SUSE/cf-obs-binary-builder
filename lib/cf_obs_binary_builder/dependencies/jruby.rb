@@ -2,12 +2,14 @@ class CfObsBinaryBuilder::Jruby < CfObsBinaryBuilder::BaseDependency
   attr_reader :jruby_version, :ruby_version
 
   def initialize(version, checksum)
-    @jruby_version = version.match(/(.*)_ruby-\d+\.\d.*/)[1]
-    @ruby_version = version.match(/.*_ruby-(\d+\.\d).*/)[1]
+    raise "Invalid version" unless version.match(/ruby-(.*)-jruby-(.*)/)
+
+    @jruby_version = version.match(/jruby-(.*)/)[1]
+    @ruby_version = version.match(/ruby-([^-]*)-/)[1]
 
     super(
       "jruby",
-      version,
+      "#{jruby_version}_ruby#{ruby_version}",
       "https://s3.amazonaws.com/jruby.org/downloads/#{jruby_version}/jruby-src-#{jruby_version}.tar.gz",
       checksum
     )

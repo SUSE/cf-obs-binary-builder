@@ -1,11 +1,12 @@
 class CfObsBinaryBuilder::Openjdk < CfObsBinaryBuilder::SCMDependency
-  attr_reader :minor_version, :update_version, :build_number
+  attr_reader :minor_version, :update_version, :build_number, :full_version
 
   def initialize(version, checksum)
+    full_version = version
     @minor_version, @update_version, @build_number = version.match(/jdk(\d)u(\d+)-b(\d+)/).captures
     super(
       "openjdk",
-      version,
+      "1.#{minor_version}.0_#{update_version}",
       {
         scm_type: "mercurial",
         url: "http://hg.openjdk.java.net/jdk8u/jdk8u",
@@ -23,7 +24,7 @@ class CfObsBinaryBuilder::Openjdk < CfObsBinaryBuilder::SCMDependency
     Dir.chdir "jdk8u" do
       system("chmod +x common/bin/hgforest.sh configure get_source.sh")
       system("./get_source.sh")
-      system("./common/bin/hgforest.sh checkout #{version}")
+      system("./common/bin/hgforest.sh checkout #{full_version}")
     end
 
     log "Creating tarball..."

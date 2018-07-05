@@ -16,10 +16,10 @@
 #
 
 
-Name:           <%= dependency %>-<%= jruby_version %>
-Version:        <%= jruby_version %>
+Name:           <%= dependency %>-<%= jruby_version %>_ruby<%= ruby_version %>
+Version:        <%= jruby_version %>_ruby<%= ruby_version %>
 Release:        1
-%define destdir %{_builddir}/%{name}
+%define destdir %{_builddir}/jruby-<%= jruby_version %>
 Summary: This is the <%= dependency %> binary used in buildpacks in SUSE CloudFoundry (SCF)
 License:        Ruby
 Group:          Cloud/Platform/scf
@@ -56,7 +56,7 @@ mvn -P '!truffle' -Djruby.default.ruby.version=<%= ruby_version %> \
   --settings kit/m2/settings.xml \
 
 %install
-tar czvf /home/abuild/rpmbuild/OTHER/%{name}.tgz -C %{destdir} bin/ lib/ sources.yml --owner=0 --group=0
+tar czvf /home/abuild/rpmbuild/OTHER/jruby-%{version}.tgz -C %{destdir} bin/ lib/ sources.yml --owner=0 --group=0
 
 %post
 %postun

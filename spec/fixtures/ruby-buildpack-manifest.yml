@@ -43,6 +43,12 @@ dependencies:
   sha256: 2eccbf917e3418f59b6f74f859436b14347b83a5ac8b5a53c4c45ddebad47134
   cf_stacks:
   - cflinuxfs2
+- name: openjdk1.8-latest
+  version: 1.8.0
+  uri: https://buildpacks.cloudfoundry.org/dependencies/manual-binaries/jruby/openjdk-1.8.0_172-9287eda1.tar.gz
+  sha256: 9287eda198990c8cfae8a23db725283a040f82555f87086ed5447690a2869f5a
+  cf_stacks:
+  - cflinuxfs2
 include_files:
 - CHANGELOG
 - CONTRIBUTING.md

@@ -11,9 +11,10 @@ describe CfObsBinaryBuilder::BaseBuildpack do
     it "returns the list of dependencies" do
       expected = [
         { name: "bundler", version: "1.16.2" },
-        { name: "jruby", version: "9.1.17.0" },
-        { name: "jruby", version: "9.2.0.0" },
-        { name: "node", version: "4.9.1" }
+        { name: "jruby", version: "9.1.17.0_ruby2.3.3" },
+        { name: "jruby", version: "9.2.0.0_ruby2.5.0" },
+        { name: "node", version: "4.9.1" },
+        { name: "openjdk", version: "1.8.0_172" }
       ]
 
       expect(buildpack.manifest_dependencies).to match_array(expected)
