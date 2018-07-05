@@ -40,6 +40,7 @@ class CfObsBinaryBuilder::BaseBuildpack
 
   def prepare_sources
     system("wget https://github.com/SUSE/cf-#{name}-buildpack/archive/v#{version}.tar.gz -O v#{version}.tar.gz")
+    # Extract manifest.yml from the tarball so that its dependencies can be parsed
     system("tar xfv v#{version}.tar.gz cf-#{name}-buildpack-#{version}/manifest.yml --strip-components=1")
   end
 

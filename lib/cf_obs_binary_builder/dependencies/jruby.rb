@@ -13,8 +13,11 @@ class CfObsBinaryBuilder::Jruby < CfObsBinaryBuilder::BaseDependency
     )
   end
 
-  def prepare_files
+  def prepare_sources
     super
+
+    log "Download ca bundle..."
+    system("curl -L https://curl.haxx.se/ca/cacert.pem  > cacerts.pem")
 
     log "Caching maven dependencies..."
     working_dir = Dir.pwd
