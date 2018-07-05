@@ -16,5 +16,7 @@ Gem::Specification.new do |s|
   s.homepage    = 'http://rubygems.org/gems/cf_obs_binary_builder'
   s.license       = 'MIT'
 
+  s.add_runtime_dependency 'tetra', '>= 2.0.5'
+
   %w(pry pry-nav rspec).each { |gem| s.add_development_dependency gem }
 end
