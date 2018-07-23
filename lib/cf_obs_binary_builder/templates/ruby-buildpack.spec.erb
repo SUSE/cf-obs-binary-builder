@@ -38,7 +38,7 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 %build
 source ./.envrc
 (cd src/ruby/vendor/github.com/cloudfoundry/libbuildpack/packager/buildpack-packager && go install)
-buildpack-packager build
+buildpack-packager build -any-stack
 
 %install
 mv ruby_buildpack-v%{version}.zip /home/abuild/rpmbuild/OTHER/
