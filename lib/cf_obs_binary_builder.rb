@@ -89,6 +89,6 @@ module CfObsBinaryBuilder
   def self.print_usage
     puts "USAGE:"
     puts "  #{File.basename($0)} dependency <dependency> <version> <checksum>"
-    puts "  #{File.basename($0)} buildpack <buildpack> <path>"
+    puts "  #{File.basename($0)} buildpack <buildpack> <version>"
   end
 end
