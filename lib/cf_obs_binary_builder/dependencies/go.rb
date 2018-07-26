@@ -1,6 +1,4 @@
 class CfObsBinaryBuilder::Go < CfObsBinaryBuilder::BaseDependency
-  attr_reader :minor_version
-
   def initialize(version, checksum)
     super(
       "go",
