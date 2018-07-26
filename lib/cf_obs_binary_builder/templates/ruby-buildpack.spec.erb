@@ -41,7 +41,7 @@ source ./.envrc
 buildpack-packager build -any-stack
 
 %install
-CHECKSUM=`sha256sum ruby_buildpack-v%{version}.zip | cut -d' ' -f1`
+CHECKSUM=`sha1sum ruby_buildpack-v%{version}.zip | cut -d' ' -f1`
 mv ruby_buildpack-v%{version}.zip /home/abuild/rpmbuild/OTHER/ruby_buildpack-v%{version}-${CHECKSUM:0:8}.zip
 
 %post
