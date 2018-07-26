@@ -38,4 +38,9 @@ EOF
     log `osc addremove`
     log `osc commit -m "Commiting files"`
   end
+
+  # Checks if this package already exists on OBS under @obs_project
+  def exists?
+    system("osc search --package -s #{@name} | grep #{@obs_project} > /dev/null")
+  end
 end
