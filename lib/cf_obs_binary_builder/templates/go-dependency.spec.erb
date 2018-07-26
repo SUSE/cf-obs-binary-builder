@@ -1,0 +1,51 @@
+#
+# spec file for SUSE CAP buildpack dependency
+#
+# Copyright (c) 2018 SUSE LINUX GmbH, Nuernberg, Germany.
+#
+# All modifications and additions to the file contributed by third parties
+# remain the property of their copyright owners, unless otherwise agreed
+# upon. The license for this file, and modifications and additions to the
+# file, is the same license as for the pristine package itself (unless the
+# license for the pristine package is not an Open Source License, in which
+# case the license is the MIT License). An "Open Source License" is a
+# license that conforms to the Open Source Definition (Version 1.9)
+# published by the Open Source Initiative.
+
+Name:           <%= dependency %>-<%= version %>
+Version:        <%= version[1..-1] %>
+Release:        1
+Summary:        This is a dependency used in SUSE CAP buildpacks
+License:        BSD-3-Clause
+Group:          Cloud/Platform/scf
+Url:            https://<%= import_path %>
+Source0:        <%= source %>
+Source1:        sources.yml
+BuildRequires:  golang-packaging
+BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+
+%description
+
+%prep
+%setup -q -n <%= dependency %>-%{version}
+
+%build
+%goprep <%= import_path %>
+%gobuild ...
+
+%install
+mkdir -p bin
+cp %{SOURCE1} ./
+cp ../go/bin/<%= dependency %> bin/
+# Allow also license files with different writing like License
+cp `find -iname LICENSE -maxdepth 1` bin/
+TARBALL=/home/abuild/rpmbuild/OTHER/%{name}.tgz
+tar czf ${TARBALL} bin sources.yml --owner=0 --group=0
+CHECKSUM=`sha256sum ${TARBALL} | cut -d' ' -f1`
+mv ${TARBALL} /home/abuild/rpmbuild/OTHER/%{name}-linux-x64-${CHECKSUM:0:8}.tgz
+
+%files
+%defattr(-,root,root)
+
+%changelog
+
