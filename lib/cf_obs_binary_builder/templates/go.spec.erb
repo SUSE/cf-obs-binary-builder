@@ -34,6 +34,7 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 %setup -q -n go/src
 
 %build
+export GOROOT_BOOTSTRAP=/usr/lib64/go1.4
 ./make.bash
 
 %install
