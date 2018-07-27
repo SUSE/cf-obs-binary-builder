@@ -15,6 +15,7 @@ require_relative 'cf_obs_binary_builder/dependencies/non_build_dependency'
 require_relative 'cf_obs_binary_builder/dependencies/go_dependency'
 require_relative 'cf_obs_binary_builder/dependencies/scm_dependency'
 require_relative 'cf_obs_binary_builder/obs_package'
+require_relative 'cf_obs_binary_builder/syncer'
 
 [
   File.join(File.dirname(__FILE__), "cf_obs_binary_builder/dependencies/*"),
@@ -50,6 +51,8 @@ module CfObsBinaryBuilder
       build_dependency(args)
     elsif type == "buildpack"
       build_buildpack(args)
+    elsif type == "sync"
+      sync(args)
     else
       print_usage
     end
@@ -81,6 +84,15 @@ module CfObsBinaryBuilder
     end
   end
 
+  def self.sync(args)
+    if args.length != 1
+      abort "Wrong number of arguments, please specify: manifest_path"
+    end
+
+    manifest_path = args.shift
+    Syncer.new(manifest_path).sync
+  end
+
   def self.get_build_target(dependency)
     const_get(dependency)
   rescue NameError
@@ -88,8 +100,16 @@ module CfObsBinaryBuilder
   end
 
   def self.print_usage
-    puts "USAGE:"
-    puts "  #{File.basename($0)} dependency <dependency> <version> <checksum>"
-    puts "  #{File.basename($0)} buildpack <buildpack> <version>"
+    puts <<EOF
+USAGE:
+  #{File.basename($0)} dependency <dependency> <version> <checksum>
+    Create a new package on OBS.
+
+  #{File.basename($0)} buildpack <buildpack> <version>
+    Create a new buildpack on OBS.
+
+  #{File.basename($0)} sync <manifest_path>
+    Create missing OBS packages for all dependencies in the given manifest.
+EOF
   end
 end
