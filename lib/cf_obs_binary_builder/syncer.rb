@@ -16,7 +16,7 @@ class CfObsBinaryBuilder::Syncer
   def missing_deps
     dependencies = stack_dependencies_from_manifest
     dependencies
-      .map { |dep_hash| dependency_for(dep_hash) }
+      .map { |hash| dependency_for(hash) }
       .select { |dep| !dep.obs_package.exists? }
   end
 
@@ -32,17 +32,28 @@ class CfObsBinaryBuilder::Syncer
     openjdk_html.scan(/jdk#{minor_version}u#{update_version}-b(\d+)/).flatten.map(&:to_i).max
   end
 
+  def version_from_manifest(dep_hash)
+    if dep_hash["name"] == "openjdk1.8-latest"
+      minor_version = 8
+      update_version = dep_hash["uri"][/openjdk-1.8.0_(\d+)-/, 1]
+      build = find_latest_jdk_build(minor_version, update_version)
+      "jdk#{minor_version}u#{update_version}-b#{build}"
+    else
+      dep_hash["version"]
+    end
+  end
+
   def dependency_for(hash_from_manifest)
-    checksum = "foo" # Checksum.for(dep_hash["name"], dep_hash["version"])
+    version = version_from_manifest(hash_from_manifest)
 
     if hash_from_manifest["name"] == "openjdk1.8-latest"
-      minor_version = 8
-      update_version = hash_from_manifest["uri"][/openjdk-1.8.0_(\d+)-/, 1]
-      build = find_latest_jdk_build(minor_version, update_version)
-      CfObsBinaryBuilder::Openjdk.new("jdk#{minor_version}u#{update_version}-b#{build}", checksum)
+      dep_class = CfObsBinaryBuilder::Openjdk
+      # OpenJDK is downloaded from the mercurial SCM, not as a tarball. We thus don't have a checksum.
+      checksum = ""
     else
+      checksum = CfObsBinaryBuilder::Checksum.for(hash_from_manifest["name"], hash_from_manifest["version"])
       dep_class = CfObsBinaryBuilder.get_build_target("CfObsBinaryBuilder::#{hash_from_manifest["name"].capitalize}")
-      dependency = dep_class.new(hash_from_manifest["version"], checksum)
     end
+    dependency = dep_class.new(version, checksum)
   end
 end
