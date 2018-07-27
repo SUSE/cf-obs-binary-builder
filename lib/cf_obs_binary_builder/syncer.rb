@@ -7,18 +7,17 @@ class CfObsBinaryBuilder::Syncer
     @manifest_path = manifest_path
   end
 
+  def sync
+    missing_deps.each do |dep|
+      dep.obs_package.create
+    end
+  end
 
   def missing_deps
     dependencies = stack_dependencies_from_manifest
-    dependencies.each do |dep_hash|
-      dep = dependency_for(dep_hash)
-      if dep.obs_package.exists?
-        puts "Package #{dep.package_name} already exists."
-      else
-        puts "Didn't find package a package for #{dep.package_name} on OBS. Will create it now"
-        #dep.run # TODO: Uncomment when we fix the checksum
-      end
-    end
+    dependencies
+      .map { |dep_hash| dependency_for(dep_hash) }
+      .select { |dep| !dep.obs_package.exists? }
   end
 
   private
