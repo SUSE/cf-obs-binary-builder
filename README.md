@@ -6,6 +6,28 @@ This project creates packages in OBS to create binaries for CloudFoundry buildpa
 
 You need to have a working `osc` environment set up.
 
+For getting the checksums of the source tarballs of dependencies this tool relies on the `in.cr` of the [depwatcher](https://github.com/cloudfoundry/buildpacks-ci/tree/master/dockerfiles/depwatcher/src/depwatcher) concourse resource. This script has to be compiled and be available as `depwatcher` in the current `PATH`.
+
+To compile the script run
+
+```
+$ git clone https://github.com/cloudfoundry/buildpacks-ci
+$ cd buildpacks-ci/dockerfiles/depwatcher/
+$ crystal src/in.cr -o depwatcher
+$ chmod +x depwatcher
+$ mv depwatcher /usr/local/bin
+```
+
+Example usage of `depwatcher`:
+
+```
+$ echo '{"source":{"name":"ruby","type":"ruby"},"version":{"ref":"2.5.1"}}' | depwatcher /tmp > /dev/null
+{"source":{"name":"ruby","type":"ruby"},"version":{"ref":"2.5.1"}}
+{"ref":"2.5.1","url":"https://cache.ruby-lang.org/pub/ruby/2.5/ruby-2.5.1.tar.gz","sha256":"dac81822325b79c3ba9532b048c2123357d3310b2b40024202f360251d9829b1"}
+```
+
+The relevant information is returned on STDERR.
+
 ## Usage
 
 Define the OBS project using
