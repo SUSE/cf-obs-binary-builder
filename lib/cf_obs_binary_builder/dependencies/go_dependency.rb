@@ -2,10 +2,10 @@
 class CfObsBinaryBuilder::GoDependency < CfObsBinaryBuilder::BaseDependency
   attr_reader :import_path
 
-  def initialize(dependency, version, source, checksum)
+  def initialize(dependency, version, source)
     @import_path = source[/^https:\/\/(.*)\/archive\/v/, 1]
 
-    super(dependency, version, source, checksum)
+    super(dependency, version, source)
   end
 
   def render_spec_template

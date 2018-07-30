@@ -12,8 +12,8 @@ describe CfObsBinaryBuilder::Syncer do
 
   describe "#sync" do
     it "creates missing dependencies" do
-      expect_any_instance_of(CfObsBinaryBuilder::ObsPackage).to receive(:create).once do |obj|
-        expect(obj.name).to eq("bundler-1.16.2")
+      expect_any_instance_of(CfObsBinaryBuilder::BaseDependency).to receive(:run).once do |obj|
+        expect(obj.dependency).to eq("bundler")
       end
 
       subject.sync

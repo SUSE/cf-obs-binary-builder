@@ -9,7 +9,8 @@ class CfObsBinaryBuilder::Syncer
 
   def sync
     missing_deps.each do |dep|
-      dep.obs_package.create
+      checksum = CfObsBinaryBuilder::Checksum.for(dep.dependency, dep.version)
+      dep.run(checksum)
     end
   end
 
@@ -48,12 +49,9 @@ class CfObsBinaryBuilder::Syncer
 
     if hash_from_manifest["name"] == "openjdk1.8-latest"
       dep_class = CfObsBinaryBuilder::Openjdk
-      # OpenJDK is downloaded from the mercurial SCM, not as a tarball. We thus don't have a checksum.
-      checksum = ""
     else
-      checksum = CfObsBinaryBuilder::Checksum.for(hash_from_manifest["name"], hash_from_manifest["version"])
       dep_class = CfObsBinaryBuilder.get_build_target("CfObsBinaryBuilder::#{hash_from_manifest["name"].capitalize}")
     end
-    dependency = dep_class.new(version, checksum)
+    dependency = dep_class.new(version)
   end
 end

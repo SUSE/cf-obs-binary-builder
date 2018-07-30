@@ -1,7 +1,7 @@
 class CfObsBinaryBuilder::Openjdk < CfObsBinaryBuilder::SCMDependency
   attr_reader :minor_version, :update_version, :build_number, :full_version
 
-  def initialize(version, checksum)
+  def initialize(version)
     full_version = version
     @minor_version, @update_version, @build_number = version.match(/jdk(\d)u(\d+)-b(\d+)/).captures
     super(

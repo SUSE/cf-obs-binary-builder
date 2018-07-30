@@ -70,7 +70,7 @@ module CfObsBinaryBuilder
 
     Dir.mktmpdir(TMP_DIR_SUFFIX) do |tmpdir|
       Dir.chdir tmpdir
-      dependency.new(args[1],args[2]).run
+      dependency.new(args[1]).run(args[2])
     end
   end
 

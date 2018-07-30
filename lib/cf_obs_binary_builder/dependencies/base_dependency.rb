@@ -1,22 +1,21 @@
 class CfObsBinaryBuilder::BaseDependency
-  attr_reader :version, :checksum, :dependency, :package_name, :source, :obs_package
+  attr_reader :version, :dependency, :package_name, :source, :obs_package
 
-  def initialize(dependency, version, source = nil, checksum = nil)
+  def initialize(dependency, version, source = nil)
     @dependency = dependency
     @version = version
     @source = source
-    @checksum = checksum
     @package_name = "#{dependency}-#{version}"
     obs_project = ENV["OBS_DEPENDENCY_PROJECT"] || raise("no OBS_DEPENDENCY_PROJECT environment variable set")
     @obs_package = CfObsBinaryBuilder::ObsPackage.new(package_name, obs_project)
   end
 
-  def run
+  def run(checksum)
     obs_package.create
     obs_package.checkout do
       write_spec_file
       prepare_sources
-      validate_checksum
+      validate_checksum(checksum)
       write_sources_yaml
       obs_package.commit
     end
@@ -24,6 +23,10 @@ class CfObsBinaryBuilder::BaseDependency
   end
 
   def write_sources_yaml
+    if !@validated_checksum
+      raise "Checksum not validated, won't write to yaml"
+    end
+
     File.write("sources.yml", self.to_yaml)
   end
 
@@ -43,12 +46,14 @@ class CfObsBinaryBuilder::BaseDependency
     File.write(File.basename(source), open(source).read)
   end
 
-  def validate_checksum
+  def validate_checksum(checksum)
     sha256 = Digest::SHA256.file File.basename(source)
     actual_checksum = sha256.hexdigest
 
     if actual_checksum != checksum
       raise "Checksum mismatch #{actual_checksum} vs. #{checksum}"
+    else
+      @validated_checksum = checksum
     end
   end
 
@@ -56,7 +61,7 @@ class CfObsBinaryBuilder::BaseDependency
     [
       {
         'url'    => @source,
-        'sha256' => @checksum
+        'sha256' => @validated_checksum
       }
     ].to_yaml
   end

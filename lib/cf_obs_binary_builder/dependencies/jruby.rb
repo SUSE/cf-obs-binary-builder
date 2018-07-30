@@ -1,7 +1,7 @@
 class CfObsBinaryBuilder::Jruby < CfObsBinaryBuilder::BaseDependency
   attr_reader :jruby_version, :ruby_version
 
-  def initialize(version, checksum)
+  def initialize(version)
     raise "Invalid version" unless version.match(/ruby-(.*)-jruby-(.*)/)
 
     @jruby_version = version.match(/jruby-(.*)/)[1]
@@ -10,8 +10,7 @@ class CfObsBinaryBuilder::Jruby < CfObsBinaryBuilder::BaseDependency
     super(
       "jruby",
       "#{jruby_version}_ruby#{ruby_version}",
-      "https://s3.amazonaws.com/jruby.org/downloads/#{jruby_version}/jruby-src-#{jruby_version}.tar.gz",
-      checksum
+      "https://s3.amazonaws.com/jruby.org/downloads/#{jruby_version}/jruby-src-#{jruby_version}.tar.gz"
     )
   end
 

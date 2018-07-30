@@ -1,10 +1,9 @@
 class CfObsBinaryBuilder::Rubygems < CfObsBinaryBuilder::NonBuildDependency
-  def initialize(version, checksum)
+  def initialize(version)
     super(
       "rubygems",
       version,
       "https://rubygems.org/rubygems/rubygems-#{version}.tgz",
-      checksum,
       "Ruby",
       "https://rubygems.org"
     )

@@ -3,11 +3,11 @@
 class CfObsBinaryBuilder::NonBuildDependency < CfObsBinaryBuilder::BaseDependency
   attr_reader :license, :url
 
-  def initialize(dependency, version, source, checksum, license, url)
+  def initialize(dependency, version, source, license, url)
     @license = license
     @url = url
 
-    super(dependency, version, source, checksum)
+    super(dependency, version, source)
   end
 
   def render_spec_template

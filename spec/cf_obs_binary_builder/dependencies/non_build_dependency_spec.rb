@@ -4,7 +4,6 @@ describe CfObsBinaryBuilder::NonBuildDependency do
       "bundler",
       "1.2.3",
       "http://rubygems.org/gems/bundler-1.2.3.gem",
-      1234,
       "MIT",
       "https://bundler.io"
     )
