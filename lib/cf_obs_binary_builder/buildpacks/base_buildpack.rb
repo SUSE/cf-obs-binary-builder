@@ -1,6 +1,8 @@
 class CfObsBinaryBuilder::BaseBuildpack
   attr_reader :name, :version, :obs_package
 
+  BASE_STACK = "cflinuxfs2"
+
   def initialize(name, version)
     @name = name
     @version = version
@@ -22,7 +24,7 @@ class CfObsBinaryBuilder::BaseBuildpack
 
   def manifest_dependencies
     parsed_manifest["dependencies"]
-      .select { |dep| dep["cf_stacks"].include?("cflinuxfs2") }
+      .select { |dep| dep["cf_stacks"].include?(BASE_STACK) }
       .map { |dep| parse_dependency(dep) }
   end
 
