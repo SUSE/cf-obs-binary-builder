@@ -42,7 +42,7 @@ class CfObsBinaryBuilder::BaseDependency
   end
 
   def prepare_sources
-    log 'Downloading the sources in the package directory...'
+    log "Downloading the sources in the package directory... (#{source})"
     File.write(File.basename(source), open(source).read)
   end
 
