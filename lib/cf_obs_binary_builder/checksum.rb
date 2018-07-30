@@ -7,6 +7,20 @@ class CfObsBinaryBuilder::Checksum
         "fetch_source" => true
       }
     },
+    "glide" => {
+      "type" => "github_releases",
+      "params" => {
+        "repo" => 'Masterminds/glide',
+        "fetch_source" => true
+      }
+    },
+    "godep" => {
+      "type" => "github_releases",
+      "params" => {
+        "repo" => 'tools/godep',
+        "fetch_source" => true
+      }
+    },
     "bundler" => {
       "type" => "rubygems"
     }

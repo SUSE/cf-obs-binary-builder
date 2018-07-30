@@ -3,7 +3,7 @@ class CfObsBinaryBuilder::Godep < CfObsBinaryBuilder::GoDependency
     super(
       "godep",
       version,
-      "https://github.com/tools/godep/archive/#{version}.tar.gz"
+      "https://github.com/tools/godep/archive/v#{version}.tar.gz"
     )
   end
 end

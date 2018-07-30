@@ -3,7 +3,7 @@ class CfObsBinaryBuilder::Glide < CfObsBinaryBuilder::GoDependency
     super(
       "glide",
       version,
-      "https://github.com/Masterminds/glide/archive/#{version}.tar.gz"
+      "https://github.com/Masterminds/glide/archive/v#{version}.tar.gz"
     )
   end
 end
