@@ -93,7 +93,11 @@ module CfObsBinaryBuilder
     end
 
     manifest_path = args.shift
-    Syncer.new(manifest_path).sync
+    unknown = Syncer.new(manifest_path).sync
+    if !unknown.empty?
+      puts "Encountered unknown dependencies: #{unknown.join(",")}"
+      exit 1
+    end
   end
 
   def self.get_build_target(dependency)

@@ -7,18 +7,38 @@ class CfObsBinaryBuilder::Syncer
     @manifest_path = manifest_path
   end
 
+  # Returns a list of unknown dependencies (for which a class should be created)
   def sync
-    missing_deps.each do |dep|
+    missing, unknown = missing_deps
+    missing.each do |dep|
+      puts "Creating package for #{dep.package_name}"
       checksum = CfObsBinaryBuilder::Checksum.for(dep.dependency, dep.version)
       dep.run(checksum)
     end
+
+    return unknown
   end
 
   def missing_deps
     dependencies = stack_dependencies_from_manifest
-    dependencies
-      .map { |hash| dependency_for(hash) }
-      .select { |dep| !dep.obs_package.exists? }
+    missing_deps = []
+    unknown_deps = []
+
+    dependencies.each do |hash|
+      dep = dependency_for(hash)
+      if dep
+        puts "Checking if #{dep.package_name} exists"
+        if !dep.obs_package.exists?
+          missing_deps << dep
+        else
+          puts "Already exists"
+        end
+      else
+        unknown_deps << hash["name"]
+      end
+    end
+
+    [missing_deps, unknown_deps.uniq]
   end
 
   private
@@ -52,6 +72,7 @@ class CfObsBinaryBuilder::Syncer
     else
       dep_class = CfObsBinaryBuilder.get_build_target("CfObsBinaryBuilder::#{hash_from_manifest["name"].capitalize}")
     end
-    dependency = dep_class.new(version)
+
+    dep_class.nil? ? nil : dep_class.new(version)
   end
 end
