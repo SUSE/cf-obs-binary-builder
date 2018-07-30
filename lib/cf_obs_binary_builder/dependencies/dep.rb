@@ -3,7 +3,7 @@ class CfObsBinaryBuilder::Dep < CfObsBinaryBuilder::GoDependency
     super(
       "dep",
       version,
-      "https://github.com/golang/dep/archive/#{version}.tar.gz"
+      "https://github.com/golang/dep/archive/v#{version}.tar.gz"
     )
   end
 end
