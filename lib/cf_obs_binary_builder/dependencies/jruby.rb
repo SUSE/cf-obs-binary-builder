@@ -2,10 +2,8 @@ class CfObsBinaryBuilder::Jruby < CfObsBinaryBuilder::BaseDependency
   attr_reader :jruby_version, :ruby_version
 
   def initialize(version)
-    raise "Invalid version" unless version.match(/ruby-(.*)-jruby-(.*)/)
-
-    @jruby_version = version.match(/jruby-(.*)/)[1]
-    @ruby_version = version.match(/ruby-([^-]*)-/)[1]
+    raise "Invalid version" unless @ruby_version = ruby_from_jruby_version(version)
+    @jruby_version = version
 
     super(
       "jruby",
@@ -32,6 +30,16 @@ class CfObsBinaryBuilder::Jruby < CfObsBinaryBuilder::BaseDependency
         end
         FileUtils.cp "packages/#{dependency}-kit/#{dependency}-kit.tar.xz", working_dir
       end
+    end
+  end
+
+  private
+
+  def ruby_from_jruby_version(jruby_version)
+    if jruby_version =~ /9.1.*/
+      '2.3'
+    elsif jruby_version =~ /9.2.*/
+      '2.5'
     end
   end
 end

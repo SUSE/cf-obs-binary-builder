@@ -52,15 +52,7 @@ class CfObsBinaryBuilder::BaseBuildpack
   end
 
   def parse_dependency(dep)
-    if dep["name"] == "jruby"
-      jruby_version = dep["version"].match(/jruby-(.*)/)[1]
-      ruby_version = dep["version"].match(/ruby-([^-]*)-/)[1]
-
-      {
-        name: dep["name"],
-        version: "#{jruby_version}_ruby#{ruby_version}"
-      }
-    elsif dep["name"].start_with?("openjdk")
+    if dep["name"].start_with?("openjdk")
       {
         name: "openjdk",
         version: dep["uri"].match(/openjdk-([0-9._]+)-/)[1]
@@ -71,6 +63,5 @@ class CfObsBinaryBuilder::BaseBuildpack
         version: dep["version"]
       }
     end
-
   end
 end

@@ -7,8 +7,8 @@ describe CfObsBinaryBuilder::Jruby do
     end
 
     it "parses the ruby and the jruby version" do
-      jruby = CfObsBinaryBuilder::Jruby.new "ruby-2.5.0-jruby-9.2.0.0"
-      expect(jruby.ruby_version).to eq("2.5.0")
+      jruby = CfObsBinaryBuilder::Jruby.new "9.2.0.0"
+      expect(jruby.ruby_version).to eq("2.5")
       expect(jruby.jruby_version).to eq("9.2.0.0")
     end
   end
