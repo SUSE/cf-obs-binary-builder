@@ -30,7 +30,7 @@ describe CfObsBinaryBuilder::Syncer do
 
     it "returns unknown dependencies" do
       allow_any_instance_of(CfObsBinaryBuilder::Syncer).to receive(:dependency_for).and_wrap_original do |original, *args|
-        if args[0]["name"] = "bundler"
+        if args[0]["name"] == "bundler"
           nil
         else
           original.call(*args)
