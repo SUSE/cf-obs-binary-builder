@@ -19,6 +19,7 @@ require_relative 'cf_obs_binary_builder/dependencies/scm_dependency'
 require_relative 'cf_obs_binary_builder/obs_package'
 require_relative 'cf_obs_binary_builder/syncer'
 require_relative 'cf_obs_binary_builder/checksum'
+require_relative 'cf_obs_binary_builder/manifest'
 
 [
   File.join(File.dirname(__FILE__), "cf_obs_binary_builder/dependencies/*"),

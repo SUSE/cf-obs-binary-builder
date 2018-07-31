@@ -1,7 +1,7 @@
 class CfObsBinaryBuilder::BaseBuildpack
   attr_reader :name, :version, :obs_package
 
-  BASE_STACK = "cflinuxfs2"
+  BUILD_STACKS = [ "cflinuxfs2", "sle12", "opensuse42" ]
 
   def initialize(name, version)
     @name = name
@@ -15,17 +15,14 @@ class CfObsBinaryBuilder::BaseBuildpack
   def run
     obs_package.create
     obs_package.checkout do
-      prepare_sources
+      manifest = prepare_sources
+      manifest.populate!
+      manifest.write("manifest.yml")
+
       write_spec_file
       obs_package.commit
     end
     log 'Done!'
-  end
-
-  def manifest_dependencies
-    parsed_manifest["dependencies"]
-      .select { |dep| dep["cf_stacks"].include?(BASE_STACK) }
-      .map { |dep| parse_dependency(dep) }
   end
 
   private
@@ -42,26 +39,10 @@ class CfObsBinaryBuilder::BaseBuildpack
   end
 
   def prepare_sources
-    system("wget https://github.com/SUSE/cf-#{name}-buildpack/archive/v#{version}.tar.gz -O v#{version}.tar.gz")
+    system("wget https://github.com/cloudfoundry/#{name}-buildpack/archive/v#{version}.tar.gz -O v#{version}.tar.gz")
     # Extract manifest.yml from the tarball so that its dependencies can be parsed
     system("tar xfv v#{version}.tar.gz cf-#{name}-buildpack-#{version}/manifest.yml --strip-components=1")
-  end
 
-  def parsed_manifest
-    YAML.load_file("manifest.yml")
-  end
-
-  def parse_dependency(dep)
-    if dep["name"].start_with?("openjdk")
-      {
-        name: "openjdk",
-        version: dep["uri"].match(/openjdk-([0-9._]+)-/)[1]
-      }
-    else
-      {
-        name: dep["name"],
-        version: dep["version"]
-      }
-    end
+    CfObsBinaryBuilder::Manifest.new("manifest.yml")
   end
 end

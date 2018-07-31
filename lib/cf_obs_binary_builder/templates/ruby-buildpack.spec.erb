@@ -25,8 +25,9 @@ Group:          Cloud/Platform/scf
 Url:            https://github.com/SUSE/cf-ruby-buildpack
 Source:         https://github.com/SUSE/cf-ruby-buildpack/archive/v%{version}.tar.gz
 BuildRequires: go
-<% manifest_dependencies.each do |dependency| %>
-BuildRequires: <%= dependency[:name] %>-<%= dependency[:version] %>
+<% dependencies = manifest.dependencies.first
+<% dependencies.each do |dependency| %>
+BuildRequires: <%= dependency.package_name %>
 <% end %>
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
