@@ -41,6 +41,13 @@ EOF
 
   # Checks if this package already exists on OBS under @obs_project
   def exists?
-    system("osc search --package #{@name} | grep #{@obs_project} > /dev/null")
+    system("osc search --package #{@name} | grep #{obs_project} > /dev/null")
+  end
+
+  def build_succeeded?
+    output, status = Open3.capture2e("osc prjresults #{obs_project} -c | grep #{name}")
+    raise "Error getting project results: #{output}" unless status.exitstatus == 0
+    results = output.split(";")[1..-1]
+    results.all? { |r| r.strip == "succeeded" }
   end
 end
