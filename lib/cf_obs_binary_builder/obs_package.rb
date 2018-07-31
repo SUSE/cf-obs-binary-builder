@@ -50,4 +50,29 @@ EOF
     results = output.split(";")[1..-1]
     results.all? { |r| r.strip == "succeeded" }
   end
+
+  def artifact_checksum(stack)
+    obs_repository = case stack
+    when "sle12"
+      "SLE_12_SP3"
+    when "opensuse42"
+      "openSUSE_Leap_42.3"
+    else
+      raise "unknown stack: #{stack}"
+    end
+
+    checksum_file, status = Open3.capture2e("osc ls -b #{obs_project} #{name} #{obs_repository} x86_64 | grep sha256")
+    raise "Error getting checksum filename: #{checksum_file}" unless status.exitstatus == 0
+
+    checksum = nil
+    Dir.mktmpdir do
+      output, status = Open3.capture2e("osc getbinaries -d . #{obs_project} #{name} #{obs_repository} x86_64 #{checksum_file}")
+      raise "Could not get binary #{checksum_file}" unless status.exitstatus == 0
+      checksum = File.read(checksum_file)[/(\w+) .*#{name}.*/, 1]
+    end
+
+    raise "Error extracting checksum" unless checksum
+
+    checksum
+  end
 end
