@@ -39,7 +39,8 @@ export GOROOT_BOOTSTRAP=/usr/lib64/go1.4
 cp %{SOURCE1} ../../
 TARBALL=/home/abuild/rpmbuild/OTHER/%{name}.tgz
 tar czf ${TARBALL} -C ../../ go sources.yml --owner=0 --group=0
-CHECKSUM=`sha256sum ${TARBALL} | cut -d' ' -f1`
+CHECKSUM=`sha256sum ${TARBALL}`
+echo $CHECKSUM > /home/abuild/rpmbuild/OTHER/%{name}-linux-x64-${CHECKSUM:0:8}.sha256
 mv ${TARBALL} /home/abuild/rpmbuild/OTHER/%{name}-linux-amd64-${CHECKSUM:0:8}.tgz
 
 %files

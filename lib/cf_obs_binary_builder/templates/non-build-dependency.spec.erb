@@ -33,7 +33,12 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 %build
 
 %install
+BASENAME=${SOURCE0%.*}
 cp %{SOURCE0} /home/abuild/rpmbuild/OTHER/
+TARBALL=/home/abuild/rpmbuild/OTHER/%{SOURCE0}
+CHECKSUM=`sha256sum ${TARBALL}`
+echo $CHECKSUM > /home/abuild/rpmbuild/OTHER/%{BASENAME}-${CHECKSUM:0:8}.sha256
+mv ${TARBALL} /home/abuild/rpmbuild/OTHER/%{BASENAME}-${CHECKSUM:0:8}.tgz
 
 %post
 %postun

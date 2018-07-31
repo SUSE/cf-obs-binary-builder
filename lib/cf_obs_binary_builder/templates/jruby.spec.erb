@@ -56,7 +56,11 @@ mvn -P '!truffle' -Djruby.default.ruby.version=<%= ruby_version %> \
   --settings kit/m2/settings.xml \
 
 %install
-tar czvf /home/abuild/rpmbuild/OTHER/jruby-%{version}.tgz -C %{destdir} bin/ lib/ sources.yml --owner=0 --group=0
+TARBALL=/home/abuild/rpmbuild/OTHER/jruby-%{version}.tgz
+tar czvf ${TARBALL} -C %{destdir} bin/ lib/ sources.yml --owner=0 --group=0
+CHECKSUM=`sha256sum ${TARBALL}`
+echo $CHECKSUM > /home/abuild/rpmbuild/OTHER/jruby-%{version}-${CHECKSUM:0:8}.sha256
+mv ${TARBALL} /home/abuild/rpmbuild/OTHER/jruby-%{version}-${CHECKSUM:0:8}.tgz
 
 %post
 %postun

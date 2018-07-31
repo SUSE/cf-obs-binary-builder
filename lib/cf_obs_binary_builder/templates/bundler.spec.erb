@@ -45,7 +45,11 @@ rm -rf cache/bundler-%{version}.gem
 %install
 mkdir -p %{buildroot}/var/binary-builder
 cd %{_builddir}
-tar czvf /home/abuild/rpmbuild/OTHER/%{mod_full_name}.tgz . --owner=0 --group=0
+TARBALL=/home/abuild/rpmbuild/OTHER/%{mod_full_name}.tgz
+tar czvf ${TARBALL} . --owner=0 --group=0
+CHECKSUM=`sha256sum ${TARBALL}`
+echo $CHECKSUM > /home/abuild/rpmbuild/OTHER/%{mod_full_name}-${CHECKSUM:0:8}.sha256
+mv ${TARBALL} /home/abuild/rpmbuild/OTHER/%{mod_full_name}-${CHECKSUM:0:8}.tgz
 
 %post
 %postun

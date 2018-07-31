@@ -50,7 +50,8 @@ cp %{SOURCE1} ${APP_PATH}
 
 TARBALL=/home/abuild/rpmbuild/OTHER/%{name}.tgz
 tar czf ${TARBALL} -C ${APP_PATH} . --owner=0 --group=0
-CHECKSUM=`sha256sum ${TARBALL} | cut -d' ' -f1`
+CHECKSUM=`sha256sum ${TARBALL}`
+echo $CHECKSUM > /home/abuild/rpmbuild/OTHER/%{name}-linux-x64-${CHECKSUM:0:8}.sha256
 mv ${TARBALL} /home/abuild/rpmbuild/OTHER/%{name}-linux-x64-${CHECKSUM:0:8}.tgz
 
 %post

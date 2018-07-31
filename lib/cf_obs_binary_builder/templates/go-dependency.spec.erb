@@ -41,7 +41,8 @@ cp ../go/bin/<%= dependency %> bin/
 cp `find -iname LICENSE -maxdepth 1` bin/
 TARBALL=/home/abuild/rpmbuild/OTHER/%{name}.tgz
 tar czf ${TARBALL} bin sources.yml --owner=0 --group=0
-CHECKSUM=`sha256sum ${TARBALL} | cut -d' ' -f1`
+CHECKSUM=`sha256sum ${TARBALL}`
+echo $CHECKSUM > /home/abuild/rpmbuild/OTHER/%{name}-linux-x64-${CHECKSUM:0:8}.sha256
 mv ${TARBALL} /home/abuild/rpmbuild/OTHER/%{name}-linux-x64-${CHECKSUM:0:8}.tgz
 
 %files
