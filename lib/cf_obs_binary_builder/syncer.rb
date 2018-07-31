@@ -9,7 +9,7 @@ class CfObsBinaryBuilder::Syncer
 
   # Returns a list of unknown dependencies (for which a class should be created)
   def sync
-    missing, unknown = missing_deps
+    _, missing, unknown = dependencies
     missing.each do |dep|
       puts "Creating package for #{dep.package_name}"
       checksum = CfObsBinaryBuilder::Checksum.for(dep.dependency, dep.version)
@@ -19,26 +19,40 @@ class CfObsBinaryBuilder::Syncer
     return unknown
   end
 
-  def missing_deps
+  # Re-generates the spec files for all (existing) dependencies on OBS.
+  # Should be used when something is changed on the dependency templates.
+  def regenerate_specs
+    existing_deps, _, _ = dependencies
+
+    existing_deps.each do |dep|
+      dep.regenerate_spec
+    end
+  end
+
+  def dependencies
     dependencies = stack_dependencies_from_manifest
     missing_deps = []
     unknown_deps = []
+    existing_deps = []
 
     dependencies.each do |hash|
+      print "Checking #{hash["name"]}-#{hash["version"]}..."
       dep = dependency_for(hash)
       if dep
-        puts "Checking if #{dep.package_name} exists"
         if !dep.obs_package.exists?
+          puts " doesn't exist"
           missing_deps << dep
         else
-          puts "Already exists"
+          puts " exists"
+          existing_deps << dep
         end
       else
+        puts " unknown dependency"
         unknown_deps << hash["name"]
       end
     end
 
-    [missing_deps, unknown_deps.uniq]
+    [existing_deps, missing_deps, unknown_deps.uniq]
   end
 
   private

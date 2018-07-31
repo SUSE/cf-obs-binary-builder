@@ -22,6 +22,13 @@ class CfObsBinaryBuilder::BaseDependency
     log 'Done!'
   end
 
+  def regenerate_spec
+    obs_package.checkout do
+      write_spec_file
+      obs_package.commit
+    end
+  end
+
   def write_sources_yaml
     if !@validated_checksum
       raise "Checksum not validated, won't write to yaml"

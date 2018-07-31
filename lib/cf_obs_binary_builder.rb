@@ -50,12 +50,15 @@ module CfObsBinaryBuilder
 
   def self.run(*args)
     type = args.shift
-    if type == "dependency"
+    case type
+    when "dependency"
       build_dependency(args)
-    elsif type == "buildpack"
+    when "buildpack"
       build_buildpack(args)
-    elsif type == "sync"
+    when "sync"
       sync(args)
+    when "regenerate-specs"
+      regenerate_specs(args)
     else
       print_usage
     end
@@ -100,6 +103,15 @@ module CfObsBinaryBuilder
     end
   end
 
+  def self.regenerate_specs(args)
+    if args.length != 1
+      abort "Wrong number of arguments, please specify: manifest_path"
+    end
+
+    manifest_path = args.shift
+    Syncer.new(manifest_path).regenerate_specs
+  end
+
   def self.get_build_target(dependency)
     const_get(dependency)
   rescue NameError
@@ -117,6 +129,9 @@ USAGE:
 
   #{File.basename($0)} sync <manifest_path>
     Create missing OBS packages for all dependencies in the given manifest.
+
+  #{File.basename($0)} regenerate-specs <manifest_path>
+    Regenerate the spec files for all (existing) dependencies on OBS.
 EOF
   end
 end

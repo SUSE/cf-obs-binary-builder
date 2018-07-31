@@ -20,9 +20,9 @@ describe CfObsBinaryBuilder::Syncer do
     end
   end
 
-  describe "#missing_deps" do
+  describe "#dependencies" do
     it "returns missing dependencies" do
-      missing_deps, _ = subject.missing_deps
+      _, missing_deps, _ = subject.dependencies
       expect(missing_deps.length).to eq(1)
       expect(missing_deps.first).to be_a(CfObsBinaryBuilder::Bundler)
       expect(missing_deps.first.version).to eq("1.16.2")
@@ -36,7 +36,8 @@ describe CfObsBinaryBuilder::Syncer do
           original.call(*args)
         end
       end
-      _, unknown_deps = subject.missing_deps
+      _, _, unknown_deps = subject.dependencies
+
       expect(unknown_deps).to eq(["bundler"])
     end
   end
