@@ -28,9 +28,12 @@ EOF
 
   def checkout(&block)
     log 'Checking out the package with osc...'
-    `osc checkout #{obs_project}/#{name} -o #{name}`
-    Dir.chdir(name)
-    block.call
+    Dir.mktmpdir(CfObsBinaryBuilder::TMP_DIR_SUFFIX) do |tmpdir|
+      Dir.chdir(tmpdir)
+      `osc checkout #{obs_project}/#{name} -o #{name}`
+      Dir.chdir(name)
+      block.call
+    end
   end
 
   def commit
