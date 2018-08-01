@@ -50,8 +50,15 @@ class CfObsBinaryBuilder::Manifest
       if dependency.obs_package.build_succeeded?
         puts "available"
         (BUILD_STACKS-[BASE_STACK]).each do |stack|
-          checksum = dependency.obs_package.artifact_checksum(stack)
-          puts "#{dependency.package_name} #{stack}: #{checksum}"
+          artifact = dependency.obs_package.artifact(stack)
+
+          hash["dependencies"] << {
+            "name" => name_to_manifest(dependency.dependency),
+            "version" => dependency.version,
+            "uri" => artifact[:uri],
+            "sha256" => artifact[:checksum],
+            "cf_stacks" => [stack]
+          }
         end
       else
         puts "not available"
@@ -86,6 +93,10 @@ class CfObsBinaryBuilder::Manifest
     else
       dep_hash["version"]
     end
+  end
+
+  def name_to_manifest(name)
+    name == "openjdk" ? "openjdk1.8-latest" : name
   end
 
   def dependency_for(hash_from_manifest)

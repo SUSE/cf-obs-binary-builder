@@ -1,5 +1,5 @@
 #
-# spec file for the ruby buildpack
+# spec file for the <%= name %> buildpack
 #
 # Copyright (c) 2018 SUSE LINUX GmbH, Nuernberg, Germany.
 #
@@ -16,16 +16,16 @@
 #
 
 
-Name:           ruby-buildpack
+Name:           <%= name %>-buildpack
 Version:        <%= version %>
 Release:        1
-Summary:        Cloud Foundry buildpack for Ruby, Sinatra and Rails
+Summary:        Cloud Foundry buildpack for <%= name %>
 License:        Apache-2.0
 Group:          Cloud/Platform/scf
-Url:            https://github.com/SUSE/cf-ruby-buildpack
-Source:         https://github.com/SUSE/cf-ruby-buildpack/archive/v%{version}.tar.gz
+Url:            https://github.com/SUSE/cf-<%= name %>-buildpack
+Source:         https://github.com/SUSE/cf-<%= name %>-buildpack/archive/v%{version}.tar.gz
 BuildRequires: go
-<% dependencies = manifest.dependencies.first
+<% dependencies = manifest.dependencies.first %>
 <% dependencies.each do |dependency| %>
 BuildRequires: <%= dependency.package_name %>
 <% end %>
@@ -34,16 +34,16 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 %description
 
 %prep
-%setup -q -n cf-%{name}-%{version}
+%setup -q -n %{name}-%{version}
 
 %build
 source ./.envrc
-(cd src/ruby/vendor/github.com/cloudfoundry/libbuildpack/packager/buildpack-packager && go install)
+(cd src/<%= name %>/vendor/github.com/cloudfoundry/libbuildpack/packager/buildpack-packager && go install)
 buildpack-packager build -any-stack
 
 %install
-CHECKSUM=`sha1sum ruby_buildpack-v%{version}.zip | cut -d' ' -f1`
-mv ruby_buildpack-v%{version}.zip /home/abuild/rpmbuild/OTHER/ruby_buildpack-v%{version}-${CHECKSUM:0:8}.zip
+CHECKSUM=`sha1sum <%= name %>_buildpack-v%{version}.zip | cut -d' ' -f1`
+mv <%= name %>_buildpack-v%{version}.zip /home/abuild/rpmbuild/OTHER/<%= name %>_buildpack-v%{version}-${CHECKSUM:0:8}.zip
 
 %post
 %postun
