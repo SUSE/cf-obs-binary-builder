@@ -61,7 +61,7 @@ EOF
       raise "unknown stack: #{stack}"
     end
 
-    checksum_file, status = Open3.capture2e("osc ls -b #{obs_project} #{name} #{obs_repository} x86_64 | grep #{name} | grep sha256")
+    checksum_file, status = Open3.capture2e("osc ls -b #{obs_project} #{name} #{obs_repository} x86_64 | grep sha256")
     raise "Error getting checksum filename: #{checksum_file}" unless status.exitstatus == 0
 
     checksum_file.strip!
