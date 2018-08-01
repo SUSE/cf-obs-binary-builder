@@ -75,7 +75,7 @@ tar czvf ${TARBALL2} -C build/linux-x86_64-normal-server-release/images/j2re-ima
 #CHECKSUM1=`sha256sum ${TARBALL1}`
 CHECKSUM2=`sha256sum ${TARBALL2}`
 #echo $CHECKSUM1 > /home/abuild/rpmbuild/OTHER/%{full_jdk_name}-%{version}.sha256
-echo $CHECKSUM2 > /home/abuild/rpmbuild/OTHER/%{full_name}-%{version}.sha256
+echo $CHECKSUM2 > /home/abuild/rpmbuild/OTHER/$(basename $TARBALL2).sha256
 #mv ${TARBALL1} /home/abuild/rpmbuild/OTHER/%{full_jdk_name}-%{version}-${CHECKSUM1:0:8}.tar.gz
 mv ${TARBALL2} /home/abuild/rpmbuild/OTHER/%{full_name}-%{version}-${CHECKSUM2:0:8}.tar.gz
 
