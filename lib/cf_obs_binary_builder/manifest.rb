@@ -30,14 +30,17 @@ class CfObsBinaryBuilder::Manifest
         unknown_deps << dep_hash["name"]
       end
     end
-
     [existing_deps, missing_deps, unknown_deps.uniq]
   end
 
   def populate!
     existing, missing, unknown = dependencies
 
-    return false if missing.any? || unknown.any?
+    if missing.any? || unknown.any?
+      missing_deps = missing.map(&:package_name).join(", ")
+      unknown_deps = unknown.join(", ")
+      raise("Missing or unknown dependencies encountered.\nMissing: #{missing_deps}\nUnknown: #{unknown_deps}")
+    end
 
     existing.each do |dependency|
       print "Checking #{dependency.package_name}... "

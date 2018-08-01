@@ -33,12 +33,19 @@ describe CfObsBinaryBuilder::Manifest do
   end
 
   describe "#populate!" do
-    it "fails if some dependencies are not available yet" do
+    it "raises if some dependencies are missing or unknown" do
       allow_any_instance_of(CfObsBinaryBuilder::ObsPackage).to receive(:exists?) do |obj|
         obj.name != "bundler-1.16.2"
       end
+      allow_any_instance_of(described_class).to receive(:dependency_for).and_wrap_original do |original, *args|
+        if args[0]["name"] == "node"
+          nil
+        else
+          original.call(*args)
+        end
+      end
 
-      expect(subject.populate!).to be(false)
+      expect { subject.populate! }.to raise_error(/Missing: bundler-1.16.2.*Unknown: node/m)
     end
 
     it "adds dependencies for sle12 and opensuse42" do
