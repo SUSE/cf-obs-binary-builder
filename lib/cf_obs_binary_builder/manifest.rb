@@ -35,10 +35,25 @@ class CfObsBinaryBuilder::Manifest
   end
 
   def populate!
-    base_deps = hash["dependencies"]
-      .select { |dep| dep["cf_stacks"].include?(BASE_STACK) }
+    existing, missing, unknown = dependencies
 
-    false
+    return false if missing.any? || unknown.any?
+
+    existing.each do |dependency|
+      print "Checking #{dependency.package_name}... "
+      if dependency.obs_package.build_succeeded?
+        puts "available"
+        (BUILD_STACKS-[BASE_STACK]).each do |stack|
+          checksum = dependency.obs_package.artifact_checksum(stack)
+          puts "#{dependency.package_name} #{stack}: #{checksum}"
+        end
+      else
+        puts "not available"
+        return false
+      end
+    end
+
+    true
   end
 
   def write(path)

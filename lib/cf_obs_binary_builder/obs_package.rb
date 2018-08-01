@@ -41,7 +41,7 @@ EOF
 
   # Checks if this package already exists on OBS under @obs_project
   def exists?
-    system("osc search --package #{@name} | grep #{obs_project} > /dev/null")
+    system("osc search --package #{name} | grep #{obs_project} > /dev/null")
   end
 
   def build_succeeded?
@@ -61,14 +61,15 @@ EOF
       raise "unknown stack: #{stack}"
     end
 
-    checksum_file, status = Open3.capture2e("osc ls -b #{obs_project} #{name} #{obs_repository} x86_64 | grep sha256")
+    checksum_file, status = Open3.capture2e("osc ls -b #{obs_project} #{name} #{obs_repository} x86_64 | grep #{name} | grep sha256")
     raise "Error getting checksum filename: #{checksum_file}" unless status.exitstatus == 0
 
+    checksum_file.strip!
     checksum = nil
-    Dir.mktmpdir do
-      output, status = Open3.capture2e("osc getbinaries -d . #{obs_project} #{name} #{obs_repository} x86_64 #{checksum_file}")
+    Dir.mktmpdir do |tmpdir|
+      output, status = Open3.capture2e("osc getbinaries -d #{tmpdir} #{obs_project} #{name} #{obs_repository} x86_64 #{checksum_file}")
       raise "Could not get binary #{checksum_file}" unless status.exitstatus == 0
-      checksum = File.read(checksum_file)[/(\w+) .*#{name}.*/, 1]
+      checksum = File.read(File.join(tmpdir, checksum_file))[/(\w+) .*#{name}.*/, 1]
     end
 
     raise "Error extracting checksum" unless checksum
