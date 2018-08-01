@@ -15,11 +15,11 @@
 # Please submit bugfixes or comments via http://bugs.opensuse.org/
 #
 
-Name:           openjdk-<%= "1.#{minor_version}.0_#{update_version}" %>
+%define full_name openjdk-<%= "1.#{minor_version}.0_#{update_version}" %>
+%define full_jdk_name openjdk-jdk-<%= "1.#{minor_version}.0_#{update_version}" %>
+Name:           %{full_name}
 Version:        <%= "#{minor_version}.#{update_version}b#{build_number}" %>
 Release:        1
-%define mod_name %{name}
-%define mod_full_name %{mod_name}-%{version}
 Summary: This is the openjdk binary used in buildpacks in SUSE CloudFoundry (SCF)
 License:        GPL-2.0-with-classpath-exception
 Group:          Cloud/Platform/scf
@@ -67,17 +67,17 @@ COMPANY_NAME="SUSE LINUX GmbH" make images
 
 %install
 chmod -R a+r build/linux-x86_64-normal-server-release/images
-TARBALL1=/home/abuild/rpmbuild/OTHER/openjdk-jdk-%{version}.tar.gz
-TARBALL2=/home/abuild/rpmbuild/OTHER/openjdk-%{version}.tar.gz
+TARBALL1=/home/abuild/rpmbuild/OTHER/%{full_jdk_name}-%{version}.tar.gz
+TARBALL2=/home/abuild/rpmbuild/OTHER/%{full_name}-%{version}.tar.gz
 tar czvf ${TARBALL1} -C build/linux-x86_64-normal-server-release/images/j2sdk-image . --owner=0 --group=0
 tar czvf ${TARBALL2} -C build/linux-x86_64-normal-server-release/images/j2re-image . -C ../j2sdk-image ./lib/tools.jar ./bin/jcmd ./bin/jmap ./bin/jstack ./man/man1/jcmd.1 ./man/man1/jmap.1 ./man/man1/jstack.1 -C ./jre ./lib/amd64/libattach.so --owner=0 --group=0
 
 CHECKSUM1=`sha256sum ${TARBALL1}`
 CHECKSUM2=`sha256sum ${TARBALL2}`
-echo $CHECKSUM1 > /home/abuild/rpmbuild/OTHER/openjdk-jdk-%{version}.sha256
-echo $CHECKSUM2 > /home/abuild/rpmbuild/OTHER/openjdk-%{version}.sha256
-mv ${TARBALL1} /home/abuild/rpmbuild/OTHER/openjdk-jdk-%{version}-${CHECKSUM1:0:8}.tar.gz
-mv ${TARBALL2} /home/abuild/rpmbuild/OTHER/openjdk-%{version}-${CHECKSUM2:0:8}.tar.gz
+echo $CHECKSUM1 > /home/abuild/rpmbuild/OTHER/%{full_jdk_name}-%{version}.sha256
+echo $CHECKSUM2 > /home/abuild/rpmbuild/OTHER/%{full_name}-%{version}.sha256
+mv ${TARBALL1} /home/abuild/rpmbuild/OTHER/%{full_jdk_name}-%{version}-${CHECKSUM1:0:8}.tar.gz
+mv ${TARBALL2} /home/abuild/rpmbuild/OTHER/%{full_name}-%{version}-${CHECKSUM2:0:8}.tar.gz
 
 %post
 %postun

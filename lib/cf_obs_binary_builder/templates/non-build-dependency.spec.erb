@@ -21,7 +21,7 @@ Version:        <%= version %>
 Release:        1
 License:        <%= license %>
 Group:          Cloud/Platform/scf
-Summary:        Automatic build of <%= dependency %> for the use in buildpacks in SCF.
+Summary:        Automatic build of <%= dependency %> for the use in buildpacks in SCF
 Url:            <%= url %>
 Source:         <%= source %>
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -33,12 +33,13 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 %build
 
 %install
-BASENAME=${SOURCE0%.*}
-cp %{SOURCE0} /home/abuild/rpmbuild/OTHER/
-TARBALL=/home/abuild/rpmbuild/OTHER/%{SOURCE0}
+TARBALL=/home/abuild/rpmbuild/OTHER/$(basename %{SOURCE0})
+cp %{SOURCE0} ${TARBALL}
+BASENAME=$(basename ${TARBALL%.*})
+
 CHECKSUM=`sha256sum ${TARBALL}`
-echo $CHECKSUM > /home/abuild/rpmbuild/OTHER/%{BASENAME}-${CHECKSUM:0:8}.sha256
-mv ${TARBALL} /home/abuild/rpmbuild/OTHER/%{BASENAME}-${CHECKSUM:0:8}.tgz
+echo $CHECKSUM > /home/abuild/rpmbuild/OTHER/${BASENAME}-${CHECKSUM:0:8}.sha256
+mv ${TARBALL} /home/abuild/rpmbuild/OTHER/${BASENAME}-${CHECKSUM:0:8}.tgz
 
 %post
 %postun
