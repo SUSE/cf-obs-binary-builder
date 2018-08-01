@@ -10,6 +10,8 @@ class CfObsBinaryBuilder::Manifest
   end
 
   def dependencies
+    return @dependencies if @dependencies
+
     missing_deps = []
     unknown_deps = []
     existing_deps = []
@@ -30,7 +32,8 @@ class CfObsBinaryBuilder::Manifest
         unknown_deps << dep_hash["name"]
       end
     end
-    [existing_deps, missing_deps, unknown_deps.uniq]
+
+    @dependencies = [existing_deps, missing_deps, unknown_deps.uniq]
   end
 
   def populate!
