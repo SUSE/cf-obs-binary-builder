@@ -48,7 +48,7 @@ cd %{_builddir}
 TARBALL=/home/abuild/rpmbuild/OTHER/%{mod_full_name}.tgz
 tar czvf ${TARBALL} . --owner=0 --group=0
 CHECKSUM=`sha256sum ${TARBALL}`
-echo $CHECKSUM > /home/abuild/rpmbuild/OTHER/%{mod_full_name}-${CHECKSUM:0:8}.sha256
+echo $CHECKSUM > /home/abuild/rpmbuild/OTHER/%{mod_full_name}.sha256
 mv ${TARBALL} /home/abuild/rpmbuild/OTHER/%{mod_full_name}-${CHECKSUM:0:8}.tgz
 
 %post

@@ -47,7 +47,7 @@ make install %{?_smp_mflags} DESTDIR=${DESTDIR} PORTABLE=1
 TARBALL=/home/abuild/rpmbuild/OTHER/%{name}-linux-x64.tgz
 tar czvf ${TARBALL} -C /tmp/%{name} . --owner=0 --group=0
 CHECKSUM=`sha256sum ${TARBALL}`
-echo $CHECKSUM > /home/abuild/rpmbuild/OTHER/%{name}-linux-x64-${CHECKSUM:0:8}.sha256
+echo $CHECKSUM > /home/abuild/rpmbuild/OTHER/%{name}-linux-x64.sha256
 mv ${TARBALL} /home/abuild/rpmbuild/OTHER/%{name}-linux-x64-${CHECKSUM:0:8}.tgz
 
 %post

@@ -38,7 +38,7 @@ cp %{SOURCE0} ${TARBALL}
 BASENAME=$(basename ${TARBALL%.*})
 
 CHECKSUM=`sha256sum ${TARBALL}`
-echo $CHECKSUM > /home/abuild/rpmbuild/OTHER/${BASENAME}-${CHECKSUM:0:8}.sha256
+echo $CHECKSUM > /home/abuild/rpmbuild/OTHER/${BASENAME}.sha256
 mv ${TARBALL} /home/abuild/rpmbuild/OTHER/${BASENAME}-${CHECKSUM:0:8}.tgz
 
 %post
