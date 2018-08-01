@@ -1,11 +1,12 @@
 class CfObsBinaryBuilder::BaseBuildpack
-  attr_reader :name, :version, :obs_package, :manifest
+  attr_reader :name, :version, :upstream_version, :obs_package, :manifest
 
   BUILD_STACKS = [ "cflinuxfs2", "sle12", "opensuse42" ]
 
-  def initialize(name, version)
+  def initialize(name, upstream_version, revision = 1)
     @name = name
-    @version = version
+    @upstream_version = upstream_version
+    @version = "#{@upstream_version}.#{revision}"
 
     package_name = "#{name}-buildpack-#{version}"
     obs_project = ENV["OBS_BUILDPACK_PROJECT"] || raise("no OBS_BUILDPACK_PROJECT environment variable set")
@@ -39,10 +40,10 @@ class CfObsBinaryBuilder::BaseBuildpack
   end
 
   def prepare_sources
-    system("wget https://github.com/cloudfoundry/#{name}-buildpack/archive/v#{version}.tar.gz -O v#{version}.tar.gz")
+    system("wget https://github.com/cloudfoundry/#{name}-buildpack/archive/v#{upstream_version}.tar.gz -O v#{upstream_version}.tar.gz")
     Dir.mktmpdir do |tmpdir|
       # Extract manifest.yml from the tarball so that its dependencies can be parsed
-      system("tar xfv v#{version}.tar.gz -C #{tmpdir} #{name}-buildpack-#{version}/manifest.yml --strip-components=1")
+      system("tar xfv v#{upstream_version}.tar.gz -C #{tmpdir} #{name}-buildpack-#{upstream_version}/manifest.yml --strip-components=1")
 
       CfObsBinaryBuilder::Manifest.new(File.join(tmpdir, "manifest.yml"))
     end

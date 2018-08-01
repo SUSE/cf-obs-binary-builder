@@ -15,6 +15,7 @@
 # Please submit bugfixes or comments via http://bugs.opensuse.org/
 #
 
+%define upstream_version <%= upstream_version %>
 
 Name:           <%= name %>-buildpack
 Version:        <%= version %>
@@ -23,7 +24,7 @@ Summary:        Cloud Foundry buildpack for <%= name %>
 License:        Apache-2.0
 Group:          Cloud/Platform/scf
 Url:            https://github.com/SUSE/cf-<%= name %>-buildpack
-Source:         https://github.com/SUSE/cf-<%= name %>-buildpack/archive/v%{version}.tar.gz
+Source:         https://github.com/SUSE/cf-<%= name %>-buildpack/archive/v%{upstream_version}.tar.gz
 BuildRequires: go
 <% dependencies = manifest.dependencies.first %>
 <% dependencies.each do |dependency| %>
@@ -34,10 +35,11 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 %description
 
 %prep
-%setup -q -n %{name}-%{version}
+%setup -q -n %{name}-%{upstream_version}
 
 %build
 source ./.envrc
+echo %{version} > VERSION
 (cd src/<%= name %>/vendor/github.com/cloudfoundry/libbuildpack/packager/buildpack-packager && go install)
 buildpack-packager build -any-stack
 

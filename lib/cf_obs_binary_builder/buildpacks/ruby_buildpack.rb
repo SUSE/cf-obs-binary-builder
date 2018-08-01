@@ -1,5 +1,5 @@
 class CfObsBinaryBuilder::RubyBuildpack < CfObsBinaryBuilder::BaseBuildpack
-  def initialize(version)
-    super("ruby", version)
+  def initialize(upstream_version, revision)
+    super("ruby", upstream_version, revision)
   end
 end

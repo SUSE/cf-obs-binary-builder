@@ -1,5 +1,5 @@
 class CfObsBinaryBuilder::GoBuildpack < CfObsBinaryBuilder::BaseBuildpack
-  def initialize(version)
-    super("go", version)
+  def initialize(upstream_version, revision)
+    super("go", upstream_version, revision)
   end
 end

@@ -79,15 +79,15 @@ module CfObsBinaryBuilder
   end
 
   def self.build_buildpack(args)
-    if args.length != 2
-      abort "Wrong number of arguments, please specify: buildpack and version"
+    if args.length != 3
+      abort "Wrong number of arguments, please specify: buildpack, upstream-version and revision"
     end
     buildpack = get_build_target(args[0].capitalize + "Buildpack")
     abort "Buildpack #{args[0]} not supported!" unless buildpack
 
     Dir.mktmpdir(TMP_DIR_SUFFIX) do |tmpdir|
       Dir.chdir tmpdir
-      buildpack.new(args[1]).run
+      buildpack.new(args[1], args[2]).run
     end
   end
 
@@ -125,7 +125,7 @@ USAGE:
   #{File.basename($0)} dependency <dependency> <version> <checksum>
     Create a new package on OBS.
 
-  #{File.basename($0)} buildpack <buildpack> <version>
+  #{File.basename($0)} buildpack <buildpack> <upstream-version> <revision>
     Create a new buildpack on OBS.
 
   #{File.basename($0)} sync <manifest_path>

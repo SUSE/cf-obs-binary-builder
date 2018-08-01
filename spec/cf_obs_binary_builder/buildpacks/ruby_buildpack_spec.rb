@@ -1,5 +1,5 @@
 describe CfObsBinaryBuilder::RubyBuildpack do
-  let(:buildpack) { described_class.new("1.0.0") }
+  let(:buildpack) { described_class.new("1.0.0", 1) }
 
   describe "#initialize" do
     it "returns an instance" do
