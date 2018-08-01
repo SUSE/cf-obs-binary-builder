@@ -68,11 +68,12 @@ EOF
     checksum = nil
     Dir.mktmpdir do |tmpdir|
       output, status = Open3.capture2e("osc getbinaries -d #{tmpdir} #{obs_project} #{name} #{obs_repository} x86_64 #{checksum_file}")
-      raise "Could not get binary #{checksum_file}" unless status.exitstatus == 0
-      checksum = File.read(File.join(tmpdir, checksum_file))[/(\w+) .*#{name}.*/, 1]
-    end
+      raise "Could not get checksum file #{checksum_file}" unless status.exitstatus == 0
 
-    raise "Error extracting checksum" unless checksum
+      content = File.read(File.join(tmpdir, checksum_file))
+      checksum = content[/(\w{64}) .+/, 1]
+      raise "Error extracting checksum. File content:\n#{content}" unless checksum
+    end
 
     checksum
   end
