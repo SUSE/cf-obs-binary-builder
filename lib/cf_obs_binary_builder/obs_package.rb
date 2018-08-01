@@ -1,6 +1,8 @@
 class CfObsBinaryBuilder::ObsPackage
   attr_reader :name, :obs_project
 
+  ARTIFACT_EXTENSION_REGEXP=".tgz|.tar.gz|.tbz|tar.bz|.zip"
+
   def initialize(name, obs_project)
     @name = name
     @obs_project = obs_project
@@ -54,7 +56,31 @@ EOF
     results.all? { |r| r.strip == "succeeded" }
   end
 
-  def artifact_checksum(stack)
+  def artifact(stack)
+    obs_repository = repository_for_stack(stack)
+    checksum_file, artifact_file = artifact_filenames(stack)
+
+    artifact_uri = "https://download.opensuse.org/repositories/#{obs_project.gsub(":", ":/")}/#{obs_repository}/#{artifact_file}"
+
+    checksum = nil
+    Dir.mktmpdir do |tmpdir|
+      output, status = Open3.capture2e("osc getbinaries -d #{tmpdir} #{obs_project} #{name} #{obs_repository} x86_64 #{checksum_file}")
+      raise "Could not get checksum file #{checksum_file}:\n#{output}" unless status.exitstatus == 0
+
+      content = File.read(File.join(tmpdir, checksum_file))
+      checksum = content[/(\w{64}) .+/, 1]
+      raise "Error extracting checksum. File content:\n#{content}" unless checksum
+    end
+
+    {
+      checksum: checksum,
+      uri: artifact_uri
+    }
+  end
+
+  private
+
+  def repository_for_stack(stack)
     obs_repository = case stack
     when "sle12"
       "SLE_12_SP3"
@@ -63,21 +89,16 @@ EOF
     else
       raise "unknown stack: #{stack}"
     end
-
-    checksum_file, status = Open3.capture2e("osc ls -b #{obs_project} #{name} #{obs_repository} x86_64 | grep sha256")
-    raise "Error getting checksum filename: #{checksum_file}" unless status.exitstatus == 0
-
-    checksum_file.strip!
-    checksum = nil
-    Dir.mktmpdir do |tmpdir|
-      output, status = Open3.capture2e("osc getbinaries -d #{tmpdir} #{obs_project} #{name} #{obs_repository} x86_64 #{checksum_file}")
-      raise "Could not get checksum file #{checksum_file}" unless status.exitstatus == 0
-
-      content = File.read(File.join(tmpdir, checksum_file))
-      checksum = content[/(\w{64}) .+/, 1]
-      raise "Error extracting checksum. File content:\n#{content}" unless checksum
-    end
-
-    checksum
   end
+
+  def artifact_filenames(stack)
+    obs_repository = repository_for_stack(stack)
+    ls_output, status = Open3.capture2e("osc ls -b #{obs_project} #{name} #{obs_repository} x86_64")
+    raise "Error getting checksum filename: #{checksum_file}" unless status.exitstatus == 0
+    checksum_file = ls_output[/#{name}.+\.sha256$/].strip
+    artifact_file = ls_output[/#{name}.+[#{ARTIFACT_EXTENSION_REGEXP}]$/].strip
+
+    [checksum_file, artifact_file]
+  end
+
 end

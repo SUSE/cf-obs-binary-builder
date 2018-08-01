@@ -35,7 +35,7 @@ EOF
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA256
 
-f49c1def007f7aa1c282606e3e2937ef6f67ea90b48e8c062c1d011402930861 /home/abuild/rpmbuild/OTHER/bundler-1.16.2.tgz
+f49c1def007f7aa1c282606e3e2937ef6f67ea90b48e8c062c1d011402930861 /home/abuild/rpmbuild/OTHER/bundler-1.16.2-f49c1def.tgz
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.0.7 (GNU/Linux)
 
@@ -48,11 +48,15 @@ tgSb7SJYd6OpTsEM408iv7byfjIA+DVu/qGbwwk5rtV2oucA56Ne5w==
 =iOMP
 -----END PGP SIGNATURE-----
 EOF
+
     it "returns the checksum" do
-      expect(Open3).to receive(:capture2e).with(/osc ls/).and_return(["bundler-1.16.2-f49c1def\n", double(exitstatus: 0)])
+      expect(Open3).to receive(:capture2e).with(/osc ls/).and_return(["bundler-1.16.2.tgz.sha256\nbundler-1.16.2-f49c1def.tgz\n", double(exitstatus: 0)])
       expect(Open3).to receive(:capture2e).with(/osc getbinaries/).and_return(["", double(exitstatus: 0)])
       expect(File).to receive(:read).and_return(sha256_content)
-      expect(subject.artifact_checksum("sle12")).to eq("f49c1def007f7aa1c282606e3e2937ef6f67ea90b48e8c062c1d011402930861")
+
+      artifact = subject.artifact("sle12")
+      expect(artifact[:checksum]).to eq("f49c1def007f7aa1c282606e3e2937ef6f67ea90b48e8c062c1d011402930861")
+      expect(artifact[:uri]).to eq("https://download.opensuse.org/repositories/home:/ObsUser/SLE_12_SP3/bundler-1.16.2-f49c1def.tgz")
     end
   end
 end
