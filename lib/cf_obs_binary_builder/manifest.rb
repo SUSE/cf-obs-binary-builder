@@ -52,8 +52,10 @@ class CfObsBinaryBuilder::Manifest
 
       case build_status
       when :failed
+        puts "failed"
         return :failed
       when :in_process
+        puts "in process"
         return :in_process
       when :succeeded
         puts "available"
