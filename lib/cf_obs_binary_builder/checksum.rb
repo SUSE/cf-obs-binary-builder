@@ -21,6 +21,13 @@ class CfObsBinaryBuilder::Checksum
         "fetch_source" => true
       }
     },
+    "yarn" => {
+      "type" => "github_releases",
+      "params" => {
+        "repo" => 'yarnpkg/yarn',
+        "extension" => ".tar.gz"
+      }
+    },
     "bundler" => {
       "type" => "rubygems"
     }
