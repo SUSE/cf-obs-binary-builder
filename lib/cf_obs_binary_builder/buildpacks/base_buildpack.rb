@@ -1,7 +1,10 @@
+require 'fileutils'
+
 class CfObsBinaryBuilder::BaseBuildpack
   attr_reader :name, :version, :upstream_version, :obs_package, :manifest
 
   BUILD_STACKS = [ "cflinuxfs2", "sle12", "opensuse42" ]
+  SOURCES_CACHE_DIR = File.expand_path("~/.cf-obs-binary-builder")
 
   def initialize(name, upstream_version, revision = 1)
     @name = name
@@ -43,8 +46,26 @@ class CfObsBinaryBuilder::BaseBuildpack
     ERB.new(spec_template).result(binding)
   end
 
+  # If CACHE_SOURCES is true it will check if the source tarball is already
+  # downloaded and copy from there to the current directory.
+  # If CACHE_SOURCE is false, always download the source to the current directory.
+  def download_sources(url)
+    filename = File.basename(url)
+    cached_sources = File.join(SOURCES_CACHE_DIR, filename)
+
+    if CfObsBinaryBuilder::CACHE_SOURCES
+      FileUtils.mkdir_p(SOURCES_CACHE_DIR)
+      if !File.exist?(cached_sources)
+        system("wget https://github.com/cloudfoundry/#{name}-buildpack/archive/#{filename} -O #{cached_sources}")
+      end
+      FileUtils.copy(cached_sources, filename)
+    else
+      system("wget https://github.com/cloudfoundry/#{name}-buildpack/archive/#{filename} -O #{filename}")
+    end
+  end
+
   def prepare_sources
-    system("wget https://github.com/cloudfoundry/#{name}-buildpack/archive/v#{upstream_version}.tar.gz -O v#{upstream_version}.tar.gz")
+    download_sources("https://github.com/cloudfoundry/#{name}-buildpack/archive/v#{upstream_version}.tar.gz")
     Dir.mktmpdir do |tmpdir|
       # Extract manifest.yml from the tarball so that its dependencies can be parsed
       system("tar xfv v#{upstream_version}.tar.gz -C #{tmpdir} #{name}-buildpack-#{upstream_version}/manifest.yml --strip-components=1")

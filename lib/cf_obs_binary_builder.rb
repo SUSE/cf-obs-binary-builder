@@ -47,6 +47,10 @@ def log(message, level="info")
 end
 
 module CfObsBinaryBuilder
+  # If set, it will download the buildpack sources in cache directory and
+  # use that if it exists. This prevents multiple downloads when, for example,
+  # we are polling for dependencies which are currently building on OBS.
+  CACHE_SOURCES = ENV["CACHE_SOURCES"]
   TMP_DIR_SUFFIX = "cf_obs_binary_builder"
 
   def self.run(*args)
