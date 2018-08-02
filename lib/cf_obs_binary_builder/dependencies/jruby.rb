@@ -7,7 +7,7 @@ class CfObsBinaryBuilder::Jruby < CfObsBinaryBuilder::BaseDependency
 
     super(
       "jruby",
-      "#{jruby_version}_ruby#{ruby_version}",
+      jruby_version,
       "https://s3.amazonaws.com/jruby.org/downloads/#{jruby_version}/jruby-src-#{jruby_version}.tar.gz"
     )
   end
