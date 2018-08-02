@@ -39,7 +39,12 @@ class CfObsBinaryBuilder::Checksum
       }
     }.to_json
     _, output, _ = Open3.capture3("depwatcher /tmp", :stdin_data => data)
-    result = JSON.parse(output.lines.last)
+    begin
+      result = JSON.parse(output.lines.last)
+    rescue Exception
+      puts "Could not parse json. Tried the last line of this output:\n#{output}"
+      raise
+    end
 
     result["sha256"]
   end
