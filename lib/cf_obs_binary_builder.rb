@@ -87,7 +87,16 @@ module CfObsBinaryBuilder
 
     Dir.mktmpdir(TMP_DIR_SUFFIX) do |tmpdir|
       Dir.chdir tmpdir
-      buildpack.new(args[1], args[2]).run
+      result = buildpack.new(args[1], args[2]).run
+
+      case result
+      when :failed
+        puts 'At least one dependency is in "failed" state. Fix it and retry.'
+        exit 1
+      when :in_process
+        puts 'Not all dependencies are in "succeeded" state. Retry later.'
+        exit 2
+      end
     end
   end
 

@@ -47,7 +47,15 @@ class CfObsBinaryBuilder::Manifest
 
     existing.each do |dependency|
       print "Checking #{dependency.package_name}... "
-      if dependency.obs_package.build_succeeded?
+
+      build_status = dependency.obs_package.build_status
+
+      case build_status
+      when :failed
+        return :failed
+      when :in_process
+        return :in_process
+      when :succeeded
         puts "available"
         (BUILD_STACKS-[BASE_STACK]).each do |stack|
           artifact = dependency.obs_package.artifact(stack)
@@ -61,12 +69,11 @@ class CfObsBinaryBuilder::Manifest
           }
         end
       else
-        puts "not available"
-        return false
+        raise "Unknown build status: #{build_status}"
       end
     end
 
-    true
+    :succeeded
   end
 
   def write(path)

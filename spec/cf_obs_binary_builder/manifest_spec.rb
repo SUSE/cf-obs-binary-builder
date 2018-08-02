@@ -50,7 +50,7 @@ describe CfObsBinaryBuilder::Manifest do
 
     it "adds dependencies for sle12 and opensuse42" do
       allow_any_instance_of(CfObsBinaryBuilder::ObsPackage).to receive(:exists?).and_return(true)
-      allow_any_instance_of(CfObsBinaryBuilder::ObsPackage).to receive(:build_succeeded?).and_return(true)
+      allow_any_instance_of(CfObsBinaryBuilder::ObsPackage).to receive(:build_status).and_return(:succeeded)
       allow_any_instance_of(CfObsBinaryBuilder::ObsPackage).to receive(:artifact).and_return({uri: "https://foo", checksum: "abcde12345"})
 
       subject.populate!

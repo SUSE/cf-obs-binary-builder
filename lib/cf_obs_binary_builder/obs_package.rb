@@ -49,11 +49,16 @@ EOF
     system("osc search --package #{name} | grep #{obs_project} > /dev/null")
   end
 
-  def build_succeeded?
+  def build_status
     output, status = Open3.capture2e("osc prjresults #{obs_project} -c | grep #{name}")
     raise "Error getting project results: #{output}" unless status.exitstatus == 0
     results = output.split(";")[1..-1]
-    results.all? { |r| r.strip == "succeeded" }
+
+    return :failed if results.any? { |r| r.strip == "failed" }
+    return :succeeded if results.all? { |r| r.strip == "succeeded" }
+    # Might include states like "broken", "scheduled" etc. In this case we want
+    # to recheck after some time.
+    return :in_process
   end
 
   def artifact(stack)

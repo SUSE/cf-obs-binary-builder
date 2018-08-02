@@ -9,24 +9,30 @@ describe CfObsBinaryBuilder::ObsPackage do
     end
   end
 
-  describe "#build_succeeded?" do
+  describe "#build_status" do
     let(:failed_output) { <<EOF }
 bundler-1.16.2;failed;succeeded
 EOF
     let(:succeeded_output) { <<EOF }
 bundler-1.16.2;succeeded;succeeded
 EOF
+    let(:in_process_output) { <<EOF }
+bundler-1.16.2;scheduled;succeeded
+EOF
 
-    it "returns true" do
+    it "returns :succeeded if all the statuses are 'succeeded'" do
       expect(Open3).to receive(:capture2e).and_return([succeeded_output, double(exitstatus: 0)])
-
-      expect(subject.build_succeeded?).to be(true)
+      expect(subject.build_status).to eq(:succeeded)
     end
 
-    it "returns false" do
+    it "returns :failed if one or more statuses are 'failed'" do
       expect(Open3).to receive(:capture2e).and_return([failed_output, double(exitstatus: 0)])
+      expect(subject.build_status).to eq(:failed)
+    end
 
-      expect(subject.build_succeeded?).to be(false)
+    it "returns :in_process if it is not :succeeded or :failed" do
+      expect(Open3).to receive(:capture2e).and_return([in_process_output, double(exitstatus: 0)])
+      expect(subject.build_status).to eq(:in_process)
     end
   end
 

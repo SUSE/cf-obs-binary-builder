@@ -17,13 +17,17 @@ class CfObsBinaryBuilder::BaseBuildpack
     obs_package.create
     obs_package.checkout do
       @manifest = prepare_sources
-      @manifest.populate!
+      populate_result = @manifest.populate!
+      return populate_result unless populate_result == :succeeded
+
       @manifest.write("manifest.yml")
 
       write_spec_file
       obs_package.commit
     end
     log 'Done!'
+
+    :succeeded
   end
 
   private
