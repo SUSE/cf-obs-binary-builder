@@ -50,7 +50,7 @@ EOF
   end
 
   def build_status
-    output, status = Open3.capture2e("osc prjresults #{obs_project} -c | grep #{name}")
+    output, status = Open3.capture2e("osc prjresults #{obs_project} -c | grep #{name}\\;")
     raise "Error getting project results: #{output}" unless status.exitstatus == 0
     results = output.split(";")[1..-1]
 
