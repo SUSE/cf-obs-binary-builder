@@ -49,9 +49,12 @@ mvn -P '!truffle' -Djruby.default.ruby.version=<%= ruby_version %> \
 %install
 TARBALL=/home/abuild/rpmbuild/OTHER/jruby-%{version}.tgz
 tar czvf ${TARBALL} -C %{destdir} bin/ lib/ sources.yml --owner=0 --group=0
+
 CHECKSUM=`sha256sum ${TARBALL}`
-echo $CHECKSUM > /home/abuild/rpmbuild/OTHER/$(basename $TARBALL).sha256
-mv ${TARBALL} /home/abuild/rpmbuild/OTHER/jruby-%{version}-${CHECKSUM:0:8}.tgz
+NEW_TARBALL=/home/abuild/rpmbuild/OTHER/jruby-%{version}-${CHECKSUM:0:8}.tgz
+mv ${TARBALL} ${NEW_TARBALL}
+
+echo `sha256sum ${NEW_TARBALL}` > /home/abuild/rpmbuild/OTHER/$(basename ${NEW_TARBALL}).sha256
 
 %post
 %postun
