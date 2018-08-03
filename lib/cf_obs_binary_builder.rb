@@ -77,8 +77,9 @@ module CfObsBinaryBuilder
     abort "Dependency #{args[0]} not supported!" unless dependency
 
     Dir.mktmpdir(TMP_DIR_SUFFIX) do |tmpdir|
-      Dir.chdir tmpdir
-      dependency.new(args[1]).run(args[2])
+      Dir.chdir tmpdir do
+        dependency.new(args[1]).run(args[2])
+      end
     end
   end
 
@@ -90,16 +91,17 @@ module CfObsBinaryBuilder
     abort "Buildpack #{args[0]} not supported!" unless buildpack
 
     Dir.mktmpdir(TMP_DIR_SUFFIX) do |tmpdir|
-      Dir.chdir tmpdir
-      result = buildpack.new(args[1], args[2]).run
+      Dir.chdir tmpdir do
+        result = buildpack.new(args[1], args[2]).run
 
-      case result
-      when :failed
-        puts 'At least one dependency is in "failed" state. Fix it and retry.'
-        exit 1
-      when :in_process
-        puts 'Not all dependencies are in "succeeded" state. Retry later.'
-        exit 2
+        case result
+        when :failed
+          puts 'At least one dependency is in "failed" state. Fix it and retry.'
+          exit 1
+        when :in_process
+          puts 'Not all dependencies are in "succeeded" state. Retry later.'
+          exit 2
+        end
       end
     end
   end
