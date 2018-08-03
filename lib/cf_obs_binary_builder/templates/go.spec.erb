@@ -33,19 +33,20 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 %build
 export GOROOT_BOOTSTRAP=/usr/lib64/go1.4
+export GOBIN=%{_builddir}/go/bin
 ./make.bash
 
 %install
 cp %{SOURCE1} ../../
 
-TARBALL=/home/abuild/rpmbuild/OTHER/%{name}-linux-amd64.tgz
+TARBALL=%{_topdir}/OTHER/%{name}-linux-amd64.tgz
 tar czf ${TARBALL} -C ../../ go sources.yml --owner=0 --group=0
 
 CHECKSUM=`sha256sum ${TARBALL}`
-NEW_TARBALL=/home/abuild/rpmbuild/OTHER/%{name}-linux-amd64-${CHECKSUM:0:8}.tgz
+NEW_TARBALL=%{_topdir}/OTHER/%{name}-linux-amd64-${CHECKSUM:0:8}.tgz
 mv ${TARBALL} ${NEW_TARBALL}
 
-echo `sha256sum ${NEW_TARBALL}` > /home/abuild/rpmbuild/OTHER/$(basename ${NEW_TARBALL}).sha256
+echo `sha256sum ${NEW_TARBALL}` > %{_topdir}/OTHER/$(basename ${NEW_TARBALL}).sha256
 
 %files
 %defattr(-,root,root)
