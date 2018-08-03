@@ -25,31 +25,22 @@ License:        Ruby
 Group:          Cloud/Platform/scf
 Url:            http://jruby.org
 Source0:        <%= source %>
-Source1:        cacerts.pem
-Source2:        jruby-kit.tar.xz
-Source3:        sources.yml
+Source1:        jruby-kit.tar.xz
+Source2:        sources.yml
 BuildRequires:  maven
+BuildRequires:  ca-certificates-mozilla
 BuildRequires:  java-1_8_0-openjdk-devel
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 %description
 
 %prep
-# Set up keystore
-mkdir -p cacerts
-awk '/-----BEGIN CERTIFICATE-----/,/-----END CERTIFICATE-----/{ print $0; }' %{SOURCE1} | csplit -n 3 -s -f cacerts/ - '/-----BEGIN CERTIFICATE-----/' {*}
-rm cacerts/000
-
-for PEM in $(find cacerts -type f | sort); do
-  keytool -importcert -noprompt -keystore cacerts.jks -storepass changeit -file $PEM -alias $(basename $PEM)
-done
-
 %setup -q -n jruby-<%= jruby_version %>
-tar xfv %{SOURCE2}
+tar xfv %{SOURCE1}
 
 %build
 mkdir -p %{destdir}
-cp %{SOURCE3} %{destdir}
+cp %{SOURCE2} %{destdir}
 
 mvn -P '!truffle' -Djruby.default.ruby.version=<%= ruby_version %> \
   -Dmaven.repo.local=kit/m2 \
