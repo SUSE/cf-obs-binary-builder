@@ -37,6 +37,8 @@ BuildRequires:  freetype2-devel
 BuildRequires:  alsa-lib-devel
 BuildRequires:	-post-build-checks
 
+<%= rpm_macros %>
+
 %description
 
 %prep
@@ -67,20 +69,20 @@ COMPANY_NAME="SUSE LINUX GmbH" make images
 
 %install
 chmod -R a+r build/linux-x86_64-normal-server-release/images
-#TARBALL1=/home/abuild/rpmbuild/OTHER/%{full_jdk_name}-%{version}.tar.gz
-TARBALL2=/home/abuild/rpmbuild/OTHER/%{full_name}-%{version}.tar.gz
+#TARBALL1=%{otherdir}/%{full_jdk_name}-%{version}.tar.gz
+TARBALL2=%{otherdir}/%{full_name}-%{version}.tar.gz
 #tar czvf ${TARBALL1} -C build/linux-x86_64-normal-server-release/images/j2sdk-image . --owner=0 --group=0
 tar czvf ${TARBALL2} -C build/linux-x86_64-normal-server-release/images/j2re-image . -C ../j2sdk-image ./lib/tools.jar ./bin/jcmd ./bin/jmap ./bin/jstack ./man/man1/jcmd.1 ./man/man1/jmap.1 ./man/man1/jstack.1 -C ./jre ./lib/amd64/libattach.so --owner=0 --group=0
 
 #CHECKSUM1=`sha256sum ${TARBALL1}`
 CHECKSUM2=`sha256sum ${TARBALL2}`
-#NEW_TARBALL1=/home/abuild/rpmbuild/OTHER/%{full_jdk_name}-%{version}-${CHECKSUM1:0:8}.tgz
-NEW_TARBALL2=/home/abuild/rpmbuild/OTHER/%{full_name}-%{version}-${CHECKSUM2:0:8}.tgz
+#NEW_TARBALL1=%{otherdir}/%{full_jdk_name}-%{version}-%{stack}-${CHECKSUM1:0:8}.tgz
+NEW_TARBALL2=%{otherdir}/%{full_name}-%{version}-%{stack}-${CHECKSUM2:0:8}.tgz
 #mv ${TARBALL1} ${NEW_TARBALL1}
 mv ${TARBALL2} ${NEW_TARBALL2}
 
-#echo `sha256sum ${NEW_TARBALL1}` > /home/abuild/rpmbuild/OTHER/$(basename ${NEW_TARBALL1}).sha256
-echo `sha256sum ${NEW_TARBALL2}` > /home/abuild/rpmbuild/OTHER/$(basename ${NEW_TARBALL2}).sha256
+#echo `sha256sum ${NEW_TARBALL1}` > %{otherdir}/$(basename ${NEW_TARBALL1}).sha256
+echo `sha256sum ${NEW_TARBALL2}` > %{otherdir}/$(basename ${NEW_TARBALL2}).sha256
 
 %post
 %postun

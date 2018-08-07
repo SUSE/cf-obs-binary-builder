@@ -33,6 +33,8 @@ BuildRequires: <%= dependency.package_name %>
 <% end %>
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
+<%= rpm_macros %>
+
 %description
 
 %prep
@@ -48,7 +50,7 @@ buildpack-packager build -any-stack
 
 %install
 CHECKSUM=`sha1sum <%= name %>_buildpack-v%{version}.zip | cut -d' ' -f1`
-mv <%= name %>_buildpack-v%{version}.zip /home/abuild/rpmbuild/OTHER/<%= name %>_buildpack-v%{version}-${CHECKSUM:0:8}.zip
+mv <%= name %>_buildpack-v%{version}.zip %{otherdir}<%= name %>_buildpack-v%{version}-${CHECKSUM:0:8}.zip
 
 %post
 %postun

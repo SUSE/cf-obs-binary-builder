@@ -29,6 +29,8 @@ Source:         http://rubygems.org/gems/%{mod_full_name}.gem
 BuildRequires:  ruby2.3
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
+<%= rpm_macros %>
+
 %description
 
 %prep
@@ -46,14 +48,14 @@ rm -rf cache/bundler-%{version}.gem
 mkdir -p %{buildroot}/var/binary-builder
 cd %{_builddir}
 
-TARBALL=/home/abuild/rpmbuild/OTHER/%{mod_full_name}.tgz
+TARBALL=%{otherdir}/%{mod_full_name}.tgz
 tar czvf ${TARBALL} . --owner=0 --group=0
 
 CHECKSUM=`sha256sum ${TARBALL}`
-NEW_TARBALL=/home/abuild/rpmbuild/OTHER/%{mod_full_name}-${CHECKSUM:0:8}.tgz
+NEW_TARBALL=%{otherdir}/%{mod_full_name}-%{stack}-${CHECKSUM:0:8}.tgz
 mv ${TARBALL} ${NEW_TARBALL}
 
-echo `sha256sum ${NEW_TARBALL}` > /home/abuild/rpmbuild/OTHER/$(basename ${NEW_TARBALL}).sha256
+echo `sha256sum ${NEW_TARBALL}` > %{otherdir}/$(basename ${NEW_TARBALL}).sha256
 
 %post
 %postun

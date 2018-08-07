@@ -24,6 +24,8 @@ Source1:        sources.yml
 BuildRequires:  golang-packaging
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
+<%= rpm_macros %>
+
 %description
 
 %prep
@@ -40,14 +42,14 @@ cp ../go/bin/<%= dependency %> bin/
 # Allow also license files with different writing like License
 cp `find -iname LICENSE -maxdepth 1` bin/
 
-TARBALL=/home/abuild/rpmbuild/OTHER/%{name}-linux-x64.tgz
+TARBALL=%{otherdir}/%{name}-linux-x64.tgz
 tar czf ${TARBALL} bin sources.yml --owner=0 --group=0
 
 CHECKSUM=`sha256sum ${TARBALL}`
-NEW_TARBALL=/home/abuild/rpmbuild/OTHER/%{name}-linux-x64-${CHECKSUM:0:8}.tgz
+NEW_TARBALL=%{otherdir}/%{name}-linux-x64-%{stack}-${CHECKSUM:0:8}.tgz
 mv ${TARBALL} ${NEW_TARBALL}
 
-echo `sha256sum ${NEW_TARBALL}` > /home/abuild/rpmbuild/OTHER/$(basename ${NEW_TARBALL}).sha256
+echo `sha256sum ${NEW_TARBALL}` > %{otherdir}/$(basename ${NEW_TARBALL}).sha256
 
 %files
 %defattr(-,root,root)

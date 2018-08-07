@@ -26,6 +26,8 @@ Url:            <%= url %>
 Source:         <%= source %>
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
+<%= rpm_macros %>
+
 %description
 
 %prep
@@ -33,14 +35,14 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 %build
 
 %install
-TARBALL=/home/abuild/rpmbuild/OTHER/%{name}.tgz
+TARBALL=%{otherdir}/%{name}.tgz
 cp %{SOURCE0} ${TARBALL}
 
 CHECKSUM=`sha256sum ${TARBALL}`
-NEW_TARBALL=/home/abuild/rpmbuild/OTHER/$(basename $TARBALL)-${CHECKSUM:0:8}.tgz
+NEW_TARBALL=%{otherdir}/$(basename $TARBALL)-%{stack}-${CHECKSUM:0:8}.tgz
 mv ${TARBALL} ${NEW_TARBALL}
 
-echo `sha256sum ${NEW_TARBALL}` > /home/abuild/rpmbuild/OTHER/$(basename ${NEW_TARBALL}).sha256
+echo `sha256sum ${NEW_TARBALL}` > %{otherdir}/$(basename ${NEW_TARBALL}).sha256
 
 %post
 %postun

@@ -32,6 +32,8 @@ BuildRequires:  ca-certificates-mozilla
 BuildRequires:  java-1_8_0-openjdk-devel
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
+<%= rpm_macros %>
+
 %description
 
 %prep
@@ -47,14 +49,14 @@ mvn -P '!truffle' -Djruby.default.ruby.version=<%= ruby_version %> \
   --settings kit/m2/settings.xml \
 
 %install
-TARBALL=/home/abuild/rpmbuild/OTHER/jruby-%{version}.tgz
+TARBALL=%{otherdir}/jruby-%{version}.tgz
 tar czvf ${TARBALL} -C %{destdir} bin/ lib/ sources.yml --owner=0 --group=0
 
 CHECKSUM=`sha256sum ${TARBALL}`
-NEW_TARBALL=/home/abuild/rpmbuild/OTHER/jruby-%{version}-${CHECKSUM:0:8}.tgz
+NEW_TARBALL=%{otherdir}/jruby-%{version}-%{stack}-${CHECKSUM:0:8}.tgz
 mv ${TARBALL} ${NEW_TARBALL}
 
-echo `sha256sum ${NEW_TARBALL}` > /home/abuild/rpmbuild/OTHER/$(basename ${NEW_TARBALL}).sha256
+echo `sha256sum ${NEW_TARBALL}` > %{otherdir}/$(basename ${NEW_TARBALL}).sha256
 
 %post
 %postun
