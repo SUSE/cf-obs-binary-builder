@@ -11,6 +11,7 @@ require 'open3'
 # Define the parent module before requiring the namespaced classes
 module CfObsBinaryBuilder end
 
+require_relative 'cf_obs_binary_builder/rpm_spec_helpers'
 require_relative 'cf_obs_binary_builder/buildpacks/base_buildpack'
 require_relative 'cf_obs_binary_builder/dependencies/base_dependency'
 require_relative 'cf_obs_binary_builder/dependencies/non_build_dependency'
