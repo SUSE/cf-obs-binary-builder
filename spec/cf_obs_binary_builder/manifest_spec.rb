@@ -45,7 +45,7 @@ describe CfObsBinaryBuilder::Manifest do
         end
       end
 
-      expect { subject.populate! }.to raise_error(/Missing: bundler-1.16.2.*Unknown: node/m)
+      expect { subject.populate!("buildpacks-staging") }.to raise_error(/Missing: bundler-1.16.2.*Unknown: node/m)
     end
 
     it "adds dependencies for sle12 and opensuse42" do
@@ -53,7 +53,7 @@ describe CfObsBinaryBuilder::Manifest do
       allow_any_instance_of(CfObsBinaryBuilder::ObsPackage).to receive(:build_status).and_return(:succeeded)
       allow_any_instance_of(CfObsBinaryBuilder::ObsPackage).to receive(:artifact).and_return({uri: "https://foo", checksum: "abcde12345"})
 
-      subject.populate!
+      subject.populate!("buildpacks-staging")
 
       stack_deps = described_class::BUILD_STACKS.map do |stack|
         subject.hash["dependencies"].

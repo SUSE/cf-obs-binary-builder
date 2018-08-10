@@ -3,7 +3,7 @@ require 'fileutils'
 class CfObsBinaryBuilder::BaseBuildpack
   include RpmSpecHelpers
 
-  attr_reader :name, :version, :upstream_version, :obs_package, :manifest
+  attr_reader :name, :version, :upstream_version, :obs_package, :manifest, :s3_bucket
 
   BUILD_STACKS = [ "cflinuxfs2", "sle12", "opensuse42" ]
   SOURCES_CACHE_DIR = File.expand_path("~/.cf-obs-binary-builder")
@@ -15,6 +15,7 @@ class CfObsBinaryBuilder::BaseBuildpack
 
     package_name = "#{name}-buildpack-#{version}"
     obs_project = ENV["OBS_BUILDPACK_PROJECT"] || raise("no OBS_BUILDPACK_PROJECT environment variable set")
+    @s3_bucket = ENV["STAGING_BUILDPACKS_BUCKET"] || raise("no STAGING_BUILDPACKS_BUCKET environment variable set")
     @obs_package = CfObsBinaryBuilder::ObsPackage.new(package_name, obs_project)
   end
 
@@ -22,7 +23,7 @@ class CfObsBinaryBuilder::BaseBuildpack
     obs_package.create
     obs_package.checkout do
       @manifest = prepare_sources
-      populate_result = @manifest.populate!
+      populate_result = @manifest.populate!(s3_bucket)
       return populate_result unless populate_result == :succeeded
 
       @manifest.write("manifest.yml")

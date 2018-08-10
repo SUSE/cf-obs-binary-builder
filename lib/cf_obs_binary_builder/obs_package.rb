@@ -63,11 +63,12 @@ EOF
     return :in_process
   end
 
-  def artifact(stack)
+  def artifact(stack, s3_bucket)
     obs_repository = repository_for_stack(stack)
     checksum_file, artifact_file = artifact_filenames(stack)
 
-    artifact_uri = "https://download.opensuse.org/repositories/#{obs_project.gsub(":", ":/")}/#{obs_repository}/#{artifact_file}"
+    subdir = name.sub(/-.*/, "")
+    artifact_uri = "https://s3.amazonaws.com/#{s3_bucket}/dependencies/#{subdir}/#{artifact_file}"
 
     checksum = nil
     Dir.mktmpdir do |tmpdir|

@@ -36,7 +36,7 @@ class CfObsBinaryBuilder::Manifest
     @dependencies = [existing_deps, missing_deps, unknown_deps.uniq]
   end
 
-  def populate!
+  def populate!(s3_bucket)
     existing, missing, unknown = dependencies
 
     if missing.any? || unknown.any?
@@ -60,7 +60,7 @@ class CfObsBinaryBuilder::Manifest
       when :succeeded
         puts "available"
         (BUILD_STACKS-[BASE_STACK]).each do |stack|
-          artifact = dependency.obs_package.artifact(stack)
+          artifact = dependency.obs_package.artifact(stack, s3_bucket)
 
           hash["dependencies"] << {
             "name" => name_to_manifest(dependency.dependency),
