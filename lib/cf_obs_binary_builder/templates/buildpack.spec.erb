@@ -50,7 +50,7 @@ buildpack-packager build -any-stack
 
 %install
 CHECKSUM=`sha1sum <%= name %>_buildpack-v%{version}.zip | cut -d' ' -f1`
-mv <%= name %>_buildpack-v%{version}.zip %{otherdir}/<%= name %>_buildpack-pre-v%{version}-%{release}-${CHECKSUM:0:8}.zip
+mv <%= name %>_buildpack-v%{version}.zip %{otherdir}/<%= name %>_buildpack-v%{version}-%{release}-pre-${CHECKSUM:0:8}.zip
 
 %post
 %postun
