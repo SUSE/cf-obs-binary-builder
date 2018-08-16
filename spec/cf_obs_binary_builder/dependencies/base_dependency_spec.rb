@@ -5,13 +5,13 @@ describe CfObsBinaryBuilder::BaseDependency do
 
   describe "#validate_checksum" do
     it "raises an exception if the checksum does not match" do
-      expect(Digest::SHA256).to receive_message_chain(:file, :hexdigest).and_return("wrongchecksum")
-      expect{ dependency.validate_checksum("12345") }.to raise_error(/mismatch/)
+      expect(Digest::SHA256).to receive_message_chain(:file, :hexdigest).and_return("wrongchecksum!!!!!!!!!!!!!!!!!!!!!!!11111!!!!!1!!!!!!!!!!!111111")
+      expect{ dependency.validate_checksum("correctchecksum!!!!!!!!!!!!!!!!!!!!!11111!!!!!1!!!!!!!!!!!111111") }.to raise_error(/mismatch/)
     end
 
     it "doesn't raise if the checksum matches" do
-      expect(Digest::SHA256).to receive_message_chain(:file, :hexdigest).and_return("12345")
-      expect{ dependency.validate_checksum("12345") }.to_not raise_error
+      expect(Digest::SHA256).to receive_message_chain(:file, :hexdigest).and_return("correctchecksum!!!!!!!!!!!!!!!!!!!!!11111!!!!!1!!!!!!!!!!!111111")
+      expect{ dependency.validate_checksum("correctchecksum!!!!!!!!!!!!!!!!!!!!!11111!!!!!1!!!!!!!!!!!111111") }.to_not raise_error
     end
   end
 
@@ -21,9 +21,9 @@ describe CfObsBinaryBuilder::BaseDependency do
     end
 
     it "succeeds if validate_checksum has been called successfully" do
-      expect(Digest::SHA256).to receive_message_chain(:file, :hexdigest).and_return("12345")
+      expect(Digest::SHA256).to receive_message_chain(:file, :hexdigest).and_return("correctchecksum!!!!!!!!!!!!!!!!!!!!!11111!!!!!1!!!!!!!!!!!111111")
       expect(File).to receive(:write) # Avoid writting the sources.yaml file
-      dependency.validate_checksum("12345")
+      dependency.validate_checksum("correctchecksum!!!!!!!!!!!!!!!!!!!!!11111!!!!!1!!!!!!!!!!!111111")
       expect { dependency.write_sources_yaml }.to_not raise_error
     end
   end

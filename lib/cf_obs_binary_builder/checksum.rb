@@ -34,6 +34,8 @@ class CfObsBinaryBuilder::Checksum
   }
 
   def self.for(name, version)
+    return libffi(version) if name == "libffi"
+
     # There are special cases where the type does not match the dependency name.
     # See https://github.com/cloudfoundry/buildpacks-ci/blob/0b54199ecfbe98d085f4e34d224877ee415c5405/pipelines/binary-builder-new.yml#L1 for more information
     data = {
@@ -54,5 +56,13 @@ class CfObsBinaryBuilder::Checksum
     end
 
     result["sha256"]
+  end
+
+  def self.libffi(version)
+    sha512list = open("ftp://sourceware.org/pub/libffi/sha512.sum").read
+    checksum = sha512list.lines.grep(/#{Regexp.escape(version)}.tar.gz/).first&.split&.first
+    raise "Could not determine checksum for libffi-#{version}.tar.gz. The checksum file content was:\n\n#{sha512list}" if !checksum
+
+    checksum
   end
 end

@@ -56,8 +56,17 @@ class CfObsBinaryBuilder::BaseDependency
   end
 
   def validate_checksum(checksum)
-    sha256 = Digest::SHA256.file File.basename(source)
-    actual_checksum = sha256.hexdigest
+    actual_checksum = case checksum.length
+    when 40
+      sha1 = Digest::SHA1.file File.basename(source)
+      sha1.hexdigest
+    when 64
+      sha256 = Digest::SHA256.file File.basename(source)
+      sha256.hexdigest
+    when 128
+      sha512 = Digest::SHA512.file File.basename(source)
+      sha512.hexdigest
+    end
 
     if actual_checksum != checksum
       raise "Checksum mismatch #{actual_checksum} vs. #{checksum}"
