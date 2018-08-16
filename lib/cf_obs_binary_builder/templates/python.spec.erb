@@ -1,0 +1,79 @@
+#
+# spec file for SUSE CAP buildpack dependency
+#
+# Copyright (c) 2018 SUSE LINUX GmbH, Nuernberg, Germany.
+#
+# All modifications and additions to the file contributed by third parties
+# remain the property of their copyright owners, unless otherwise agreed
+# upon. The license for this file, and modifications and additions to the
+# file, is the same license as for the pristine package itself (unless the
+# license for the pristine package is not an Open Source License, in which
+# case the license is the MIT License). An "Open Source License" is a
+# license that conforms to the Open Source Definition (Version 1.9)
+# published by the Open Source Initiative.
+
+
+
+Name:           python-<%= version %>
+Version:        <%= version %>
+Release:        1
+Summary:        This is a dependency used in SUSE CAP buildpacks
+License:        Python-2.0
+Group:          Cloud/Platform/scf
+Url:            http://golang.org
+Source0:        <%= source %>
+Source1:        sources.yml
+BuildRequires:  db-devel
+BuildRequires:  gdbm-devel
+BuildRequires:  tk-devel
+BuildRequires:  tcl-devel
+BuildRequires:  libXScrnSaver-devel
+BuildRequires:  ncurses-devel
+BuildRequires:  sqlite-devel
+BuildRequires:  libopenssl-devel
+BuildRequires:  libbz2-devel
+BuildRequires:  readline-devel
+BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+
+%define destdir /tmp/%{name}
+
+<%= rpm_macros %>
+
+%description
+
+%prep
+%setup -q -n Python-%{version}
+
+%build
+# Fix ncurses panel issue
+sed -i 's|#include <panel.h>|#include <ncurses/panel.h>|g' Modules/_curses_panel.c
+
+./configure --enable-shared -with-ensurepip=no --with-dbmliborder=bdb:gdbm --prefix=%{destdir} --enable-unicode=ucs4
+make %{?_smp_mflags}
+
+%install
+make install
+
+if [ ! -e "%{destdir}/bin/python" ]; then
+  ln -s "./python3" "%{destdir}/bin/python"
+fi
+
+cp %{SOURCE1} %{destdir}/
+
+TARBALL=%{otherdir}/%{name}-linux-x64.tgz
+
+pushd %{destdir}
+tar czf ${TARBALL} * --owner=0 --group=0
+popd
+
+CHECKSUM=`sha256sum ${TARBALL}`
+NEW_TARBALL=%{otherdir}/%{name}-linux-amd64-%{stack}-${CHECKSUM:0:8}.tgz
+mv ${TARBALL} ${NEW_TARBALL}
+
+echo `sha256sum ${NEW_TARBALL}` > %{otherdir}/$(basename ${NEW_TARBALL}).sha256
+
+%files
+%defattr(-,root,root)
+
+%changelog
+
