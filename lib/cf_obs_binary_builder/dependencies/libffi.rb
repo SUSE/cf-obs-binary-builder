@@ -10,6 +10,7 @@ class CfObsBinaryBuilder::Libffi < CfObsBinaryBuilder::BaseDependency
   def prepare_sources
     super
 
-    system("curl -L https://raw.githubusercontent.com/p3ck/restraint/master/third-party/libffi-3.1-toolexeclibdir.patch -O libffi-3.1-toolexeclibdir.patch")
+    patch_url = "https://raw.githubusercontent.com/p3ck/restraint/master/third-party/libffi-3.1-toolexeclibdir.patch"
+    File.write(File.basename(patch_url), open(patch_url).read)
   end
 end
