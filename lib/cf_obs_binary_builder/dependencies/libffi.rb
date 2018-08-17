@@ -3,7 +3,7 @@ class CfObsBinaryBuilder::Libffi < CfObsBinaryBuilder::BaseDependency
     super(
       "libffi",
       version,
-      "ftp://sourceware.org/pub/libffi/libffi-#{version}.tar.gz"
+      "https://sourceware.org/pub/libffi/libffi-#{version}.tar.gz"
     )
   end
 
