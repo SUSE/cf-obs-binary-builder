@@ -30,6 +30,12 @@ describe CfObsBinaryBuilder::Manifest do
 
       expect(unknown_deps).to eq(["bundler"])
     end
+
+    it "return third-party dependencies" do
+      _, _, _, third_party_deps = subject.dependencies
+
+      expect(third_party_deps).to eq(["Miniconda2"])
+    end
   end
 
   describe "#populate!" do
@@ -61,7 +67,7 @@ describe CfObsBinaryBuilder::Manifest do
       end
 
       (1..(stack_deps.count-1)).each do |index|
-        expect(stack_deps[index]).to eq(stack_deps[0])
+        expect(stack_deps[index]).to match_array(stack_deps[0])
       end
     end
   end

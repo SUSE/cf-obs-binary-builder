@@ -49,6 +49,12 @@ dependencies:
   sha256: 9287eda198990c8cfae8a23db725283a040f82555f87086ed5447690a2869f5a
   cf_stacks:
   - cflinuxfs2
+- name: Miniconda2
+  version: 4.3.30
+  cf_stacks:
+  - cflinuxfs2
+  uri: http://repo.continuum.io/miniconda/Miniconda2-4.3.30-Linux-x86_64.sh
+  sha256: '0891000ca28359e63aa77e613c01f7a88855dedfc0ddc8be31829f3139318cf3'
 include_files:
 - CHANGELOG
 - CONTRIBUTING.md

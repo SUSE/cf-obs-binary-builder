@@ -15,29 +15,35 @@ class CfObsBinaryBuilder::Manifest
     missing_deps = []
     unknown_deps = []
     existing_deps = []
+    third_party_deps = []
 
     base_dependencies.each do |dep_hash|
       print "Checking #{dep_hash["name"]}-#{dep_hash["version"]}..."
-      dep = dependency_for(dep_hash)
-      if dep
-        if !dep.obs_package.exists?
-          puts " doesn't exist"
-          missing_deps << dep
+      if dep_hash["uri"].include?("buildpacks.cloudfoundry.org")
+        dep = dependency_for(dep_hash)
+        if dep
+          if !dep.obs_package.exists?
+            puts " doesn't exist"
+            missing_deps << dep
+          else
+            puts " exists"
+            existing_deps << dep
+          end
         else
-          puts " exists"
-          existing_deps << dep
+          puts " unknown dependency"
+          unknown_deps << dep_hash["name"]
         end
       else
-        puts " unknown dependency"
-        unknown_deps << dep_hash["name"]
+        puts " third-party dependency"
+        third_party_deps << dep_hash["name"]
       end
     end
 
-    @dependencies = [existing_deps, missing_deps, unknown_deps.uniq]
+    @dependencies = [existing_deps, missing_deps, unknown_deps.uniq, third_party_deps]
   end
 
   def populate!(s3_bucket)
-    existing, missing, unknown = dependencies
+    existing, missing, unknown, third_party = dependencies
 
     if missing.any? || unknown.any?
       missing_deps = missing.map(&:package_name).join(", ")
@@ -73,6 +79,11 @@ class CfObsBinaryBuilder::Manifest
       else
         raise "Unknown build status: #{build_status}"
       end
+    end
+
+    third_party.each do |dependency|
+      original = hash["dependencies"].find { |d| d["name"] == dependency }
+      original["cf_stacks"] += (BUILD_STACKS-[BASE_STACK])
     end
 
     :succeeded
