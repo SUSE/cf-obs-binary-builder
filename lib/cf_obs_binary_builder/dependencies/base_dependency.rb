@@ -57,6 +57,9 @@ class CfObsBinaryBuilder::BaseDependency
 
   def validate_checksum(checksum)
     actual_checksum = case checksum.length
+    when 32
+      md5 = Digest::MD5.file File.basename(source)
+      md5.hexdigest
     when 40
       sha1 = Digest::SHA1.file File.basename(source)
       sha1.hexdigest

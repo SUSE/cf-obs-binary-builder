@@ -55,7 +55,7 @@ class CfObsBinaryBuilder::Checksum
       raise
     end
 
-    result["sha256"]
+    result.dig("sha256") || result.dig("md5_digest")
   end
 
   def self.libffi(version)
