@@ -75,7 +75,7 @@ module CfObsBinaryBuilder
     if args.length < 2
       abort "Wrong number of arguments, please specify: dependency, version and checksum"
     end
-    dependency = get_build_target(args[0].capitalize)
+    dependency = get_build_target(args[0].capitalize.tr("-", ""))
     abort "Dependency #{args[0]} not supported!" unless dependency
 
     Dir.mktmpdir(TMP_DIR_SUFFIX) do |tmpdir|
