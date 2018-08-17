@@ -18,7 +18,6 @@
 
 Name:           libffi-<%= version %>
 Version:        <%= version %>
-%define prefix_path /app/vendor/libffi-%{version}
 Release:        1
 Summary: This is the libffi binary used in buildpacks in SUSE CloudFoundry (SCF)
 License:        MIT
@@ -42,14 +41,14 @@ patch -p1 < %{SOURCE1}
 make
 
 %install
-export DESTDIR=/tmp/%{name}/
-export APP_PATH=${DESTDIR}%{prefix_path}
-
-mkdir -p ${DESTDIR}
-make install DESTDIR=${DESTDIR}
+mkdir -p %{destdir}
+make install DESTDIR=%{destdir}
 
 TARBALL=%{otherdir}/%{name}-linux-x64.tgz
-tar -C ${APP_PATH} -czvf ${TARBALL} . --owner=0 --group=0
+
+pushd %{dependencydir}
+tar -C %{dependencydir} -czvf ${TARBALL} * --owner=0 --group=0
+popd
 
 CHECKSUM=`sha256sum ${TARBALL}`
 NEW_TARBALL=%{otherdir}/%{name}-linux-x64-%{stack}-${CHECKSUM:0:8}.tgz
