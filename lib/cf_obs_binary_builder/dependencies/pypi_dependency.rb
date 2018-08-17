@@ -11,7 +11,7 @@ class CfObsBinaryBuilder::PypiDependency < CfObsBinaryBuilder::NonBuildDependenc
 
   def pypi_source
     html = open("https://pypi.org/project/#{dependency}/#{version}/#files").read
-    url = html.scan(/https:\/\/.*?#{dependency}-#{version}.tar.gz/).first
+    url = html.scan(/(https:\/\/.*?#{dependency}-#{version}\.(zip|tar.gz))/).flatten.first
 
     raise "Failed to find download URL for #{dependency} #{version}" unless url
     url
