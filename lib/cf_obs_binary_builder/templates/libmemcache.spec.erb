@@ -1,0 +1,76 @@
+#
+# spec file for package libffi
+#
+# Copyright (c) 2018 SUSE LINUX GmbH, Nuernberg, Germany.
+#
+# All modifications and additions to the file contributed by third parties
+# remain the property of their copyright owners, unless otherwise agreed
+# upon. The license for this file, and modifications and additions to the
+# file, is the same license as for the pristine package itself (unless the
+# license for the pristine package is not an Open Source License, in which
+# case the license is the MIT License). An "Open Source License" is a
+# license that conforms to the Open Source Definition (Version 1.9)
+# published by the Open Source Initiative.
+
+# Please submit bugfixes or comments via http://bugs.opensuse.org/
+#
+
+
+Name:           libmemcache-<%= version %>
+Version:        <%= version %>
+Release:        1
+Summary:        This is a dependency used in SUSE CAP buildpacks
+License:        BSD-3-Clause
+Group:          Cloud/Platform/scf
+Url:            http://libmemcached.org/License.html
+Source0:        <%= source %>
+Source1:        sources.yml
+Source2:        https://www.cyrusimap.org/releases/cyrus-sasl-2.1.26.tar.gz
+BuildRequires:  gcc-c++
+# cyrus-sasl build requires
+BuildRequires:  openssl-devel
+BuildRoot:      %{_tmppath}/%{name}-build
+
+<%= rpm_macros %>
+
+%description
+
+%prep
+%setup -q -n libmemcached-%{version}
+
+%build
+mkdir -p %{destdir}
+# setup cyrus-sasl
+tar -xf %{SOURCE2}
+pushd cyrus-sasl-2.1.26
+./configure --prefix=%{prefix_path}
+make
+make install DESTDIR=%{destdir}
+popd
+rm -rf cyrus-sasl-2.1.26
+
+./configure --prefix=%{prefix_path} CXXFLAGS="-I%{prefix_path}/include" CFLAGS="-I%{prefix_path}/include" LDFLAGS="-L%{prefix_path}/lib"
+make
+
+%install
+make install DESTDIR=%{destdir}
+
+TARBALL=%{otherdir}/%{name}-linux-x64.tgz
+
+pushd %{dependencydir}
+tar -C %{dependencydir} -czvf ${TARBALL} * --owner=0 --group=0
+popd
+
+CHECKSUM=`sha256sum ${TARBALL}`
+NEW_TARBALL=%{otherdir}/%{name}-linux-x64-%{stack}-${CHECKSUM:0:8}.tgz
+mv ${TARBALL} ${NEW_TARBALL}
+
+echo `sha256sum ${NEW_TARBALL}` > %{otherdir}/$(basename ${NEW_TARBALL}).sha256
+
+%post
+%postun
+
+%files
+%defattr(-,root,root)
+
+%changelog
