@@ -10,7 +10,8 @@ module RpmSpecHelpers
 
 %define otherdir %{_topdir}/OTHER
 %define prefix_path /app/vendor/%{name}
-%define destdir /tmp/%{name}/%{prefix_path}
+%define destdir /tmp/%{name}/
+%define dependencydir %{destdir}/%{prefix_path}
 # END shared macros
 EOF
   end
