@@ -76,11 +76,16 @@ class CfObsBinaryBuilder::BaseDependency
   end
 
   def to_yaml
-    [
-      {
-        'url'    => @source,
-        'sha256' => @validated_checksum
-      }
-    ].to_yaml
+    dependency_hash = { 'url' => @source }
+    case @validated_checksum.length
+    when 40
+      dependency_hash['sha1'] = @validated_checksum
+    when 64
+      dependency_hash['sha256'] = @validated_checksum
+    when 128
+      dependency_hash['sha512'] = @validated_checksum
+    end
+
+    [dependency_hash].to_yaml
   end
 end
