@@ -30,6 +30,15 @@ class CfObsBinaryBuilder::Checksum
     },
     "bundler" => {
       "type" => "rubygems"
+    },
+    "pip" => {
+      "type" => "pypi"
+    },
+    "pipenv" => {
+      "type" => "pypi"
+    },
+    "setuptools" => {
+      "type" => "pypi"
     }
   }
 
