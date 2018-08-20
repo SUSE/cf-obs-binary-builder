@@ -39,6 +39,9 @@ class CfObsBinaryBuilder::Checksum
     },
     "setuptools" => {
       "type" => "pypi"
+    },
+    "pip-pop" => {
+      "type" => "pypi"
     }
   }
 
