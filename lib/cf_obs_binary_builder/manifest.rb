@@ -125,7 +125,7 @@ class CfObsBinaryBuilder::Manifest
     if hash_from_manifest["name"] == "openjdk1.8-latest"
       dep_class = CfObsBinaryBuilder::Openjdk
     else
-      dep_class = CfObsBinaryBuilder.get_build_target("CfObsBinaryBuilder::#{hash_from_manifest["name"].capitalize}")
+      dep_class = CfObsBinaryBuilder.get_build_target("CfObsBinaryBuilder::#{hash_from_manifest["name"].capitalize.tr("-","")}")
     end
 
     dep_class.nil? ? nil : dep_class.new(version)
