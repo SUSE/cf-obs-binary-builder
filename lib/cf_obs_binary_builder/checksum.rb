@@ -71,7 +71,7 @@ class CfObsBinaryBuilder::Checksum
   end
 
   def self.libffi(version)
-    sha512list = open("ftp://sourceware.org/pub/libffi/sha512.sum").read
+    sha512list = open("https://sourceware.org/pub/libffi/sha512.sum").read
     checksum = sha512list.lines.grep(/#{Regexp.escape(version)}.tar.gz/).first&.split&.first
     raise "Could not determine checksum for libffi-#{version}.tar.gz. The checksum file content was:\n\n#{sha512list}" if !checksum
 
