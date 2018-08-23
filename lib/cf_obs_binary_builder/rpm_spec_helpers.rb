@@ -2,6 +2,8 @@ module RpmSpecHelpers
   def rpm_macros
     <<EOF
 # BEGIN shared macros for all dependency packages
+BuildRequires: aaa_stack_build_requires
+
 %if 0%{?is_opensuse}
 %define stack opensuse42
 %else
