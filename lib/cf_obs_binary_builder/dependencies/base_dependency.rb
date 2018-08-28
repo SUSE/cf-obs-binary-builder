@@ -51,11 +51,35 @@ class CfObsBinaryBuilder::BaseDependency
   end
 
   def prepare_sources
+    download_source(source)
+  end
+
+  def validate_checksum(checksum)
+    @validated_checksum = verify_checksum(source, checksum)
+  end
+
+  def to_yaml
+    dependency_hash = { 'url' => @source }
+    case @validated_checksum.length
+    when 40
+      dependency_hash['sha1'] = @validated_checksum
+    when 64
+      dependency_hash['sha256'] = @validated_checksum
+    when 128
+      dependency_hash['sha512'] = @validated_checksum
+    end
+
+    [dependency_hash].to_yaml
+  end
+
+  private
+
+  def download_source(source)
     log "Downloading the sources in the package directory... (#{source})"
     File.write(File.basename(source), open(source).read)
   end
 
-  def validate_checksum(checksum)
+  def verify_checksum(source, checksum)
     actual_checksum = case checksum.length
     when 32
       md5 = Digest::MD5.file File.basename(source)
@@ -73,22 +97,8 @@ class CfObsBinaryBuilder::BaseDependency
 
     if actual_checksum != checksum
       raise "Checksum mismatch #{actual_checksum} vs. #{checksum}"
-    else
-      @validated_checksum = checksum
-    end
-  end
-
-  def to_yaml
-    dependency_hash = { 'url' => @source }
-    case @validated_checksum.length
-    when 40
-      dependency_hash['sha1'] = @validated_checksum
-    when 64
-      dependency_hash['sha256'] = @validated_checksum
-    when 128
-      dependency_hash['sha512'] = @validated_checksum
     end
 
-    [dependency_hash].to_yaml
+    checksum
   end
 end
