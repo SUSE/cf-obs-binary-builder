@@ -1,5 +1,5 @@
 #
-# spec file for non-build buildpack dependencies
+# spec file for SUSE CAP buildpack dependency
 #
 # Copyright (c) 2018 SUSE LINUX GmbH, Nuernberg, Germany.
 #
@@ -12,16 +12,14 @@
 # license that conforms to the Open Source Definition (Version 1.9)
 # published by the Open Source Initiative.
 
-# Please submit bugfixes or comments via http://bugs.opensuse.org/
-#
 
 
 Name:           <%= dependency %>-<%= version %>
 Version:        <%= version %>
 Release:        1
+Summary:        This is a dependency used in SUSE CAP buildpacks
 License:        <%= license %>
 Group:          Cloud/Platform/scf
-Summary:        Automatic build of <%= dependency %> for the use in buildpacks in SCF
 Url:            <%= url %>
 Source:         <%= source %>
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -33,19 +31,15 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 %prep
 
 %build
-
-%install
-TARBALL=%{otherdir}/%{name}.tgz
-cp %{SOURCE0} ${TARBALL}
+TARBALL=%{SOURCE0}
 
 CHECKSUM=`sha256sum ${TARBALL}`
-NEW_TARBALL=%{otherdir}/$(basename $TARBALL)-%{stack}-${CHECKSUM:0:8}.tgz
-mv ${TARBALL} ${NEW_TARBALL}
+SHORT_CHECKSUM=${CHECKSUM:0:8}
+NEW_TARBALL=%{otherdir}/$(basename "${TARBALL}")
+NEW_TARBALL=${NEW_TARBALL/%{name}/%{name}-${SHORT_CHECKSUM}}
+cp ${TARBALL} ${NEW_TARBALL}
 
 echo `sha256sum ${NEW_TARBALL}` > %{otherdir}/$(basename ${NEW_TARBALL}).sha256
-
-%post
-%postun
 
 %files
 %defattr(-,root,root)
