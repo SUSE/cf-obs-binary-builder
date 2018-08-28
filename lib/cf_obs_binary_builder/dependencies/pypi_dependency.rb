@@ -10,6 +10,10 @@ class CfObsBinaryBuilder::PypiDependency < CfObsBinaryBuilder::NonBuildDependenc
   private
 
   def pypi_source
+    parse_pypi_url(dependency, version)
+  end
+
+  def parse_pypi_url(dependency, version)
     html = open("https://pypi.org/project/#{dependency}/#{version}/#files").read
     url = html.scan(/(https:\/\/.*?#{dependency}-#{version}\.(zip|tar.gz))/).flatten.first
 
