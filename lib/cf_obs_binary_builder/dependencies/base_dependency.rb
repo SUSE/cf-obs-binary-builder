@@ -61,6 +61,8 @@ class CfObsBinaryBuilder::BaseDependency
   def to_yaml
     dependency_hash = { 'url' => @source }
     case @validated_checksum.length
+    when 32
+      dependency_hash['md5'] = @validated_checksum
     when 40
       dependency_hash['sha1'] = @validated_checksum
     when 64
