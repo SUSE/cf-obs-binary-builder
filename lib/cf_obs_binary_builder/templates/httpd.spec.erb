@@ -1,0 +1,119 @@
+#
+# spec file for SUSE CAP buildpack dependency
+#
+# Copyright (c) 2018 SUSE LINUX GmbH, Nuernberg, Germany.
+#
+# All modifications and additions to the file contributed by third parties
+# remain the property of their copyright owners, unless otherwise agreed
+# upon. The license for this file, and modifications and additions to the
+# file, is the same license as for the pristine package itself (unless the
+# license for the pristine package is not an Open Source License, in which
+# case the license is the MIT License). An "Open Source License" is a
+# license that conforms to the Open Source Definition (Version 1.9)
+# published by the Open Source Initiative.
+
+
+
+Name:           httpd-<%= version %>
+Version:        <%= version %>
+Release:        1
+Summary:        This is a dependency used in SUSE CAP buildpacks
+License:        Apache-2.0
+Group:          Cloud/Platform/scf
+Url:            http://apache.org/
+Source0:        <%= source %>
+Source1:        sources.yml
+Source2:        http://apache.mirrors.tds.net/apr/apr-1.6.3.tar.gz
+Source3:        http://apache.mirrors.tds.net/apr/apr-iconv-1.2.2.tar.gz
+Source4:        http://apache.mirrors.tds.net/apr/apr-util-1.6.1.tar.gz
+
+BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+
+<%= rpm_macros %>
+
+%define apr_path /tmp/apr
+%define prefix_path /app/vendor/httpd
+
+%description
+
+%prep
+%setup -q -n %{name}
+
+%build
+mkdir -p /tmp/apr-sources
+pushd /tmp/apr-sources
+
+tar -xf %{SOURCE2}
+pushd apr-1.6.3
+./configure --prefix=%{apr_path}
+make -j4
+make install
+popd
+
+tar -xf %{SOURCE3}
+pushd apr-iconv-1.2.2
+./configure --with-apr=%{apr_path}/bin/apr-1-config --prefix=%{apr_path}
+make -j4
+make install
+popd
+
+tar -xf %{SOURCE4}
+pushd apr-util-1.6.1
+./configure --prefix=%{apr_path} \
+      --with-apr=%{apr_path} \
+      --with-iconv=%{apr_path} \
+      --with-crypto \
+      --with-openssl \
+      --with-mysql \
+      --with-pgsql \
+      --with-gdbm \
+      --with-ldap
+make -j4
+make install
+popd
+popd
+
+./configure --prefix=%{prefix_path} \
+      --with-apr=%{apr_path} \
+      --with-apr-util=%{apr_path} \
+      --with-ssl=/usr/lib64 \
+      --enable-mpms-shared="worker event" \
+      --enable-mods-shared=reallyall \
+      --disable-isapi \
+      --disable-dav \
+      --disable-dialup
+make -j4
+
+%install
+make install DESTDIR=%{destdir}
+
+
+TARBALL=%{otherdir}/%{name}-linux-x64.tgz
+
+pushd %{destdir}%{prefix_path}
+cp %{SOURCE1} ../
+rm -rf build/ cgi-bin/ error/ icons/ include/ man/ manual/ htdocs/
+rm -rf conf/extra/* conf/httpd.conf conf/httpd.conf.bak conf/magic conf/original
+mkdir -p lib
+cp "%{apr_path}/lib/libapr-1.so.0" ./lib
+cp "%{apr_path}/lib/libaprutil-1.so.0" ./lib
+mkdir -p "./lib/apr-util-1"
+cp "%{apr_path}/lib/apr-util-1/"*.so ./lib/apr-util-1/
+mkdir -p "./lib/iconv"
+cp "%{apr_path}/lib/libapriconv-1.so.0" ./lib
+cp "%{apr_path}/lib/iconv/"*.so ./lib/iconv/
+cd ..
+tar czf ${TARBALL} * --owner=0 --group=0
+popd
+
+CHECKSUM=`sha256sum ${TARBALL}`
+NEW_TARBALL=%{otherdir}/%{name}-linux-x64-%{stack}-${CHECKSUM:0:8}.tgz
+mv ${TARBALL} ${NEW_TARBALL}
+
+echo `sha256sum ${NEW_TARBALL}` > %{otherdir}/$(basename ${NEW_TARBALL}).sha256
+
+%files
+%defattr(-,root,root)
+
+%changelog
+
