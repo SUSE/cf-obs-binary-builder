@@ -37,7 +37,10 @@ cp %{_sourcedir}/*.zip  %{_sourcedir}/*.tar.gz %{destdir}/
 TARBALL=%{otherdir}/%{name}-linux-x64.tgz
 
 pushd %{destdir}
-tar czf ${TARBALL} * --owner=0 --group=0
+# The upstream binary-builder is using `cp -r` which has the same effect
+# as the --hard-dereference flag here.
+# (https://github.com/cloudfoundry/binary-builder/blob/master/lib/archive_recipe.rb#L20)
+tar czf ${TARBALL} --hard-dereference * --owner=0 --group=0
 popd
 
 CHECKSUM=`sha256sum ${TARBALL}`

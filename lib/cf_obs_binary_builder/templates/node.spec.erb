@@ -47,7 +47,10 @@ cp %{SOURCE1} /tmp/
 make install %{?_smp_mflags} DESTDIR=${DESTDIR} PORTABLE=1
 
 TARBALL=%{otherdir}/%{name}-linux-x64.tgz
-tar czvf ${TARBALL} -C /tmp/%{name} . --owner=0 --group=0
+# The upstream binary-builder is using `cp -r` which has the same effect
+# as the --hard-dereference flag here.
+# (https://github.com/cloudfoundry/binary-builder/blob/master/lib/archive_recipe.rb#L20)
+tar czvf ${TARBALL} --hard-dereference -C /tmp/%{name} . --owner=0 --group=0
 
 CHECKSUM=`sha256sum ${TARBALL}`
 NEW_TARBALL=%{otherdir}/%{name}-linux-x64-%{stack}-${CHECKSUM:0:8}.tgz

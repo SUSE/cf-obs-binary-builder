@@ -49,7 +49,10 @@ mkdir -p %{buildroot}/var/binary-builder
 cd %{_builddir}
 
 TARBALL=%{otherdir}/%{mod_full_name}.tgz
-tar czvf ${TARBALL} . --owner=0 --group=0
+# The upstream binary-builder is using `cp -r` which has the same effect
+# as the --hard-dereference flag here.
+# (https://github.com/cloudfoundry/binary-builder/blob/master/lib/archive_recipe.rb#L20)
+tar czvf ${TARBALL} --hard-dereference . --owner=0 --group=0
 
 CHECKSUM=`sha256sum ${TARBALL}`
 NEW_TARBALL=%{otherdir}/%{mod_full_name}-%{stack}-${CHECKSUM:0:8}.tgz

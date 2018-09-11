@@ -71,8 +71,12 @@ COMPANY_NAME="SUSE LINUX GmbH" make images
 chmod -R a+r build/linux-x86_64-normal-server-release/images
 #TARBALL1=%{otherdir}/%{full_jdk_name}-%{version}.tar.gz
 TARBALL2=%{otherdir}/%{full_name}-%{version}.tar.gz
-#tar czvf ${TARBALL1} -C build/linux-x86_64-normal-server-release/images/j2sdk-image . --owner=0 --group=0
-tar czvf ${TARBALL2} -C build/linux-x86_64-normal-server-release/images/j2re-image . -C ../j2sdk-image ./lib/tools.jar ./bin/jcmd ./bin/jmap ./bin/jstack ./man/man1/jcmd.1 ./man/man1/jmap.1 ./man/man1/jstack.1 -C ./jre ./lib/amd64/libattach.so --owner=0 --group=0
+
+# The upstream binary-builder is using `cp -r` which has the same effect
+# as the --hard-dereference flag here.
+# (https://github.com/cloudfoundry/binary-builder/blob/master/lib/archive_recipe.rb#L20)
+#tar czvf ${TARBALL1} --hard-dereference -C build/linux-x86_64-normal-server-release/images/j2sdk-image . --owner=0 --group=0
+tar czvf ${TARBALL2} --hard-dereference -C build/linux-x86_64-normal-server-release/images/j2re-image . -C ../j2sdk-image ./lib/tools.jar ./bin/jcmd ./bin/jmap ./bin/jstack ./man/man1/jcmd.1 ./man/man1/jmap.1 ./man/man1/jstack.1 -C ./jre ./lib/amd64/libattach.so --owner=0 --group=0
 
 #CHECKSUM1=`sha256sum ${TARBALL1}`
 CHECKSUM2=`sha256sum ${TARBALL2}`
