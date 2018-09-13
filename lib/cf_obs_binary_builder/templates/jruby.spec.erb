@@ -25,8 +25,8 @@ License:        Ruby
 Group:          Cloud/Platform/scf
 Url:            http://jruby.org
 Source0:        <%= source %>
-Source1:        jruby-kit.tar.xz
-Source2:        sources.yml
+Source1:        sources.yml
+Source2:        jruby-kit.tar.xz
 BuildRequires:  maven
 BuildRequires:  ca-certificates-mozilla
 BuildRequires:  java-1_8_0-openjdk-devel
@@ -37,12 +37,12 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 %description
 
 %prep
-%setup -q -n jruby-<%= jruby_version %>
-tar xfv %{SOURCE1}
+%setup -q -n %{name}
+tar xf %{SOURCE2}
 
 %build
 mkdir -p %{destdir}
-cp %{SOURCE2} %{destdir}
+cp %{SOURCE1} ./
 
 mvn -P '!truffle' -Djruby.default.ruby.version=<%= ruby_version %> \
   -Dmaven.repo.local=kit/m2 \
@@ -53,10 +53,10 @@ TARBALL=%{otherdir}/jruby-%{version}.tgz
 # The upstream binary-builder is using `cp -r` which has the same effect
 # as the --hard-dereference flag here.
 # (https://github.com/cloudfoundry/binary-builder/blob/master/lib/archive_recipe.rb#L20)
-tar czvf ${TARBALL} --hard-dereference -C %{destdir} bin/ lib/ sources.yml --owner=0 --group=0
+tar czvf ${TARBALL} --hard-dereference bin/ lib/ sources.yml --owner=0 --group=0
 
 CHECKSUM=`sha256sum ${TARBALL}`
-NEW_TARBALL=%{otherdir}/jruby-%{version}-%{stack}-${CHECKSUM:0:8}.tgz
+NEW_TARBALL=%{otherdir}/jruby-%{version}-linux-x64-%{stack}-${CHECKSUM:0:8}.tgz
 mv ${TARBALL} ${NEW_TARBALL}
 
 echo `sha256sum ${NEW_TARBALL}` > %{otherdir}/$(basename ${NEW_TARBALL}).sha256
