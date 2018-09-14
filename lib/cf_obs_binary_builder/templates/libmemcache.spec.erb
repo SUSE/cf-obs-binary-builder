@@ -68,7 +68,9 @@ CHECKSUM=`sha256sum ${TARBALL}`
 NEW_TARBALL=%{otherdir}/%{name}-linux-x64-%{stack}-${CHECKSUM:0:8}.tgz
 mv ${TARBALL} ${NEW_TARBALL}
 
-echo `sha256sum ${NEW_TARBALL}` > %{otherdir}/$(basename ${NEW_TARBALL}).sha256
+pushd $(dirname ${NEW_TARBALL})
+sha256sum $(basename ${NEW_TARBALL}) > ${NEW_TARBALL}.sha256
+popd
 
 %post
 %postun

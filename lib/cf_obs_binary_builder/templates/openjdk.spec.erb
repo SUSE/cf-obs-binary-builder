@@ -86,7 +86,9 @@ NEW_TARBALL2=%{otherdir}/%{full_name}-%{version}-%{stack}-${CHECKSUM2:0:8}.tgz
 mv ${TARBALL2} ${NEW_TARBALL2}
 
 #echo `sha256sum ${NEW_TARBALL1}` > %{otherdir}/$(basename ${NEW_TARBALL1}).sha256
-echo `sha256sum ${NEW_TARBALL2}` > %{otherdir}/$(basename ${NEW_TARBALL2}).sha256
+pushd $(dirname ${NEW_TARBALL2})
+sha256sum $(basename ${NEW_TARBALL2}) > ${NEW_TARBALL2}.sha256
+popd
 
 %post
 %postun
