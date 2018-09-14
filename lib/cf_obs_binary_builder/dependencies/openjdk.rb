@@ -28,6 +28,6 @@ class CfObsBinaryBuilder::Openjdk < CfObsBinaryBuilder::SCMDependency
     end
 
     log "Creating tarball..."
-    system("tar --exclude=\.hg -cJf #{version}.tar.xz jdk8u")
+    system("tar --exclude=\.hg -czf #{version}.tar.gz jdk8u")
   end
 end
