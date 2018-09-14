@@ -31,15 +31,15 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 %prep
 
 %build
-TARBALL=%{SOURCE0}
-
-CHECKSUM=`sha256sum ${TARBALL}`
+CHECKSUM=`sha256sum %{SOURCE0}`
 SHORT_CHECKSUM=${CHECKSUM:0:8}
-NEW_TARBALL=%{otherdir}/$(basename "${TARBALL}")
-NEW_TARBALL=${NEW_TARBALL/%{name}/%{name}-${SHORT_CHECKSUM}}
-cp ${TARBALL} ${NEW_TARBALL}
+EXTENSION=$(echo "%{SOURCE0}" | perl -lne 'print $& if /(\.[a-zA-Z]{1,4}\.{0,1}[a-zA-Z]{0,3})/')
+NEW_TARBALL=%{otherdir}/%{name}-${SHORT_CHECKSUM}${EXTENSION}
 
-echo `sha256sum ${NEW_TARBALL}` > %{otherdir}/$(basename ${NEW_TARBALL}).sha256
+cp %{SOURCE0} ${NEW_TARBALL}
+pushd $(dirname ${NEW_TARBALL})
+sha256sum $(basename ${NEW_TARBALL}) > ${NEW_TARBALL}.sha256
+popd
 
 %files
 %defattr(-,root,root)
