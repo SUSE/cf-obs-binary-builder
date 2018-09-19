@@ -1,7 +1,7 @@
 #
-# spec file for package node
+# spec file for SUSE CAP buildpack dependency
 #
-# Copyright (c) 2017 SUSE LINUX GmbH, Nuernberg, Germany.
+# Copyright (c) 2018 SUSE LINUX GmbH, Nuernberg, Germany.
 #
 # All modifications and additions to the file contributed by third parties
 # remain the property of their copyright owners, unless otherwise agreed
@@ -12,14 +12,12 @@
 # license that conforms to the Open Source Definition (Version 1.9)
 # published by the Open Source Initiative.
 
-# Please submit bugfixes or comments via http://bugs.opensuse.org/
-#
 
 
 Name:           node-<%= version %>
 Version:        <%= version %>
 Release:        1
-Summary: This is the node binary used in buildpacks in SUSE CloudFoundry (SCF)
+Summary:        This is a dependency used in SUSE CAP buildpacks
 License:        MIT
 Group:          Cloud/Platform/scf
 Url:            https://nodejs.org/
@@ -37,20 +35,22 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 %setup -q -n node-v%{version}
 
 %build
-python configure --prefix=/
+python configure --prefix=/ --openssl-use-def-ca-store
 
 %install
-DESTDIR=/tmp/%{name}/%{name}-v%{version}-linux-x64
-mkdir -p ${DESTDIR}
-cp %{SOURCE1} /tmp/
+export DESTDIR=%{destdir}/node-v%{version}-linux-x64
 
-make install %{?_smp_mflags} DESTDIR=${DESTDIR} PORTABLE=1
+mkdir -p "$DESTDIR"
+cp %{SOURCE1} %{destdir}
+cp LICENSE $DESTDIR/
+
+make install %{?_smp_mflags} PORTABLE=1
 
 TARBALL=%{otherdir}/%{name}-linux-x64.tgz
 # The upstream binary-builder is using `cp -r` which has the same effect
 # as the --hard-dereference flag here.
 # (https://github.com/cloudfoundry/binary-builder/blob/master/lib/archive_recipe.rb#L20)
-tar czvf ${TARBALL} --hard-dereference -C /tmp/%{name} . --owner=0 --group=0
+tar --hard-dereference -czvf ${TARBALL} -C %{destdir} . --owner=0 --group=0
 
 CHECKSUM=`sha256sum ${TARBALL}`
 NEW_TARBALL=%{otherdir}/%{name}-linux-x64-%{stack}-${CHECKSUM:0:8}.tgz
