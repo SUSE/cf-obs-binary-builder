@@ -14,7 +14,6 @@ describe CfObsBinaryBuilder::NonBuildDependency do
       script = dependency.render_spec_template
 
       expect(script).to include("MIT")
-      expect(script).to include("TARBALL=%{SOURCE0}")
       expect(script).to match(/Name:\s*bundler/)
       expect(script).to match(/Version:\s*1.2.3/)
       expect(script).to match(/License:\s*MIT/)
