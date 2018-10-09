@@ -2,6 +2,7 @@ class CfObsBinaryBuilder::Php < CfObsBinaryBuilder::BaseDependency
   attr_reader :major_version, :php_extensions
 
   def initialize(version)
+    @version = version
     @major_version = version[/^(\d).*/,1]
     @php_extensions = extract_extensions
 
@@ -43,7 +44,15 @@ class CfObsBinaryBuilder::Php < CfObsBinaryBuilder::BaseDependency
   def extract_extensions
     php_extensions_yml = {}
     Dir.mktmpdir("cf-obs-binary-builder-php") do |tmpdir|
-      filename = @major_version == "7" ? "php7-extensions.yml" : "php-extensions.yml"
+      case @version
+      when /^5\./
+        filename = "php-extensions.yml"
+      when /^7\.[01]\./
+        filename = "php7-extensions.yml"
+      else
+        filename = "php72-extensions.yml"
+      end
+
       source = "https://raw.githubusercontent.com/cloudfoundry/public-buildpacks-ci-robots/master/binary-builds/#{filename}"
       File.write(File.join(tmpdir, File.basename(source)), open(source).read)
       php_extensions_yml = YAML.load_file(File.join(tmpdir, filename))
