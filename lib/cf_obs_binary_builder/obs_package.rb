@@ -1,7 +1,7 @@
 class CfObsBinaryBuilder::ObsPackage
   attr_reader :name, :obs_project
 
-  ARTIFACT_EXTENSION_REGEXP=".tgz|.tar.gz|.tbz|tar.bz|.zip"
+  ARTIFACT_EXTENSION_REGEXP=".tgz|.tar.gz|.tbz|tar.bz|.zip|.phar"
 
   def initialize(name, obs_project)
     @name = name
@@ -103,8 +103,9 @@ EOF
     obs_repository = repository_for_stack(stack)
     ls_output, status = Open3.capture2e("osc ls -b #{obs_project} #{name} #{obs_repository} x86_64")
     raise "Error getting checksum filename: #{checksum_file}" unless status.exitstatus == 0
-    checksum_file = ls_output[/#{name}.+\.sha256$/].strip
-    artifact_file = ls_output[/#{name}.+[#{ARTIFACT_EXTENSION_REGEXP}]$/].strip
+    name_without_version = name.match(/^(.*)-/)[1]
+    checksum_file = ls_output[/#{name_without_version}.+\.sha256$/].strip
+    artifact_file = ls_output[/#{name_without_version}.+[#{ARTIFACT_EXTENSION_REGEXP}]$/].strip
 
     [checksum_file, artifact_file]
   end
