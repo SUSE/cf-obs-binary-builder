@@ -74,8 +74,6 @@ class CfObsBinaryBuilder::BaseDependency
     [dependency_hash].to_yaml
   end
 
-  private
-
   def download_source(source)
     log "Downloading the sources in the package directory... (#{source})"
     File.write(File.basename(source), open(source).read)
