@@ -1,0 +1,375 @@
+#
+# spec file for SUSE CAP buildpack dependency
+#
+# Copyright (c) 2018 SUSE LINUX GmbH, Nuernberg, Germany.
+#
+# All modifications and additions to the file contributed by third parties
+# remain the property of their copyright owners, unless otherwise agreed
+# upon. The license for this file, and modifications and additions to the
+# file, is the same license as for the pristine package itself (unless the
+# license for the pristine package is not an Open Source License, in which
+# case the license is the MIT License). An "Open Source License" is a
+# license that conforms to the Open Source Definition (Version 1.9)
+# published by the Open Source Initiative.
+
+
+<% if version[0,1] == "5" %>
+Name:           php-<%= version %>
+<% else %>
+Name:           php7-<%= version %>
+<% end %>
+Version:        <%= version %>
+Release:        1
+Summary:        This is a dependency used in SUSE CAP buildpacks
+License:        PHP-3.01
+Group:          Cloud/Platform/scf
+Url:            http://php.net/
+Source0:        <%= source %>
+Source1:        sources.yml
+Source2:        https://raw.githubusercontent.com/cloudfoundry/binary-builder/master/bin/download_geoip_db.rb
+Source3:        https://raw.githubusercontent.com/cloudfoundry/binary-builder/master/lib/geoip_downloader.rb
+BuildRequires:  libuv-devel
+BuildRequires:  aspell-devel
+BuildRequires:  libexpat-devel
+BuildRequires:  gdbm-devel
+BuildRequires:  gmp-devel
+BuildRequires:  libgpgme-devel
+BuildRequires:  libjpeg8-devel
+BuildRequires:  openldap2-devel
+BuildRequires:  libmcrypt-devel
+BuildRequires:  libpng12-devel
+BuildRequires:  libpspell15
+BuildRequires:  cyrus-sasl-devel
+BuildRequires:  net-snmp-devel
+BuildRequires:  sqlite3-devel
+BuildRequires:  libtool
+BuildRequires:  libxml2-devel
+BuildRequires:  libzip-devel
+BuildRequires:  automake
+BuildRequires:  freetype2-devel
+BuildRequires:  libxslt-devel
+BuildRequires:  libGeoIP-devel
+BuildRequires:  krb5-devel
+BuildRequires:  libopenssl-devel
+BuildRequires:  libcurl-devel
+<% if version[0,1] == "5" %>
+BuildRequires:  freetds-devel
+BuildRequires:  libgearman-devel
+BuildRequires:  readline-devel
+<% else %>
+BuildRequires:  libedit-devel
+BuildRequires:  argon2-devel
+<% end %>
+# re2c is recommended in the build log
+BuildRequires:  re2c
+BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+
+<%= rpm_macros %>
+%define dependencydir %{destdir}/php
+
+%define phpize %{dependencydir}/bin/phpize
+%define phpconfig %{dependencydir}/bin/php-config
+%define temp_destdir /tmp/temp_destdir/%{name}/
+
+%description
+
+%prep
+%setup -q -n php-%{version}
+
+%build
+function build_extension {
+  TEMPDIR=$(mktemp -d)
+  pushd $TEMPDIR
+
+  tar -xf "$1"
+  BUILD_DIR=$(find * -maxdepth 0 -type d)
+  pushd $BUILD_DIR
+    if [[ $(basename $BUILD_DIR) == cphalcon* ]]; then
+      pushd build
+        ./install --php-config %{phpconfig} --phpize %{phpize}
+      popd
+    elif [[ $(basename $BUILD_DIR) == xhprof* ]]; then
+      pushd extension
+        build_php_extension
+      popd
+    elif [[ $(basename $BUILD_DIR) == Twig* ]]; then
+      pushd ext/twig
+        build_php_extension
+      popd
+    elif [[ $(basename $BUILD_DIR) == snmp-mibs-downloader* ]]; then
+      build_snmp_mibs_downloader
+    elif [[ $(basename $BUILD_DIR) == hiredis* ]]; then
+      LIBRARY_PATH=lib PREFIX=%{temp_destdir} make install
+    elif [[ $(basename $BUILD_DIR) == ioncube ]]; then
+      build_ioncube
+    elif [[ $(basename $BUILD_DIR) == librdkafka* ]]; then
+      build_librdkafka
+    elif [[ $(basename $BUILD_DIR) == geoip* ]]; then
+      build_geoip
+    elif [[ $(basename $BUILD_DIR) == rdkaf* ]]; then
+      build_rdkafka
+    elif [[ $(basename $BUILD_DIR) == lua-[56]* ]]; then
+      build_lua_interpreter
+    elif [[ $(basename $BUILD_DIR) == lua-[12]* ]]; then
+      build_php_extension "--with-lua=%{temp_destdir}"
+    elif [[ $(basename $BUILD_DIR) == amqp* ]]; then
+      build_php_extension "--with-amqp --with-librabbitmq-dir=%{temp_destdir}"
+    elif [[ $(basename $BUILD_DIR) == cassandra* ]]; then
+      build_php_extension "--with-cassandra=%{temp_destdir}"
+    elif [[ $(basename $BUILD_DIR) == memcached* ]]; then
+      build_php_extension "--with-libmemcached-dir=%{temp_destdir}"
+    elif [[ $(basename $BUILD_DIR) == phpiredis* ]]; then
+      build_php_extension "--enable-phpiredis --with-hiredis-dir=%{temp_destdir}"
+    elif [[ $(basename $BUILD_DIR) == redis* ]]; then
+      build_php_extension "--enable-redis-igbinary --enable-redis-lzf --with-liblzf=no"
+    else
+      if [[ -e "cmake" ]]; then
+        build_cmake "$1"
+      elif [[ -f "config.m4" ]]; then
+        if [[ $(autoconf config.m4) != 0 ]]; then
+          %{phpize}
+        fi
+        build "$1"
+      else
+        build "$1"
+      fi
+    fi
+  popd
+  popd
+  rm -r "$TEMPDIR"
+}
+
+function build {
+  ./configure \
+    --with-php-config=%{phpconfig} --prefix=%{temp_destdir}
+  make %{?_smp_mflags}
+  make install
+}
+
+function build_php_extension {
+  %{phpize}
+  ./configure --with-php-config=%{phpconfig} $1
+  make %{?_smp_mflags}
+  make install
+}
+
+function build_cmake {
+  cmake .
+  cmake --build .
+  cmake -DCMAKE_INSTALL_PREFIX=%{temp_destdir} .
+  cmake --build . --target install
+}
+
+function build_librdkafka {
+  ./configure --prefix=%{temp_destdir}
+  make %{?_smp_mflags}
+  make install
+}
+
+function build_lua_interpreter {
+  make linux %{?_smp_mflags} MYCFLAGS="-fPIC"
+  make install INSTALL_TOP=%{temp_destdir}
+}
+
+function build_rdkafka {
+  %{phpize}
+  sed -i 's|.*SEARCH_PATH="\(.*\)"|SEARCH_PATH="%{temp_destdir}/ \1"|g' configure
+  build
+}
+
+function build_ioncube {
+  cp ioncube_loader_lin_<%= version[0,3] %>.so $(echo %{dependencydir}/lib/php/extensions/no-debug-non-zts-*/)ioncube.so
+}
+
+function build_geoip {
+  build_php_extension
+
+  pushd %{dependencydir}
+    mkdir -p geoipdb/bin
+    mkdir -p geoipdb/lib
+    mkdir -p geoipdb/dbs
+    cp %{SOURCE2} geoipdb/bin
+    cp %{SOURCE3} geoipdb/lib
+    # Missing support for bundling GeoIP Lite db
+  popd
+}
+
+function build_snmp_mibs_downloader {
+  mkdir -p %{dependencydir}/mibs/conf
+  cp /usr/lib64/libnetsnmp.so* %{dependencydir}/lib/
+  # copy mibs that are packaged freely
+  cp -r /usr/share/snmp/mibs/* %{dependencydir}/mibs
+  # copy mibs downloader & smistrip, will download un-free mibs
+  cp download-mibs %{dependencydir}/bin
+  cp /usr/bin/smistrip %{dependencydir}/bin
+  sed -i "s|^CONFDIR=/etc/snmp-mibs-downloader|CONFDIR=\$HOME/php/mibs/conf|" %{dependencydir}/bin/download-mibs
+  sed -i "s|^SMISTRIP=/usr/bin/smistrip|SMISTRIP=\$HOME/php/bin/smistrip|" %{dependencydir}/bin/download-mibs
+  # copy mibs download config
+  cp iana.conf ianalist ianarfc.conf ianarfclist rfc.conf rfclist rfcmibs.diff simplelist simpleweb.conf snmp-mibs-downloader.conf %{dependencydir}/mibs/conf
+  pushd %{dependencydir}
+    sed -i "s|^DIR=/usr/share/doc|DIR=\$HOME/php/mibs/originals|" mibs/conf/iana.conf
+    sed -i "s|^DEST=iana|DEST=|" mibs/conf/iana.conf
+    sed -i "s|^DIR=/usr/share/doc|DIR=\$HOME/php/mibs/originals|" mibs/conf/ianarfc.conf
+    sed -i "s|^DEST=iana|DEST=|" mibs/conf/ianarfc.conf
+    sed -i "s|^DIR=/usr/share/doc|DIR=\$HOME/php/mibs/originals|" mibs/conf/rfc.conf
+    sed -i "s|^DEST=ietf|DEST=|" mibs/conf/rfc.conf
+    sed -i "s|^BASEDIR=/var/lib/mibs|BASEDIR=\$HOME/php/mibs|" mibs/conf/snmp-mibs-downloader.conf
+  popd
+  # copy data files
+  mkdir %{dependencydir}/mibs/originals
+  cp mibiana/* %{dependencydir}/mibs/originals
+  cp mibrfcs/* %{dependencydir}/mibs/originals
+}
+
+SOURCES_DIR=$(dirname %{SOURCE0})
+
+# Some build environments expect lib and others lib64
+mkdir -p %{temp_destdir}/lib
+ln -s %{temp_destdir}/lib %{temp_destdir}/lib64
+
+./configure --prefix=%{dependencydir} \
+<% if version[0,1] == "5" %> \
+      --with-mhash=shared \
+      --with-mysql=shared \
+      --with-mssql=shared \
+      --with-pdo-dblib=shared \
+      --with-readline=shared \
+<% else %> \
+      --with-password-argon2=%{dependencydir}/lib \
+<% end %> \
+      --disable-static \
+      --enable-shared \
+      --enable-ftp=shared \
+      --enable-sockets=shared \
+      --enable-soap=shared \
+      --enable-fileinfo=shared \
+      --enable-bcmath \
+      --enable-calendar \
+      --enable-intl \
+      --with-kerberos \
+      --enable-zip=shared \
+      --with-bz2=shared \
+      --with-curl=shared \
+      --enable-dba=shared \
+      --with-cdb \
+      --with-gdbm \
+      --with-mcrypt=shared \
+      --with-mysqli=shared \
+      --enable-pdo=shared \
+      --with-pdo-sqlite=shared,/usr \
+      --with-pdo-mysql=shared,mysqlnd \
+      --with-gd=shared \
+      --with-jpeg-dir=/usr \
+      --with-freetype-dir=/usr \
+      --enable-gd-native-ttf \
+      --with-pdo-pgsql=shared \
+      --with-pgsql=shared \
+      --with-pspell=shared \
+      --with-gettext=shared \
+      --with-gmp=shared \
+      --with-imap=shared \
+      --with-imap-ssl=shared \
+      --with-ldap=shared \
+      --with-ldap-sasl \
+      --with-zlib=shared \
+      --with-xsl=shared \
+      --with-snmp=shared \
+      --enable-mbstring=shared \
+      --enable-mbregex \
+      --enable-exif=shared \
+      --with-openssl=shared \
+      --enable-fpm \
+      --enable-pcntl=shared \
+      --enable-sysvsem=shared \
+      --enable-sysvshm=shared \
+      --enable-sysvmsg=shared \
+      --enable-shmop=shared \
+      --with-libdir=lib64
+
+make %{?_smp_mflags}
+make install
+
+pushd $SOURCES_DIR
+  for TARBALL in $(echo -e "$(ls native_modules-* | sort -r)\n$(ls extensions-*)"); do
+    build_extension $SOURCES_DIR/$TARBALL
+  done
+popd
+
+# Make "FakePeclRecipes"
+for EXTENSION in odbc readline pdo_odbc; do
+  pushd ext/$EXTENSION
+    <% if version[0,1] == "7" %>
+    if [[ $EXTENSION == "readline" ]]; then
+        build_php_extension
+    fi
+    <% end %>
+    if [[ $EXTENSION == "pdo_odbc" ]]; then
+      build_php_extension "--with-pdo-odbc=unixODBC,%{temp_destdir}"
+    fi
+    if [[ $EXTENSION == "odbc" ]]; then
+      # patching same issue mentioned here ->
+      # https://github.com/docker-library/php/issues/103#issuecomment-271434109
+      echo 'AC_DEFUN([PHP_ALWAYS_SHARED],[])dnl' > temp.m4
+      echo >> temp.m4
+      cat config.m4 >> temp.m4
+      mv temp.m4 config.m4
+
+      build_php_extension "--with-unixODBC=shared,%{temp_destdir}"
+    fi
+  popd
+done
+
+
+%install
+pushd %{dependencydir}
+  # Copy sources.yml
+  cp %{SOURCE1} ../
+
+  # Copy libs
+  <% if version[0,1] == "5" %>
+  cp /usr/lib64/libgearman.so* lib/
+  cp /usr/lib64/libsybdb.so* lib/
+  <% else %>
+  cp /usr/lib64/libargon2.so* lib/
+  <% end %>
+  cp %{temp_destdir}/lib64/librabbitmq.so* lib/
+  cp %{temp_destdir}/lib64/libhiredis.so* lib/
+  cp %{temp_destdir}/lib64/libmemcached.so* lib/
+  cp /usr/lib64/libc-client.so* lib/
+  cp /usr/lib64/libmcrypt.so* lib/
+  cp /usr/lib64/libaspell.so* lib/
+  cp /usr/lib64/libpspell.so* lib/
+  cp %{temp_destdir}/lib/libcassandra.so* lib/
+  cp /usr/lib64/libuv.so* lib/
+  cp %{temp_destdir}/lib64/librdkafka.so* lib/
+  cp /usr/lib64/libGeoIP.so* lib/
+  cp /usr/lib64/libgpgme.so* lib/
+  cp /usr/lib64/libassuan.so* lib/
+  cp /usr/lib64/libgpg-error.so* lib/
+  cp %{temp_destdir}/lib/libodbc.so* lib/
+  cp %{temp_destdir}/lib/libodbcinst.so* lib/
+
+  # Remove unused files
+  rm "etc/php-fpm.conf.default"
+  rm -rf "include"
+  rm -rf "php"
+  rm -rf "lib/php/build"
+  rm "bin/php-cgi"
+  find "lib/php/extensions" -name "*.a" -type f -delete
+
+  cd ..
+  TARBALL=%{otherdir}/%{name}-linux-x64.tgz
+
+  tar czf ${TARBALL} --hard-dereference * --owner=0 --group=0
+popd
+
+CHECKSUM=`sha256sum ${TARBALL}`
+NEW_TARBALL=%{otherdir}/%{name}-linux-x64-%{stack}-${CHECKSUM:0:8}.tgz
+mv ${TARBALL} ${NEW_TARBALL}
+
+echo `sha256sum ${NEW_TARBALL}` > %{otherdir}/$(basename ${NEW_TARBALL}).sha256
+
+%files
+%defattr(-,root,root)
+
+%changelog
