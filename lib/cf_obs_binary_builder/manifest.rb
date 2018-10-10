@@ -68,13 +68,17 @@ class CfObsBinaryBuilder::Manifest
         (BUILD_STACKS-[BASE_STACK]).each do |stack|
           artifact = dependency.obs_package.artifact(stack, s3_bucket)
 
-          hash["dependencies"] << {
+          element = {
             "name" => name_to_manifest(dependency.dependency),
             "version" => dependency.version,
             "uri" => artifact[:uri],
             "sha256" => artifact[:checksum],
             "cf_stacks" => [stack]
           }
+          if name_to_manifest(dependency.dependency) == "php"
+            element["modules"] = artifact[:modules]
+          end
+          hash["dependencies"] << element
         end
       else
         raise "Unknown build status: #{build_status}"

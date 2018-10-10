@@ -64,26 +64,32 @@ EOF
   end
 
   def artifact(stack, s3_bucket)
+    artifacts = {}
     obs_repository = repository_for_stack(stack)
     checksum_file, artifact_file = artifact_filenames(stack)
 
     subdir = name.sub(/-.*/, "")
-    artifact_uri = "https://s3.amazonaws.com/#{s3_bucket}/dependencies/#{subdir}/#{artifact_file}"
+    artifacts[:uri] = "https://s3.amazonaws.com/#{s3_bucket}/dependencies/#{subdir}/#{artifact_file}"
 
-    checksum = nil
     Dir.mktmpdir do |tmpdir|
       output, status = Open3.capture2e("osc getbinaries -d #{tmpdir} #{obs_project} #{name} #{obs_repository} x86_64 #{checksum_file}")
       raise "Could not get checksum file #{checksum_file}:\n#{output}" unless status.exitstatus == 0
 
       content = File.read(File.join(tmpdir, checksum_file))
-      checksum = content[/(\w{64}) .+/, 1]
-      raise "Error extracting checksum. File content:\n#{content}" unless checksum
+      artifacts[:checksum] = content[/(\w{64}) .+/, 1]
+
+      raise "Error extracting checksum. File content:\n#{content}" unless artifacts[:checksum]
+
+      if @name =~ /^php-/
+        modules_file = "#{name}-extensions.yaml"
+        output, status = Open3.capture2e("osc getbinaries -d #{tmpdir} #{obs_project} #{name} #{obs_repository} x86_64 #{modules_file}")
+        raise "Could not get modules file #{modules_file}:\n#{output}" unless status.exitstatus == 0
+
+        artifacts[:modules] = YAML.load_file(File.join(tmpdir, modules_file))
+      end
     end
 
-    {
-      checksum: checksum,
-      uri: artifact_uri
-    }
+    artifacts
   end
 
   private
