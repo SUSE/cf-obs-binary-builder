@@ -45,7 +45,7 @@ class CfObsBinaryBuilder::BaseBuildpack
 
   def render_spec_template
     spec_template = File.read(
-      File.expand_path(File.dirname(__FILE__) + "/../templates/buildpack.spec.erb"))
+      File.expand_path(File.dirname(__FILE__) + "/../templates/buildpack-go-based.spec.erb"))
     ERB.new(spec_template).result(binding)
   end
 
