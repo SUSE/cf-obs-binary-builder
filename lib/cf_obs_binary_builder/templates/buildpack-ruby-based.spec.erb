@@ -1,0 +1,63 @@
+#
+# spec file for the <%= name %> buildpack
+#
+# Copyright (c) 2018 SUSE LINUX GmbH, Nuernberg, Germany.
+#
+# All modifications and additions to the file contributed by third parties
+# remain the property of their copyright owners, unless otherwise agreed
+# upon. The license for this file, and modifications and additions to the
+# file, is the same license as for the pristine package itself (unless the
+# license for the pristine package is not an Open Source License, in which
+# case the license is the MIT License). An "Open Source License" is a
+# license that conforms to the Open Source Definition (Version 1.9)
+# published by the Open Source Initiative.
+
+# Please submit bugfixes or comments via http://bugs.opensuse.org/
+#
+
+%define upstream_version <%= upstream_version %>
+
+Name:           <%= name %>-buildpack
+Version:        <%= version %>
+Release:        1
+Summary:        Cloud Foundry buildpack for <%= name %>
+License:        Apache-2.0
+Group:          Cloud/Platform/scf
+Url:            https://github.com/SUSE/cf-<%= name %>-buildpack
+Source0:        https://github.com/SUSE/cf-<%= name %>-buildpack/archive/v%{upstream_version}.tar.gz
+Source1:        manifest.yml
+BuildRequires:  ruby2.3-rubygem-buildpack-packager
+BuildRequires:  compile-extensions-tarball
+BuildRequires:  zip
+<% dependencies = manifest.dependencies.first %>
+<% dependencies.each do |dependency| %>
+BuildRequires: <%= dependency.package_name %>
+<% end %>
+BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+
+%define otherdir %{_topdir}/OTHER
+
+%description
+
+%prep
+%setup -q -n %{name}-%{upstream_version}
+
+%build
+echo %{version} > VERSION
+# Replace the upstream manifest with the updated one for the SUSE stacks
+cp %{SOURCE1} ./manifest.yml
+tar --strip-components=1 -xf /usr/share/compile-extensions/compile-extensions.tar.gz -C compile-extensions
+buildpack-packager --any-stack --uncached
+
+%install
+CHECKSUM=`sha1sum <%= name %>_buildpack-v%{version}.zip | cut -d' ' -f1`
+mv <%= name %>_buildpack-v%{version}.zip %{otherdir}/<%= name %>_buildpack-v%{version}-%{release}-pre-${CHECKSUM:0:8}.zip
+
+%post
+%postun
+
+%files
+%defattr(-,root,root)
+
+%changelog
+
