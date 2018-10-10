@@ -318,6 +318,13 @@ done
 
 %install
 pushd %{dependencydir}
+  # Extract php extensions list
+  EXTENSIONS_FILE="%{otherdir}/%{name}-extensions.yaml"
+  echo "---" > "$EXTENSIONS_FILE"
+  for EXTENSION in $(ls lib/php/extensions/no-debug-non-zts-*/); do
+    echo "- $(echo -n $EXTENSION | cut -d. -f1)" >> "$EXTENSIONS_FILE"
+  done
+
   # Copy sources.yml
   cp %{SOURCE1} ../
 
