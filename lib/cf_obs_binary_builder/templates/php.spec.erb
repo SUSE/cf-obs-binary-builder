@@ -184,6 +184,7 @@ function build_geoip {
     mkdir -p geoipdb/lib
     mkdir -p geoipdb/dbs
     cp %{SOURCE2} geoipdb/bin
+    chmod +x geoipdb/bin/*
     cp %{SOURCE3} geoipdb/lib
     # Missing support for bundling GeoIP Lite db
   popd
