@@ -32,9 +32,8 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 %build
 CHECKSUM=`sha256sum %{SOURCE0}`
-SHORT_CHECKSUM=${CHECKSUM:0:8}
 EXTENSION=$(echo "%{SOURCE0}" | perl -lne 'print $& if /(\.[a-zA-Z]{1,4}\.{0,1}[a-zA-Z]{0,3})/')
-NEW_TARBALL=%{otherdir}/%{name}-${SHORT_CHECKSUM}${EXTENSION}
+NEW_TARBALL=%{otherdir}/%{name}-${CHECKSUM:0:8}${EXTENSION}
 
 cp %{SOURCE0} ${NEW_TARBALL}
 pushd $(dirname ${NEW_TARBALL})
