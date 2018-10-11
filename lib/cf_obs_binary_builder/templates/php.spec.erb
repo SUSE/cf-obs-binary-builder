@@ -54,7 +54,6 @@ BuildRequires:  libgearman-devel
 BuildRequires:  readline-devel
 <% else %>
 BuildRequires:  libedit-devel
-BuildRequires:  argon2-devel
 <% end %>
 # re2c is recommended in the build log
 BuildRequires:  re2c
@@ -230,8 +229,6 @@ ln -s %{temp_destdir}/lib %{temp_destdir}/lib64
       --with-mssql=shared \
       --with-pdo-dblib=shared \
       --with-readline=shared \
-<% else %> \
-      --with-password-argon2=%{dependencydir}/lib \
 <% end %> \
       --disable-static \
       --enable-shared \
@@ -332,8 +329,6 @@ pushd %{dependencydir}
   <% if version[0,1] == "5" %>
   cp /usr/lib64/libgearman.so* lib/
   cp /usr/lib64/libsybdb.so* lib/
-  <% else %>
-  cp /usr/lib64/libargon2.so* lib/
   <% end %>
   cp %{temp_destdir}/lib64/librabbitmq.so* lib/
   cp %{temp_destdir}/lib64/libhiredis.so* lib/
