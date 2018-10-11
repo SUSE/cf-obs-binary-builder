@@ -46,14 +46,14 @@ pushd /tmp/apr-sources
 tar -xf %{SOURCE2}
 pushd apr-1.6.3
 ./configure --prefix=%{apr_path}
-make -j4
+make %{?_smp_mflags}
 make install
 popd
 
 tar -xf %{SOURCE3}
 pushd apr-iconv-1.2.2
 ./configure --with-apr=%{apr_path}/bin/apr-1-config --prefix=%{apr_path}
-make -j4
+make %{?_smp_mflags}
 make install
 popd
 
@@ -68,7 +68,7 @@ pushd apr-util-1.6.1
       --with-pgsql \
       --with-gdbm \
       --with-ldap
-make -j4
+make %{?_smp_mflags}
 make install
 popd
 popd
@@ -82,7 +82,7 @@ popd
       --disable-isapi \
       --disable-dav \
       --disable-dialup
-make -j4
+make %{?_smp_mflags}
 
 %install
 make install DESTDIR=%{destdir}
