@@ -23,9 +23,9 @@ Group:          Cloud/Platform/scf
 Url:            http://apache.org/
 Source0:        <%= source %>
 Source1:        sources.yml
-Source2:        http://apache.mirrors.tds.net/apr/apr-1.6.3.tar.gz
-Source3:        http://apache.mirrors.tds.net/apr/apr-iconv-1.2.2.tar.gz
-Source4:        http://apache.mirrors.tds.net/apr/apr-util-1.6.1.tar.gz
+Source2:        https://www.apache.org/dist/apr/apr-1.6.5.tar.bz2
+Source3:        https://www.apache.org/dist/apr/apr-iconv-1.2.2.tar.bz2
+Source4:        https://www.apache.org/dist/apr/apr-util-1.6.1.tar.bz2
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
@@ -44,21 +44,21 @@ mkdir -p /tmp/apr-sources
 pushd /tmp/apr-sources
 
 tar -xf %{SOURCE2}
-pushd apr-1.6.3
+pushd apr-1.*
 ./configure --prefix=%{apr_path}
 make %{?_smp_mflags}
 make install
 popd
 
 tar -xf %{SOURCE3}
-pushd apr-iconv-1.2.2
+pushd apr-iconv-1.*
 ./configure --with-apr=%{apr_path}/bin/apr-1-config --prefix=%{apr_path}
 make %{?_smp_mflags}
 make install
 popd
 
 tar -xf %{SOURCE4}
-pushd apr-util-1.6.1
+pushd apr-util-1.*
 ./configure --prefix=%{apr_path} \
       --with-apr=%{apr_path} \
       --with-iconv=%{apr_path} \

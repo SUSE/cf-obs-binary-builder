@@ -10,16 +10,16 @@ class CfObsBinaryBuilder::Httpd < CfObsBinaryBuilder::BaseDependency
   def prepare_sources
     additional_sources = [
       {
-        url: "http://apache.mirrors.tds.net/apr/apr-1.6.3.tar.gz",
-        checksum: "8fdabcc0004216c3588b7dca0f23d104dfe012a47e2bb6f13827534a6ee73aa7"
+        url: "https://www.apache.org/dist/apr/apr-1.6.5.tar.bz2",
+        checksum: "a67ca9fcf9c4ff59bce7f428a323c8b5e18667fdea7b0ebad47d194371b0a105"
       },
       {
-        url: "http://apache.mirrors.tds.net/apr/apr-iconv-1.2.2.tar.gz",
-        checksum: "ce94c7722ede927ce1e5a368675ace17d96d60ff9b8918df216ee5c1298c6a5e"
+        url: "https://www.apache.org/dist/apr/apr-iconv-1.2.2.tar.bz2",
+        checksum: "7d454e0fe32f2385f671000e3b755839d16aabd7291e3947c973c90377c35313"
       },
       {
-        url: "http://apache.mirrors.tds.net/apr/apr-util-1.6.1.tar.gz",
-        checksum: "b65e40713da57d004123b6319828be7f1273fbc6490e145874ee1177e112c459"
+        url: "https://www.apache.org/dist/apr/apr-util-1.6.1.tar.bz2",
+        checksum: "d3e12f7b6ad12687572a3a39475545a072608f4ba03a6ce8a3778f607dd0035b"
       }
     ]
 
