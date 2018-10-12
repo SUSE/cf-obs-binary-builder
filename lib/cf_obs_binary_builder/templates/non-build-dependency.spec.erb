@@ -24,7 +24,7 @@ Url:            <%= url %>
 Source:         <%= source %>
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
-<%= rpm_macros %>
+%define otherdir %{_topdir}/OTHER
 
 %description
 
