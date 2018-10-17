@@ -119,12 +119,6 @@ class CfObsBinaryBuilder::Php < CfObsBinaryBuilder::BaseDependency
     end
   end
 
-  class IonCubeRecipe < BaseRecipe
-    def url
-      "http://downloads3.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64_#{version}.tar.gz"
-    end
-  end
-
   class LibmemcachedRecipe < BaseRecipe
     def url
       "https://launchpad.net/libmemcached/1.0/#{version}/+download/libmemcached-#{version}.tar.gz"

@@ -95,8 +95,6 @@ function build_extension {
       build_snmp_mibs_downloader
     elif [[ $(basename $BUILD_DIR) == hiredis* ]]; then
       LIBRARY_PATH=lib PREFIX=%{temp_destdir} make install
-    elif [[ $(basename $BUILD_DIR) == ioncube ]]; then
-      build_ioncube
     elif [[ $(basename $BUILD_DIR) == librdkafka* ]]; then
       build_librdkafka
     elif [[ $(basename $BUILD_DIR) == geoip* ]]; then
@@ -170,10 +168,6 @@ function build_rdkafka {
   %{phpize}
   sed -i 's|.*SEARCH_PATH="\(.*\)"|SEARCH_PATH="%{temp_destdir}/ \1"|g' configure
   build
-}
-
-function build_ioncube {
-  cp ioncube_loader_lin_<%= version[0,3] %>.so $(echo %{dependencydir}/lib/php/extensions/no-debug-non-zts-*/)ioncube.so
 }
 
 function build_geoip {
