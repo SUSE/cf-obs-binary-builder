@@ -310,13 +310,6 @@ done
 
 %install
 pushd %{dependencydir}
-  # Extract php extensions list
-  EXTENSIONS_FILE="%{otherdir}/%{name}-extensions.yaml"
-  echo "---" > "$EXTENSIONS_FILE"
-  for EXTENSION in $(ls lib/php/extensions/no-debug-non-zts-*/); do
-    echo "- $(echo -n $EXTENSION | cut -d. -f1)" >> "$EXTENSIONS_FILE"
-  done
-
   # Copy sources.yml
   cp %{SOURCE1} ../
 
@@ -349,6 +342,13 @@ pushd %{dependencydir}
   rm -rf "lib/php/build"
   rm "bin/php-cgi"
   find "lib/php/extensions" -name "*.a" -type f -delete
+
+  # Extract php extensions list
+  EXTENSIONS_FILE="%{otherdir}/%{name}-extensions.yaml"
+  echo "---" > "$EXTENSIONS_FILE"
+  for EXTENSION in $(ls lib/php/extensions/no-debug-non-zts-*/); do
+    echo "- $(echo -n $EXTENSION | cut -d. -f1)" >> "$EXTENSIONS_FILE"
+  done
 
   cd ..
   TARBALL=%{otherdir}/%{name}-linux-x64.tgz
