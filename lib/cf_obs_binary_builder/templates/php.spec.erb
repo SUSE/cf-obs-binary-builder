@@ -81,7 +81,8 @@ function build_extension {
   pushd $BUILD_DIR
     if [[ $(basename $BUILD_DIR) == cphalcon* ]]; then
       pushd build
-        ./install --php-config %{phpconfig} --phpize %{phpize}
+        cd php<%= version[0,1] %>/64bits
+        build_php_extension --enable-phalcon
       popd
     elif [[ $(basename $BUILD_DIR) == xhprof* ]]; then
       pushd extension
