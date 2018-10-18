@@ -53,7 +53,7 @@ class CfObsBinaryBuilder::Php < CfObsBinaryBuilder::BaseDependency
         filename = "php72-extensions.yml"
       end
 
-      source = "https://raw.githubusercontent.com/cloudfoundry/public-buildpacks-ci-robots/master/binary-builds/#{filename}"
+      source = "https://raw.githubusercontent.com/cloudfoundry/buildpacks-ci/master/tasks/build-binary-new/#{filename}"
       File.write(File.join(tmpdir, File.basename(source)), open(source).read)
       php_extensions_yml = YAML.load_file(File.join(tmpdir, filename))
     end
