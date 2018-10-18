@@ -3,7 +3,7 @@ class CfObsBinaryBuilder::Composer < CfObsBinaryBuilder::NonBuildDependency
     super(
       "composer",
       version,
-      "https://getcomposer.org/download/1.7.2/composer.phar",
+      "https://getcomposer.org/download/#{version}/composer.phar",
       "MIT",
       "https://getcomposer.org"
     )

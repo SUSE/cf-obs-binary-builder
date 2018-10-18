@@ -12,12 +12,12 @@ class CfObsBinaryBuilder::BaseDependency
     @obs_package = CfObsBinaryBuilder::ObsPackage.new(package_name, obs_project)
   end
 
-  def run(checksum)
+  def run(verification_data)
     obs_package.create
     obs_package.checkout do
       write_spec_file
       prepare_sources
-      validate_checksum(checksum)
+      validate_checksum(verification_data)
       write_sources_yaml
       obs_package.commit
     end
@@ -32,7 +32,7 @@ class CfObsBinaryBuilder::BaseDependency
   end
 
   def write_sources_yaml
-    if !@validated_checksum
+    if !@file_verified
       raise "Checksum not validated, won't write to yaml"
     end
 
@@ -54,22 +54,33 @@ class CfObsBinaryBuilder::BaseDependency
     download_source(source)
   end
 
-  def validate_checksum(checksum)
-    @validated_checksum = verify_checksum(source, checksum)
+  def validate_checksum(verification_data)
+    if verification_data[/^https?:/]
+      verify_gpg_signature(source, verification_data)
+    else
+      verify_checksum(source, verification_data)
+    end
+  end
+
+  def verify_gpg_signature(source, gpg_signature_url)
+    gpg_keys_dir = File.join(File.dirname(__FILE__), "..", "..", "..", "gpg_keys")
+    signed_file = File.join(Dir.pwd, File.basename(source))
+    Dir.mktmpdir("cf-obs-gpg-verification") do |tmpdir|
+      Dir.chdir tmpdir do
+        signature_file = File.basename(gpg_signature_url)
+        File.write(signature_file, open(gpg_signature_url).read)
+        gpg_call = "gpg --homedir=#{tmpdir}"
+        Dir.glob("#{gpg_keys_dir}/*.asc") do |key|
+          system("#{gpg_call} --import #{key}")
+        end
+        @file_verified = system("#{gpg_call} --verify #{signature_file} #{signed_file}")
+      end
+    end
   end
 
   def to_yaml
     dependency_hash = { 'url' => @source }
-    case @validated_checksum.length
-    when 32
-      dependency_hash['md5'] = @validated_checksum
-    when 40
-      dependency_hash['sha1'] = @validated_checksum
-    when 64
-      dependency_hash['sha256'] = @validated_checksum
-    when 128
-      dependency_hash['sha512'] = @validated_checksum
-    end
+    dependency_hash['sha256'] = Digest::SHA256.file(File.basename(@source)).hexdigest
 
     [dependency_hash].to_yaml
   end
@@ -97,8 +108,8 @@ class CfObsBinaryBuilder::BaseDependency
 
     if actual_checksum != checksum
       raise "Checksum mismatch #{actual_checksum} vs. #{checksum}"
+    else
+      @file_verified = true
     end
-
-    checksum
   end
 end

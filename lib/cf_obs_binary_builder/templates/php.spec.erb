@@ -81,7 +81,8 @@ function build_extension {
   pushd $BUILD_DIR
     if [[ $(basename $BUILD_DIR) == cphalcon* ]]; then
       pushd build
-        ./install --php-config %{phpconfig} --phpize %{phpize}
+        cd php<%= version[0,1] %>/64bits
+        build_php_extension --enable-phalcon
       popd
     elif [[ $(basename $BUILD_DIR) == xhprof* ]]; then
       pushd extension
@@ -95,8 +96,6 @@ function build_extension {
       build_snmp_mibs_downloader
     elif [[ $(basename $BUILD_DIR) == hiredis* ]]; then
       LIBRARY_PATH=lib PREFIX=%{temp_destdir} make install
-    elif [[ $(basename $BUILD_DIR) == ioncube ]]; then
-      build_ioncube
     elif [[ $(basename $BUILD_DIR) == librdkafka* ]]; then
       build_librdkafka
     elif [[ $(basename $BUILD_DIR) == geoip* ]]; then
@@ -170,10 +169,6 @@ function build_rdkafka {
   %{phpize}
   sed -i 's|.*SEARCH_PATH="\(.*\)"|SEARCH_PATH="%{temp_destdir}/ \1"|g' configure
   build
-}
-
-function build_ioncube {
-  cp ioncube_loader_lin_<%= version[0,3] %>.so $(echo %{dependencydir}/lib/php/extensions/no-debug-non-zts-*/)ioncube.so
 }
 
 function build_geoip {
@@ -316,13 +311,6 @@ done
 
 %install
 pushd %{dependencydir}
-  # Extract php extensions list
-  EXTENSIONS_FILE="%{otherdir}/%{name}-extensions.yaml"
-  echo "---" > "$EXTENSIONS_FILE"
-  for EXTENSION in $(ls lib/php/extensions/no-debug-non-zts-*/); do
-    echo "- $(echo -n $EXTENSION | cut -d. -f1)" >> "$EXTENSIONS_FILE"
-  done
-
   # Copy sources.yml
   cp %{SOURCE1} ../
 
@@ -355,6 +343,13 @@ pushd %{dependencydir}
   rm -rf "lib/php/build"
   rm "bin/php-cgi"
   find "lib/php/extensions" -name "*.a" -type f -delete
+
+  # Extract php extensions list
+  EXTENSIONS_FILE="%{otherdir}/%{name}-extensions.yaml"
+  echo "---" > "$EXTENSIONS_FILE"
+  for EXTENSION in $(ls lib/php/extensions/no-debug-non-zts-*/); do
+    echo "- $(echo -n $EXTENSION | cut -d. -f1)" >> "$EXTENSIONS_FILE"
+  done
 
   cd ..
   TARBALL=%{otherdir}/%{name}-linux-x64.tgz
