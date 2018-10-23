@@ -285,7 +285,7 @@ pushd $SOURCES_DIR
 popd
 
 # Make "FakePeclRecipes"
-for EXTENSION in odbc readline pdo_odbc; do
+for EXTENSION in odbc readline pdo_odbc sodium; do
   pushd ext/$EXTENSION
     <% if version[0,1] == "7" %>
     if [[ $EXTENSION == "readline" ]]; then
@@ -304,6 +304,11 @@ for EXTENSION in odbc readline pdo_odbc; do
       mv temp.m4 config.m4
 
       build_php_extension "--with-unixODBC=shared,%{temp_destdir}"
+    fi
+    if [[ $EXTENSION == "sodium" ]]; then
+      export LDFLAGS="-L%{temp_destdir}/lib"
+      build_php_extension "--with-sodium=%{temp_destdir}"
+      unset LDFLAGS
     fi
   popd
 done
