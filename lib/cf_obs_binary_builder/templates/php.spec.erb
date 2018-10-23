@@ -208,7 +208,7 @@ function build_snmp_mibs_downloader {
     sed -i "s|^BASEDIR=/var/lib/mibs|BASEDIR=\$HOME/php/mibs|" mibs/conf/snmp-mibs-downloader.conf
   popd
   # copy data files
-  mkdir %{dependencydir}/mibs/originals
+  mkdir -p %{dependencydir}/mibs/originals
   cp mibiana/* %{dependencydir}/mibs/originals
   cp mibrfcs/* %{dependencydir}/mibs/originals
 }
@@ -289,31 +289,33 @@ popd
 
 # Make "FakePeclRecipes"
 for EXTENSION in odbc readline pdo_odbc sodium; do
-  pushd ext/$EXTENSION
-    <% if version[0,1] == "7" %>
-    if [[ $EXTENSION == "readline" ]]; then
-        build_php_extension
-    fi
-    <% end %>
-    if [[ $EXTENSION == "pdo_odbc" ]]; then
-      build_php_extension "--with-pdo-odbc=unixODBC,%{temp_destdir}"
-    fi
-    if [[ $EXTENSION == "odbc" ]]; then
-      # patching same issue mentioned here ->
-      # https://github.com/docker-library/php/issues/103#issuecomment-271434109
-      echo 'AC_DEFUN([PHP_ALWAYS_SHARED],[])dnl' > temp.m4
-      echo >> temp.m4
-      cat config.m4 >> temp.m4
-      mv temp.m4 config.m4
+  if [[ -d ext/$EXTENSION ]]; then
+    pushd ext/$EXTENSION
+      <% if version[0,1] == "7" %>
+      if [[ $EXTENSION == "readline" ]]; then
+          build_php_extension
+      fi
+      <% end %>
+      if [[ $EXTENSION == "pdo_odbc" ]]; then
+        build_php_extension "--with-pdo-odbc=unixODBC,%{temp_destdir}"
+      fi
+      if [[ $EXTENSION == "odbc" ]]; then
+        # patching same issue mentioned here ->
+        # https://github.com/docker-library/php/issues/103#issuecomment-271434109
+        echo 'AC_DEFUN([PHP_ALWAYS_SHARED],[])dnl' > temp.m4
+        echo >> temp.m4
+        cat config.m4 >> temp.m4
+        mv temp.m4 config.m4
 
-      build_php_extension "--with-unixODBC=shared,%{temp_destdir}"
-    fi
-    if [[ $EXTENSION == "sodium" ]]; then
-      export LDFLAGS="-L%{temp_destdir}/lib"
-      build_php_extension "--with-sodium=%{temp_destdir}"
-      unset LDFLAGS
-    fi
-  popd
+        build_php_extension "--with-unixODBC=shared,%{temp_destdir}"
+      fi
+      if [[ $EXTENSION == "sodium" ]]; then
+        export LDFLAGS="-L%{temp_destdir}/lib"
+        build_php_extension "--with-sodium=%{temp_destdir}"
+        unset LDFLAGS
+      fi
+    popd
+  fi
 done
 
 
