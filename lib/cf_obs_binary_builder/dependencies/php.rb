@@ -39,6 +39,11 @@ class CfObsBinaryBuilder::Php < CfObsBinaryBuilder::BaseDependency
     # Download geolite ruby scripts
     File.write("download_geoip_db.rb", open("https://raw.githubusercontent.com/cloudfoundry/binary-builder/master/bin/download_geoip_db.rb").read)
     File.write("geoip_downloader.rb", open("https://raw.githubusercontent.com/cloudfoundry/binary-builder/master/lib/geoip_downloader.rb").read)
+
+    # Download fix for 64 bit issues in unixODBC version 2.3.7 if needed
+    if File.exists?("native_modules-unixodbc-2.3.7.tar.gz")
+      File.write("fix-unixodbc-64-bit-issues-2.3.7.patch", open("https://github.com/lurcher/unixODBC/commit/ca226e2e94f68ef7eee5ed9b6368f6550e3ecd56.patch").read)
+    end
   end
 
   def extract_extensions
