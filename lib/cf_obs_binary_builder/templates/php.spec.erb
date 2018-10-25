@@ -114,7 +114,7 @@ function build_extension {
     elif [[ $(basename $BUILD_DIR) == memcached* ]]; then
       build_php_extension "--with-libmemcached-dir=%{temp_destdir}"
     elif [[ $(basename $BUILD_DIR) == phpiredis* ]]; then
-      build_php_extension "--enable-phpiredis --with-hiredis-dir=%{temp_destdir}"
+      build_phpiredis $(basename $BUILD_DIR)
     elif [[ $(basename $BUILD_DIR) == redis* ]]; then
       build_php_extension "--enable-redis-igbinary --enable-redis-lzf --with-liblzf=no"
     elif [[ $(basename $BUILD_DIR) == unixODBC* ]]; then
@@ -155,6 +155,16 @@ function build_cmake {
   cmake --build .
   cmake -DCMAKE_INSTALL_PREFIX=%{temp_destdir} .
   cmake --build . --target install
+}
+
+function build_phpiredis {
+  # fix 64 bit portability issues in phpiredis 1.0.0
+  # extracted from https://github.com/nrk/phpiredis/pull/47
+  if [[ "$1" == "phpiredis-1.0.0" ]]; then
+    sed -i 's/redisReplyReaderCreate/redisReaderCreate/g' phpiredis.c
+    sed -i 's/redisReplyReaderGetError/redisReaderGetError/g' phpiredis.c
+  fi
+  build_php_extension "--enable-phpiredis --with-hiredis-dir=%{temp_destdir}"
 }
 
 function build_unixodbc {
