@@ -368,6 +368,9 @@ pushd %{dependencydir}
   cp /usr/lib64/libgpg-error.so* lib/
   cp %{temp_destdir}/lib/libodbc.so* lib/
   cp %{temp_destdir}/lib/libodbcinst.so* lib/
+  if [[ -e %{temp_destdir}/lib/libsodium.so ]]; then
+    cp %{temp_destdir}/lib/libsodium.so* lib/
+  fi
 
   # Remove unused files
   rm "etc/php-fpm.conf.default"
