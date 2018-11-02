@@ -24,8 +24,7 @@ Summary:        Cloud Foundry buildpack for <%= name %>
 License:        Apache-2.0
 Group:          Cloud/Platform/scf
 Url:            https://github.com/SUSE/cf-<%= name %>-buildpack
-Source0:        https://github.com/SUSE/cf-<%= name %>-buildpack/archive/v%{upstream_version}.tar.gz
-Source1:        manifest.yml
+Source0:        https://github.com/SUSE/cf-<%= name %>-buildpack/archive/v%{version}.tar.gz
 BuildRequires:  ruby2.3-rubygem-buildpack-packager
 BuildRequires:  compile-extensions-tarball
 BuildRequires:  zip
@@ -40,12 +39,9 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 %description
 
 %prep
-%setup -q -n %{name}-%{upstream_version}
+%setup -q -n cf-%{name}-%{upstream_version}
 
 %build
-echo %{version} > VERSION
-# Replace the upstream manifest with the updated one for the SUSE stacks
-cp %{SOURCE1} ./manifest.yml
 tar --strip-components=1 -xf /usr/share/compile-extensions/compile-extensions.tar.gz -C compile-extensions
 buildpack-packager --any-stack --uncached
 

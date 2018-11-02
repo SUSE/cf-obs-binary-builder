@@ -28,6 +28,7 @@ class CfObsBinaryBuilder::BaseBuildpack
 
       @manifest.write("manifest.yml")
 
+      update_source_tarball
       write_spec_file
       obs_package.commit
     end
@@ -37,6 +38,19 @@ class CfObsBinaryBuilder::BaseBuildpack
   end
 
   private
+
+  def update_source_tarball
+    tarball_dir = "cf-#{name}-buildpack-#{upstream_version}"
+
+    system("tar -xf v#{version}.tar.gz")
+
+    File.write(File.join(tarball_dir, 'VERSION'), @version)
+    FileUtils.mv("manifest.yml", tarball_dir)
+
+    system("tar czf v#{version}.tar.gz #{tarball_dir}")
+
+    FileUtils.rm_r(tarball_dir)
+  end
 
   def write_spec_file
     log 'Render the spec template and put it in the package dir'
@@ -53,25 +67,26 @@ class CfObsBinaryBuilder::BaseBuildpack
   # downloaded and copy from there to the current directory.
   # If CACHE_SOURCE is false, always download the source to the current directory.
   def download_sources(url)
-    filename = File.basename(url)
+    filename = "v#{version}.tar.gz"
     cached_sources = File.join(SOURCES_CACHE_DIR, filename)
 
     if CfObsBinaryBuilder::CACHE_SOURCES
       FileUtils.mkdir_p(SOURCES_CACHE_DIR)
       if !File.exist?(cached_sources)
-        system("wget https://github.com/cloudfoundry/#{name}-buildpack/archive/#{filename} -O #{cached_sources}")
+        system("wget #{url} -O #{cached_sources}")
       end
       FileUtils.copy(cached_sources, filename)
     else
-      system("wget https://github.com/cloudfoundry/#{name}-buildpack/archive/#{filename} -O #{filename}")
+      system("wget #{url} -O #{filename}")
     end
   end
 
   def prepare_sources
-    download_sources("https://github.com/cloudfoundry/#{name}-buildpack/archive/v#{upstream_version}.tar.gz")
+    download_sources("https://github.com/SUSE/cf-#{name}-buildpack/archive/#{upstream_version}.tar.gz")
+
     Dir.mktmpdir do |tmpdir|
       # Extract manifest.yml from the tarball so that its dependencies can be parsed
-      system("tar xfv v#{upstream_version}.tar.gz -C #{tmpdir} #{name}-buildpack-#{upstream_version}/manifest.yml --strip-components=1")
+      system("tar xfv v#{version}.tar.gz -C #{tmpdir} cf-#{name}-buildpack-#{upstream_version}/manifest.yml --strip-components=1")
 
       CfObsBinaryBuilder::Manifest.new(File.join(tmpdir, "manifest.yml"))
     end
