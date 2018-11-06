@@ -82,11 +82,15 @@ class CfObsBinaryBuilder::BaseBuildpack
   end
 
   def prepare_sources
+    # Fetch the latest commit of our branch as a tarball
     download_sources("https://github.com/SUSE/cf-#{name}-buildpack/archive/#{upstream_version}.tar.gz")
-
     Dir.mktmpdir do |tmpdir|
-      # Extract manifest.yml from the tarball so that its dependencies can be parsed
-      system("tar xfv v#{version}.tar.gz -C #{tmpdir} cf-#{name}-buildpack-#{upstream_version}/manifest.yml --strip-components=1")
+      # Fetch the upstream manifest.yml so that its dependencies can be parsed.
+      # No matter which revision we are building, the upstream manifest file
+      # is the one that lists all the dependencies we need and no more.
+      File.write(
+        File.join(tmpdir, "manifest.yml"),
+        open("https://raw.githubusercontent.com/SUSE/cf-#{name}-buildpack/v#{upstream_version}/manifest.yml").read)
 
       CfObsBinaryBuilder::Manifest.new(File.join(tmpdir, "manifest.yml"))
     end
