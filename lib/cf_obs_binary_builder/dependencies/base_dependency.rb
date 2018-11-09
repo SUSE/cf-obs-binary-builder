@@ -19,6 +19,12 @@ class CfObsBinaryBuilder::BaseDependency
     end
   end
 
+  def regenerate(verification_data)
+    obs_package.checkout(reset: true) do
+      generate_package(verification_data)
+    end
+  end
+
   def regenerate_spec
     obs_package.checkout do
       write_spec_file
