@@ -15,13 +15,8 @@ class CfObsBinaryBuilder::BaseDependency
   def run(verification_data)
     obs_package.create
     obs_package.checkout do
-      write_spec_file
-      prepare_sources
-      validate_checksum(verification_data)
-      write_sources_yaml
-      obs_package.commit
+      generate_package(verification_data)
     end
-    log 'Done!'
   end
 
   def regenerate_spec
@@ -111,5 +106,16 @@ class CfObsBinaryBuilder::BaseDependency
     else
       @file_verified = true
     end
+  end
+
+  private
+
+  def generate_package(verification_data)
+    write_spec_file
+    prepare_sources
+    validate_checksum(verification_data)
+    write_sources_yaml
+    obs_package.commit
+    log 'Done!'
   end
 end
