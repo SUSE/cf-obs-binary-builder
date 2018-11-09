@@ -28,12 +28,16 @@ EOF
     end
   end
 
-  def checkout(&block)
+  def checkout(config = {}, &block)
     log 'Checking out the package with osc...'
     Dir.mktmpdir(CfObsBinaryBuilder::TMP_DIR_SUFFIX) do |tmpdir|
       Dir.chdir(tmpdir) do
         `osc checkout #{obs_project}/#{name} -o #{name}`
         Dir.chdir(name) do
+          if config[:reset]
+            log 'Resetting package'
+            FileUtils.rm Dir.glob("*")
+          end
           block.call
         end
       end
