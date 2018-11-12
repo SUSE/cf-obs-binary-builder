@@ -7,7 +7,17 @@ class CfObsBinaryBuilder::Syncer
 
   # Returns a list of unknown dependencies (for which a class should be created)
   def sync
-    _, missing, unknown = manifest.dependencies
+    existing, missing, unknown = manifest.dependencies
+
+    # Regenerate existing packages to make sure that they got all the new spec
+    # changes and extensions
+    # Our OBS project is setup that old buildpacks are not rebuild when their
+    # dependencies change (rebuild="local")
+    existing.each do |dep|
+      checksum = CfObsBinaryBuilder::Checksum.for(dep.dependency, dep.version)
+      dep.regenerate(checksum)
+    end
+
     missing.each do |dep|
       puts "Creating package for #{dep.package_name}"
       checksum = CfObsBinaryBuilder::Checksum.for(dep.dependency, dep.version)
@@ -18,7 +28,8 @@ class CfObsBinaryBuilder::Syncer
   end
 
   # Re-generates the spec files for all (existing) dependencies on OBS.
-  # Should be used when something is changed on the dependency templates.
+  # Should be only used when it is sure that nothing but the spec has
+  # changed in any of the dependencies
   def regenerate_specs
     existing_deps, _, _ = manifest.dependencies
 
