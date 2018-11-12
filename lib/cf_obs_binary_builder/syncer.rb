@@ -12,7 +12,7 @@ class CfObsBinaryBuilder::Syncer
     # Regenerate existing packages to make sure that they got all the new spec
     # changes and extensions
     # Our OBS project is setup that old buildpacks are not rebuild when their
-    # dependencies change
+    # dependencies change (rebuild="local")
     existing.each do |dep|
       checksum = CfObsBinaryBuilder::Checksum.for(dep.dependency, dep.version)
       dep.regenerate(checksum)
@@ -28,8 +28,8 @@ class CfObsBinaryBuilder::Syncer
   end
 
   # Re-generates the spec files for all (existing) dependencies on OBS.
-  # Should be used when something is changed on the dependency templates
-  # but not on the tarball side
+  # Should be only used when it is sure that nothing but the spec has
+  # changed in any of the dependencies
   def regenerate_specs
     existing_deps, _, _ = manifest.dependencies
 
