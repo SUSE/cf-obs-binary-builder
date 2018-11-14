@@ -31,6 +31,13 @@ class CfObsBinaryBuilder::Checksum
     "bundler" => {
       "type" => "rubygems"
     },
+    "composer" => {
+      "type" => "github_releases",
+      "params" => {
+        "repo" => "composer/composer",
+        "extension" => ".phar"
+      }
+    },
     "pip" => {
       "type" => "pypi"
     },
@@ -74,7 +81,7 @@ class CfObsBinaryBuilder::Checksum
     elsif result.dig("pgp")
       result.dig("pgp")
     else
-      raise "Unknown checksum in depwatcher output"
+      raise "Unknown checksum in depwatcher output:\n#{result}"
     end
   end
 
