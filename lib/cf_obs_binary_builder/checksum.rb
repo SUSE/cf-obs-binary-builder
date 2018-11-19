@@ -38,6 +38,13 @@ class CfObsBinaryBuilder::Checksum
         "extension" => ".phar"
       }
     },
+    "libunwind" => {
+      "type" => "github_releases",
+      "params" => {
+        "repo" => "libunwind/libunwind",
+        "extension" => ".tar.gz"
+      }
+    },
     "pip" => {
       "type" => "pypi"
     },
