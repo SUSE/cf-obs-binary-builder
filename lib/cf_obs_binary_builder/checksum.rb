@@ -45,6 +45,9 @@ class CfObsBinaryBuilder::Checksum
         "extension" => ".tar.gz"
       }
     },
+    "bower" => {
+      "type" => "npm"
+    },
     "pip" => {
       "type" => "pypi"
     },
