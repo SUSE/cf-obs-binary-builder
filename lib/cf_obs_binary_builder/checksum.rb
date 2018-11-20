@@ -28,6 +28,9 @@ class CfObsBinaryBuilder::Checksum
         "extension" => ".tar.gz"
       }
     },
+    "rubygems" => {
+      "type" => "rubygems_cli"
+    },
     "bundler" => {
       "type" => "rubygems"
     },
