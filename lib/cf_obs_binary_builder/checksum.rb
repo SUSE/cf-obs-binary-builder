@@ -81,9 +81,13 @@ class CfObsBinaryBuilder::Checksum
     _, output, _ = Open3.capture3("depwatcher /tmp", :stdin_data => data)
     begin
       result = JSON.parse(output.lines.last)
-    rescue Exception
-      puts "Could not parse json. Tried the last line of this output:\n#{output}"
-      raise
+    rescue Exception => e
+      puts "Could not parse json. Tried the last line of this output:"
+      puts "---------  DEPWATCHER OUTPUT START --------------------------"
+      puts output
+      puts "---------  DEPWATCHER OUTPUT END ----------------------------"
+      puts "Command to debug: \`echo '#{data}' | depwatcher /tmp\`"
+      raise e
     end
 
     if result.dig("sha256") || result.dig("md5_digest") || result.dig("md5")
