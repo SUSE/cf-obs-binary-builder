@@ -52,6 +52,7 @@ BuildRequires:  libtidy-devel
 BuildRequires:  enchant
 BuildRequires:  libfbclient2-devel
 BuildRequires:  recode-devel
+BuildRequires:  libtommath-devel
 <% if version[0,1] == "5" %>
 BuildRequires:  freetds-devel
 BuildRequires:  libgearman-devel
@@ -374,6 +375,7 @@ pushd %{dependencydir}
   cp /usr/lib64/libenchant.so* lib/
   cp /usr/lib64/libfbclient.so* lib/
   cp /usr/lib64/librecode.so* lib/
+  cp /usr/lib64/libtommath.so* lib/
   cp %{temp_destdir}/lib/libodbc.so* lib/
   cp %{temp_destdir}/lib/libodbcinst.so* lib/
   if [[ -e %{temp_destdir}/lib/libsodium.so ]]; then
