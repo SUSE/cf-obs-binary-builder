@@ -168,6 +168,9 @@ function build_phpiredis {
   if [[ "$1" == "phpiredis-1.0.0" ]]; then
     sed -i 's/redisReplyReaderCreate/redisReaderCreate/g' phpiredis.c
     sed -i 's/redisReplyReaderGetError/redisReaderGetError/g' phpiredis.c
+    sed -i 's/redisReplyReaderGetReply/redisReaderGetReply/g' phpiredis.c
+    sed -i 's/redisReplyReaderFree/redisReaderFree/g' phpiredis.c
+    sed -i 's/redisReplyReaderFeed/redisReaderFeed/g' phpiredis.c
   fi
   build_php_extension "--enable-phpiredis --with-hiredis-dir=%{temp_destdir}"
 }
