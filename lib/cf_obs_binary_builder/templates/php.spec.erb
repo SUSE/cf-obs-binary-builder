@@ -85,44 +85,44 @@ function build_extension {
   tar -xf "$1"
   BUILD_DIR=$(find * -maxdepth 0 -type d)
   pushd $BUILD_DIR
-    if [[ $(basename $BUILD_DIR) == cphalcon* ]]; then
+    if [[ $BUILD_DIR == cphalcon* ]]; then
       pushd build
         cd php<%= version[0,1] %>/64bits
         build_php_extension --enable-phalcon
       popd
-    elif [[ $(basename $BUILD_DIR) == xhprof* ]]; then
+    elif [[ $BUILD_DIR == xhprof* ]]; then
       pushd extension
         build_php_extension
       popd
-    elif [[ $(basename $BUILD_DIR) == Twig* ]]; then
+    elif [[ $BUILD_DIR == Twig* ]]; then
       pushd ext/twig
         build_php_extension
       popd
-    elif [[ $(basename $BUILD_DIR) == snmp-mibs-downloader* ]]; then
+    elif [[ $BUILD_DIR == snmp-mibs-downloader* ]]; then
       build_snmp_mibs_downloader
-    elif [[ $(basename $BUILD_DIR) == hiredis* ]]; then
+    elif [[ $BUILD_DIR == hiredis* ]]; then
       LIBRARY_PATH=lib PREFIX=%{temp_destdir} make install
-    elif [[ $(basename $BUILD_DIR) == librdkafka* ]]; then
+    elif [[ $BUILD_DIR == librdkafka* ]]; then
       build_librdkafka
-    elif [[ $(basename $BUILD_DIR) == geoip* ]]; then
+    elif [[ $BUILD_DIR == geoip* ]]; then
       build_geoip
-    elif [[ $(basename $BUILD_DIR) == rdkaf* ]]; then
+    elif [[ $BUILD_DIR == rdkaf* ]]; then
       build_rdkafka
-    elif [[ $(basename $BUILD_DIR) == lua-[56]* ]]; then
+    elif [[ $BUILD_DIR == lua-[56]* ]]; then
       build_lua_interpreter
-    elif [[ $(basename $BUILD_DIR) == lua-[12]* ]]; then
+    elif [[ $BUILD_DIR == lua-[12]* ]]; then
       build_php_extension "--with-lua=%{temp_destdir}"
-    elif [[ $(basename $BUILD_DIR) == amqp* ]]; then
+    elif [[ $BUILD_DIR == amqp* ]]; then
       build_php_extension "--with-amqp --with-librabbitmq-dir=%{temp_destdir}"
-    elif [[ $(basename $BUILD_DIR) == cassandra* ]]; then
+    elif [[ $BUILD_DIR == cassandra* ]]; then
       build_php_extension "--with-cassandra=%{temp_destdir}"
-    elif [[ $(basename $BUILD_DIR) == memcached* ]]; then
+    elif [[ $BUILD_DIR == memcached* ]]; then
       build_php_extension "--with-libmemcached-dir=%{temp_destdir}"
-    elif [[ $(basename $BUILD_DIR) == phpiredis* ]]; then
-      build_phpiredis $(basename $BUILD_DIR)
-    elif [[ $(basename $BUILD_DIR) == redis* ]]; then
+    elif [[ $BUILD_DIR == phpiredis* ]]; then
+      build_phpiredis $BUILD_DIR
+    elif [[ $BUILD_DIR == redis* ]]; then
       build_php_extension "--enable-redis-igbinary --enable-redis-lzf --with-liblzf=no"
-    elif [[ $(basename $BUILD_DIR) == unixODBC* ]]; then
+    elif [[ $BUILD_DIR == unixODBC* ]]; then
       build_unixodbc
     else
       if [[ -e "cmake" ]]; then
