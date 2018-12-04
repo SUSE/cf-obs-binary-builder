@@ -26,8 +26,14 @@ Source1:        sources.yml
 Source2:        https://www.apache.org/dist/apr/apr-1.6.5.tar.bz2
 Source3:        https://www.apache.org/dist/apr/apr-iconv-1.2.2.tar.bz2
 Source4:        https://www.apache.org/dist/apr/apr-util-1.6.1.tar.bz2
+Source5:        https://github.com/zmartzone/mod_auth_openidc/releases/download/v2.3.8/mod_auth_openidc-2.3.8.tar.gz
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+
+BuildRequires:  openldap2-devel
+BuildRequires:  libcjose-devel
+BuildRequires:  hiredis-devel
+BuildRequires:  libjansson-devel
 
 <%= rpm_macros %>
 
@@ -40,8 +46,8 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 %setup -q -n %{name}
 
 %build
-mkdir -p /tmp/apr-sources
-pushd /tmp/apr-sources
+mkdir -p /tmp/additional-sources
+pushd /tmp/additional-sources
 
 tar -xf %{SOURCE2}
 pushd apr-1.*
@@ -71,6 +77,7 @@ pushd apr-util-1.*
 make %{?_smp_mflags}
 make install
 popd
+
 popd
 
 ./configure --prefix=%{prefix_path} \
@@ -84,10 +91,25 @@ popd
       --disable-dialup
 make %{?_smp_mflags}
 
-%install
 make install DESTDIR=%{destdir}
 
+pushd /tmp/additional-sources
+tar -xf %{SOURCE5}
+pushd mod_auth_openidc-**
+export C_INCLUDE_PATH="%{dependencydir}/include"
+# Temporary allow access for modules to call apxs
+sed -i "s|%{prefix_path}|%{dependencydir}|g" %{dependencydir}/bin/apxs %{dependencydir}/build/config_vars.mk
+export APR_LIBS=`%{apr_path}/bin/apr-1-config --link-ld --libs`
+export APR_CFLAGS=`%{apr_path}/bin/apr-1-config --cflags --includes`
+./configure --with-apxs2=%{dependencydir}/bin/apxs
+make %{?_smp_mflags}
+make install
+# Revert apxs to original state
+sed -i "s|%{dependencydir}|%{prefix_path}|g" %{dependencydir}/bin/apxs %{dependencydir}/build/config_vars.mk
+popd
+popd
 
+%install
 TARBALL=%{otherdir}/%{name}-linux-x64.tgz
 
 pushd %{destdir}%{prefix_path}
@@ -102,6 +124,9 @@ cp "%{apr_path}/lib/apr-util-1/"*.so ./lib/apr-util-1/
 mkdir -p "./lib/iconv"
 cp "%{apr_path}/lib/libapriconv-1.so.0" ./lib
 cp "%{apr_path}/lib/iconv/"*.so ./lib/iconv/
+cp /usr/lib64/libcjose.so* ./lib
+cp /usr/lib64/libhiredis.so* ./lib
+cp /usr/lib64/libjansson.so* ./lib
 cd ..
 tar czf ${TARBALL} * --owner=0 --group=0
 popd

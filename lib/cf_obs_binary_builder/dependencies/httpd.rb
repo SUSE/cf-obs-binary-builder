@@ -20,6 +20,10 @@ class CfObsBinaryBuilder::Httpd < CfObsBinaryBuilder::BaseDependency
       {
         url: "https://www.apache.org/dist/apr/apr-util-1.6.1.tar.bz2",
         checksum: "d3e12f7b6ad12687572a3a39475545a072608f4ba03a6ce8a3778f607dd0035b"
+      },
+      {
+        url: "https://github.com/zmartzone/mod_auth_openidc/releases/download/v2.3.8/mod_auth_openidc-2.3.8.tar.gz",
+        checksum: "0f078444fed34085bc83e27eb3439556718f50dcea275307ffb66d498bdabb8f"
       }
     ]
 
