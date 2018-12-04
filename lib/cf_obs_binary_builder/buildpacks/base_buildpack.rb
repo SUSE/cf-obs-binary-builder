@@ -44,6 +44,19 @@ class CfObsBinaryBuilder::BaseBuildpack
 
     system("tar -xf v#{version}.tar.gz")
 
+    if File.file?(File.join(tarball_dir,'go.mod'))
+      puts "Buildpack contains go.mod. Generating vendor/ and bundling buildpack-packager"
+
+      # We have to fetch buildpack-packager as
+      # `go mod vendor` filters out non-modules.
+      if !system("cd #{tarball_dir} && wget https://raw.githubusercontent.com/cloudfoundry/libbuildpack/master/packager/buildpack-packager/main.go -O buildpack-packager.go")
+        raise "Could not download buildpack-packager"
+      end
+      if !system("cd #{tarball_dir} && go mod vendor")
+        raise "Failed while running go mod vendor"
+      end
+    end
+
     File.write(File.join(tarball_dir, 'VERSION'), @version)
     FileUtils.mv("manifest.yml", tarball_dir)
 
