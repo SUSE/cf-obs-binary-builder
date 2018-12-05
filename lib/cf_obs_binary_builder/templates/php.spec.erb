@@ -165,13 +165,14 @@ function build_cmake {
 function build_phpiredis {
   # fix 64 bit portability issues in phpiredis 1.0.0
   # extracted from https://github.com/nrk/phpiredis/pull/47
-  if [[ "$1" == "phpiredis-1.0.0" ]]; then
-    sed -i 's/redisReplyReaderCreate/redisReaderCreate/g' phpiredis.c
-    sed -i 's/redisReplyReaderGetError/redisReaderGetError/g' phpiredis.c
-    sed -i 's/redisReplyReaderGetReply/redisReaderGetReply/g' phpiredis.c
-    sed -i 's/redisReplyReaderFree/redisReaderFree/g' phpiredis.c
-    sed -i 's/redisReplyReaderFeed/redisReaderFeed/g' phpiredis.c
-  fi
+  # only relevant starting with hiredis 0.14.0 but it was downgraded to 0.13.3
+  #if [[ "$1" == "phpiredis-1.0.0" ]]; then
+  #  sed -i 's/redisReplyReaderCreate/redisReaderCreate/g' phpiredis.c
+  #  sed -i 's/redisReplyReaderGetError/redisReaderGetError/g' phpiredis.c
+  #  sed -i 's/redisReplyReaderGetReply/redisReaderGetReply/g' phpiredis.c
+  #  sed -i 's/redisReplyReaderFree/redisReaderFree/g' phpiredis.c
+  #  sed -i 's/redisReplyReaderFeed/redisReaderFeed/g' phpiredis.c
+  #fi
   build_php_extension "--enable-phpiredis --with-hiredis-dir=%{temp_destdir}"
 }
 
