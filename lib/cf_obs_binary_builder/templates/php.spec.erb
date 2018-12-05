@@ -246,7 +246,7 @@ SOURCES_DIR=$(dirname %{SOURCE0})
 
 # Some build environments expect lib and others lib64
 mkdir -p %{temp_destdir}/lib
-ln -s %{temp_destdir}/lib %{temp_destdir}/lib64
+ln -sf %{temp_destdir}/lib %{temp_destdir}/lib64
 
 ./configure --prefix=%{dependencydir} \
 <% if version[0,1] == "5" %> \
