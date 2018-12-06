@@ -44,6 +44,34 @@ class CfObsBinaryBuilder::BaseBuildpack
 
     system("tar -xf v#{version}.tar.gz")
 
+    if File.file?(File.join(tarball_dir,'go.mod'))
+
+      # Check if we have go >= 1.11, raise error otherwise
+      go_version = `go version`
+      go_ok=$?.success?
+
+      if !go_ok
+        raise "Can't detect go version"
+      end
+
+      installed_version = go_version.match /go(\d)\.(\d{1,2})\.(\d)/
+
+      if !installed_version || installed_version[1].to_i < 1 || installed_version[2].to_i < 11
+        raise "Found go "+installed_version[1]+"."+installed_version[2]+" . go >=1.11 is required"
+      end
+
+      puts "Buildpack contains go.mod. Generating vendor/ and bundling buildpack-packager"
+
+      # We have to fetch buildpack-packager as
+      # `go mod vendor` filters out non-modules.
+      if !system("cd #{tarball_dir} && wget https://raw.githubusercontent.com/cloudfoundry/libbuildpack/master/packager/buildpack-packager/main.go -O buildpack-packager.go")
+        raise "Could not download buildpack-packager"
+      end
+      if !system("cd #{tarball_dir} && go mod vendor")
+        raise "Failed while running go mod vendor"
+      end
+    end
+
     File.write(File.join(tarball_dir, 'VERSION'), @version)
     FileUtils.mv("manifest.yml", tarball_dir)
 
