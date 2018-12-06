@@ -318,18 +318,12 @@ pushd $SOURCES_DIR
 popd
 
 # Make "FakePeclRecipes"
-for EXTENSION in odbc readline pdo_odbc sodium; do
+for EXTENSION in odbc readline pdo_odbc sodium enchant interbase pdo_firebird recode tidy wddx xmlrpc; do
   if [[ -d ext/$EXTENSION ]]; then
     pushd ext/$EXTENSION
-      <% if version[0,1] == "7" %>
-      if [[ $EXTENSION == "readline" ]]; then
-          build_php_extension
-      fi
-      <% end %>
       if [[ $EXTENSION == "pdo_odbc" ]]; then
         build_php_extension "--with-pdo-odbc=unixODBC,%{temp_destdir}"
-      fi
-      if [[ $EXTENSION == "odbc" ]]; then
+      elif [[ $EXTENSION == "odbc" ]]; then
         # patching same issue mentioned here ->
         # https://github.com/docker-library/php/issues/103#issuecomment-271434109
         echo 'AC_DEFUN([PHP_ALWAYS_SHARED],[])dnl' > temp.m4
@@ -338,11 +332,22 @@ for EXTENSION in odbc readline pdo_odbc sodium; do
         mv temp.m4 config.m4
 
         build_php_extension "--with-unixODBC=shared,%{temp_destdir}"
-      fi
-      if [[ $EXTENSION == "sodium" ]]; then
+      elif [[ $EXTENSION == "sodium" ]]; then
         export LDFLAGS="-L%{temp_destdir}/lib"
         build_php_extension "--with-sodium=%{temp_destdir}"
         unset LDFLAGS
+      elif [[ $EXTENSION == "interbase" || $EXTENSION == "pdo_firebird" ]]; then
+        export C_INCLUDE_PATH=/usr/include/firebird
+        build_php_extension
+        unset C_INCLUDE_PATH
+      elif [[ $EXTENSION == "readline" ]]; then
+        <% if version[0,1] == "7" %>
+          build_php_extension
+        <% else %>
+          echo "Readline not supported on php 5"
+        <% end %>
+      else
+        build_php_extension
       fi
     popd
   fi
