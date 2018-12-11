@@ -60,6 +60,7 @@ BuildRequires:  readline-devel
 <% else %>
 BuildRequires:  libedit-devel
 BuildRequires:  argon2-devel
+BuildRequires:  unixODBC-devel
 <% end %>
 # re2c is recommended in the build log
 BuildRequires:  re2c
@@ -258,6 +259,7 @@ ln -sf %{temp_destdir}/lib %{temp_destdir}/lib64
       --with-readline=shared \
 <% else %> \
       --with-password-argon2=%{dependencydir}/lib \
+      --with-pdo_sqlsrv=shared \
 <% end %> \
       --disable-static \
       --enable-shared \
