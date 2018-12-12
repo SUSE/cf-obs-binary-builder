@@ -26,7 +26,7 @@ Source1:        sources.yml
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 <%= rpm_macros %>
-%define prefix_path nginx
+%define prefix_path /nginx
 
 %description
 
@@ -72,4 +72,3 @@ echo `sha256sum ${NEW_TARBALL}` > %{otherdir}/$(basename ${NEW_TARBALL}).sha256
 %defattr(-,root,root)
 
 %changelog
-
