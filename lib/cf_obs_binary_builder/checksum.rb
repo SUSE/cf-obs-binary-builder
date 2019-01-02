@@ -98,7 +98,7 @@ class CfObsBinaryBuilder::Checksum
     elsif result.dig("pgp")
       result.dig("pgp")
     else
-      raise "Unknown checksum in depwatcher output:\n#{result}"
+      raise JSON::ParserError,"Unknown checksum in depwatcher output:\n#{result}"
     end
   end
 
