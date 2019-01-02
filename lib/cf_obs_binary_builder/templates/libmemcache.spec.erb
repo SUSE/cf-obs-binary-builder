@@ -25,10 +25,11 @@ Group:          Cloud/Platform/scf
 Url:            http://libmemcached.org/License.html
 Source0:        <%= source %>
 Source1:        sources.yml
-Source2:        https://www.cyrusimap.org/releases/cyrus-sasl-2.1.26.tar.gz
 BuildRequires:  gcc-c++
 # cyrus-sasl build requires
 BuildRequires:  openssl-devel
+BuildRequires:  cyrus-sasl-devel
+BuildRequires:  cyrus-sasl
 BuildRoot:      %{_tmppath}/%{name}-build
 
 <%= rpm_macros %>
@@ -40,20 +41,17 @@ BuildRoot:      %{_tmppath}/%{name}-build
 
 %build
 mkdir -p %{destdir}
-# setup cyrus-sasl
-tar -xf %{SOURCE2}
-pushd cyrus-sasl-2.1.26
-./configure --prefix=%{prefix_path}
-make
-make install DESTDIR=%{destdir}
-popd
-rm -rf cyrus-sasl-2.1.26
 
-./configure --prefix=%{prefix_path} CXXFLAGS="-I%{prefix_path}/include" CFLAGS="-I%{prefix_path}/include" LDFLAGS="-L%{prefix_path}/lib"
-make
+./configure --prefix=%{prefix_path}
+make %{?_smp_mflags}
 
 %install
 make install DESTDIR=%{destdir}
+
+# copy cyrus sasl libraries
+cp -a /usr/lib64/sasl2 lib/
+cp /usr/lib64/libsasl* lib/
+cp -a /usr/include/sasl include/
 
 TARBALL=%{otherdir}/%{name}-linux-x64.tgz
 
