@@ -53,6 +53,7 @@ BuildRequires:  enchant-devel
 BuildRequires:  libfbclient2-devel
 BuildRequires:  recode-devel
 BuildRequires:  libtommath-devel
+BuildRequires:  libmaxminddb-devel
 <% if version[0,1] == "5" %>
 BuildRequires:  freetds-devel
 BuildRequires:  libgearman-devel
@@ -97,6 +98,10 @@ function build_extension {
       popd
     elif [[ $BUILD_DIR == Twig* ]]; then
       pushd ext/twig
+        build_php_extension
+      popd
+    elif [[ $BUILD_DIR == MaxMind-DB* ]]; then
+      pushd ext
         build_php_extension
       popd
     elif [[ $BUILD_DIR == snmp-mibs-downloader* ]]; then
