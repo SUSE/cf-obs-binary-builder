@@ -343,7 +343,7 @@ for EXTENSION in odbc readline pdo_odbc sodium enchant interbase pdo_firebird re
 
         build_php_extension "--with-unixODBC=shared,%{temp_destdir}"
       elif [[ $EXTENSION == "sodium" ]]; then
-        export LDFLAGS="-L%{temp_destdir}/lib"
+        export LDFLAGS="-L%{temp_destdir}lib"
         build_php_extension "--with-sodium=%{temp_destdir}"
         unset LDFLAGS
       elif [[ $EXTENSION == "interbase" || $EXTENSION == "pdo_firebird" ]]; then
