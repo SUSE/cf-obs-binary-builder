@@ -115,6 +115,12 @@ class CfObsBinaryBuilder::Php < CfObsBinaryBuilder::BaseDependency
     end
   end
 
+  class LibMaxMindRecipe < BaseRecipe
+    def url
+      "https://github.com/maxmind/libmaxminddb/releases/download/#{version}/libmaxminddb-#{version}.tar.gz"
+    end
+  end
+
   class GeoipRecipe < PeclRecipe
   end
 
