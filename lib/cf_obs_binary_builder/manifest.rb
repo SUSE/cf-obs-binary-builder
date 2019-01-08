@@ -2,15 +2,34 @@ class CfObsBinaryBuilder::Manifest
   attr_reader :path, :hash
 
   BASE_STACK = "cflinuxfs2"
-  BUILD_STACKS = [ "cflinuxfs2", "sle12", "opensuse42" ]
+  BUILD_STACKS = ENV["BUILD_STACKS"].to_s.split(',').sort
 
   def initialize(path)
+    if BUILD_STACKS.empty?
+      raise "no BUILD_STACKS environment variable set"
+    end
+    puts "BUILD_STACKS: #{BUILD_STACKS}"
     @path = path
     @hash = YAML.load_file(path)
   end
 
+  # FIXME: Change name
+  def filter_dependencies
+    hash['dependencies'].delete_if do |d|
+      dep = dependency_for(d)
+      if d["uri"].include?("buildpacks.cloudfoundry.org") && dep
+        if dep.respond_to?('needs_to_be_filtered') && dep.needs_to_be_filtered(@hash)
+          #puts "DEBUG: #{d} Needs to be filtered out"
+          true
+        end
+      end
+    end
+  end
+
   def dependencies
     return @dependencies if @dependencies
+
+    filter_dependencies()
 
     missing_deps = []
     unknown_deps = []
@@ -23,8 +42,12 @@ class CfObsBinaryBuilder::Manifest
         dep = dependency_for(dep_hash)
         if dep
           if !dep.obs_package.exists?
-            puts " doesn't exist"
-            missing_deps << dep
+            if !dep.respond_to?('ignore_missing') or (dep.respond_to?('ignore_missing') and !dep.ignore_missing)
+              puts " doesn't exist"
+              missing_deps << dep
+            else
+              puts "skipping"
+            end
           else
             puts " exists"
             existing_deps << dep
@@ -42,6 +65,28 @@ class CfObsBinaryBuilder::Manifest
     @dependencies = [existing_deps, missing_deps, unknown_deps.uniq, third_party_deps]
   end
 
+  def add_dependency(dependency, s3_bucket)
+    (BUILD_STACKS-[BASE_STACK]).each do |stack|
+      # FIXME: satisfies_check should be done when filtering the dependency list
+      if (dependency.obs_package.respond_to?('satifies_stack') && dependency.obs_package.satifies_stack(stack)) || !dependency.obs_package.respond_to?('satifies_stack')
+        artifact = dependency.obs_package.artifact(stack, s3_bucket)
+        dependency_manifest_name = name_to_manifest(dependency.dependency)
+        element = {
+          "name" => dependency_manifest_name,
+          "version" => dependency.version,
+          "uri" => artifact[:uri],
+          "sha256" => artifact[:checksum],
+          "cf_stacks" => [stack]
+        }
+        if dependency_manifest_name == "php"
+          element["modules"] = artifact[:modules]
+        end
+        hash["dependencies"] << element
+      end
+    end
+  end
+
+  #FIXME: unstink this
   def populate!(s3_bucket)
     existing, missing, unknown, third_party = dependencies
 
@@ -53,7 +98,6 @@ class CfObsBinaryBuilder::Manifest
 
     existing.each do |dependency|
       print "Checking #{dependency.package_name}... "
-
       build_status = dependency.obs_package.build_status
 
       case build_status
@@ -65,21 +109,7 @@ class CfObsBinaryBuilder::Manifest
         return :in_process
       when :succeeded
         puts "available"
-        (BUILD_STACKS-[BASE_STACK]).each do |stack|
-          artifact = dependency.obs_package.artifact(stack, s3_bucket)
-
-          element = {
-            "name" => name_to_manifest(dependency.dependency),
-            "version" => dependency.version,
-            "uri" => artifact[:uri],
-            "sha256" => artifact[:checksum],
-            "cf_stacks" => [stack]
-          }
-          if name_to_manifest(dependency.dependency) == "php"
-            element["modules"] = artifact[:modules]
-          end
-          hash["dependencies"] << element
-        end
+        add_dependency(dependency, s3_bucket)
       else
         raise "Unknown build status: #{build_status}"
       end
@@ -135,4 +165,3 @@ class CfObsBinaryBuilder::Manifest
     dep_class.nil? ? nil : dep_class.new(version)
   end
 end
-
