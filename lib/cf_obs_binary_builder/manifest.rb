@@ -8,18 +8,15 @@ class CfObsBinaryBuilder::Manifest
     if BUILD_STACKS.empty?
       raise "no BUILD_STACKS environment variable set"
     end
-    puts "BUILD_STACKS: #{BUILD_STACKS}"
     @path = path
     @hash = YAML.load_file(path)
   end
 
-  # FIXME: Change name
   def filter_dependencies
     hash['dependencies'].delete_if do |d|
       dep = dependency_for(d)
       if d["uri"].include?("buildpacks.cloudfoundry.org") && dep
         if dep.respond_to?('needs_to_be_filtered') && dep.needs_to_be_filtered(@hash)
-          #puts "DEBUG: #{d} Needs to be filtered out"
           true
         end
       end

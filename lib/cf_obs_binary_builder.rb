@@ -20,6 +20,7 @@ require_relative 'cf_obs_binary_builder/dependencies/go_dependency'
 require_relative 'cf_obs_binary_builder/dependencies/scm_dependency'
 require_relative 'cf_obs_binary_builder/dependencies/pypi_dependency'
 require_relative 'cf_obs_binary_builder/dependencies/npm_dependency'
+require_relative 'cf_obs_binary_builder/fake_obs_package'
 require_relative 'cf_obs_binary_builder/obs_package'
 require_relative 'cf_obs_binary_builder/syncer'
 require_relative 'cf_obs_binary_builder/checksum'
@@ -91,7 +92,7 @@ module CfObsBinaryBuilder
     if args.length != 3
       abort "Wrong number of arguments, please specify: buildpack, upstream-version and revision"
     end
-    buildpack = get_build_target(args[0].capitalize.tr("-", "") + "Buildpack")
+    buildpack = get_build_target(args[0].capitalize.tr('-', '') + 'Buildpack')
     abort "Buildpack #{args[0]} not supported!" unless buildpack
 
     Dir.mktmpdir(TMP_DIR_SUFFIX) do |tmpdir|

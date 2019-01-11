@@ -15,30 +15,25 @@ class CfObsBinaryBuilder::Syncer
     # dependencies change (rebuild="local")
     existing.each do |dep|
       can_generate_checksum = dep.respond_to?('generate_checksum')
+      next unless can_generate_checksum
+
       puts "Syncing dependency #{dep.package_name}"
-      if can_generate_checksum
-        puts "Generation of checksum"
-        dep.regenerate
+      begin
+        checksum = CfObsBinaryBuilder::Checksum.for(dep.dependency, dep.version)
+      rescue JSON::ParserError
+        puts 'Depwatcher does not support this dependency anymore, it will not be regenerated.'
       else
-
-      	begin
-       	 checksum = CfObsBinaryBuilder::Checksum.for(dep.dependency, dep.version)
-      	rescue JSON::ParserError
-       	 puts "Depwatcher does not support this dependency anymore, it will not be regenerated."
-      	else
-       	 dep.regenerate(checksum)
-      	end
-
+        dep.regenerate(checksum)
       end
     end
 
     missing.each do |dep|
       can_generate_checksum = dep.respond_to?('generate_checksum')
-      if !can_generate_checksum
-        puts "Creating package for #{dep.package_name}"
-        checksum = CfObsBinaryBuilder::Checksum.for(dep.dependency, dep.version)
-        dep.run(checksum)
-      end
+      next unless can_generate_checksum
+
+      puts "Creating package for #{dep.package_name}"
+      checksum = CfObsBinaryBuilder::Checksum.for(dep.dependency, dep.version)
+      dep.run(checksum)
     end
 
     return unknown
