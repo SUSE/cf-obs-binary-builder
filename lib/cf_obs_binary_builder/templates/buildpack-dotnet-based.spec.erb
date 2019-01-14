@@ -1,0 +1,83 @@
+#
+# spec file for the <%= name %> buildpack
+#
+# Copyright (c) 2018 SUSE LINUX GmbH, Nuernberg, Germany.
+#
+# All modifications and additions to the file contributed by third parties
+# remain the property of their copyright owners, unless otherwise agreed
+# upon. The license for this file, and modifications and additions to the
+# file, is the same license as for the pristine package itself (unless the
+# license for the pristine package is not an Open Source License, in which
+# case the license is the MIT License). An "Open Source License" is a
+# license that conforms to the Open Source Definition (Version 1.9)
+# published by the Open Source Initiative.
+
+# Please submit bugfixes or comments via http://bugs.opensuse.org/
+#
+
+%define upstream_version <%= upstream_version %>
+
+Name:           <%= name %>-buildpack
+Version:        <%= version %>
+Release:        1
+Summary:        Cloud Foundry buildpack for <%= name %>
+License:        Apache-2.0
+Group:          Cloud/Platform/scf
+Url:            https://github.com/SUSE/cf-<%= name %>-buildpack
+Source0:        https://github.com/SUSE/cf-<%= name %>-buildpack/archive/v%{version}.tar.gz
+BuildRequires: go
+<% dependencies = manifest.dependencies.first %>
+  <%
+    dependencies.each do |dependency|
+      if !dependency.package_name.match(/^dotnet.*/)
+  %>
+BuildRequires: <%= dependency.package_name %>
+  <%
+      end
+    end
+  %>
+BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+
+%define otherdir %{_topdir}/OTHER
+
+%description
+
+%prep
+%setup -q -n cf-%{name}-%{upstream_version}
+
+%build
+source ./.envrc
+
+if [ -e go.mod ]; then
+
+  # Starting with Go 1.11 modules
+  # installs buildpack-packager from generated vendor
+  go install -mod=vendor buildpack-packager.go
+
+  # With go modules, we are building up the vendor/ folder before landing in obs
+  # both for the buildpack-packager and also for the buildpack itself.
+  VENDOR_GOPATH=%{_builddir}/go
+  export GO111MODULE=off # Disable new behavior, needs network access
+  rm -rf go.mod buildpack-packager.go
+  export GOPATH=$VENDOR_GOPATH:$GOPATH
+  mkdir -p $VENDOR_GOPATH/src/
+  mv vendor/* $VENDOR_GOPATH/src/
+  mkdir -p $VENDOR_GOPATH/src/github.com/cloudfoundry/<%= name %>-buildpack
+  cp -rf src/ $VENDOR_GOPATH/src/github.com/cloudfoundry/<%= name %>-buildpack
+else
+  (cd src/<%= name %>/vendor/github.com/cloudfoundry/libbuildpack/packager/buildpack-packager && go install)
+fi
+
+buildpack-packager build -any-stack
+
+%install
+CHECKSUM=`sha1sum *buildpack-v%{version}.zip | cut -d' ' -f1`
+mv *buildpack-v%{version}.zip %{otherdir}/<%= name %>-buildpack-v%{version}-%{release}-pre-${CHECKSUM:0:8}.zip
+
+%post
+%postun
+
+%files
+%defattr(-,root,root)
+
+%changelog

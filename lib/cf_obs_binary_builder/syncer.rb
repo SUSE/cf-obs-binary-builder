@@ -14,17 +14,23 @@ class CfObsBinaryBuilder::Syncer
     # Our OBS project is setup that old buildpacks are not rebuild when their
     # dependencies change (rebuild="local")
     existing.each do |dep|
+      can_generate_checksum = dep.respond_to?('generate_checksum')
+      next if can_generate_checksum
+
       puts "Syncing dependency #{dep.package_name}"
       begin
         checksum = CfObsBinaryBuilder::Checksum.for(dep.dependency, dep.version)
       rescue JSON::ParserError
-        puts "Depwatcher does not support this dependency anymore, it will not be regenerated."
+        puts 'Depwatcher does not support this dependency anymore, it will not be regenerated.'
       else
         dep.regenerate(checksum)
       end
     end
 
     missing.each do |dep|
+      can_generate_checksum = dep.respond_to?('generate_checksum')
+      next if can_generate_checksum
+
       puts "Creating package for #{dep.package_name}"
       checksum = CfObsBinaryBuilder::Checksum.for(dep.dependency, dep.version)
       dep.run(checksum)
