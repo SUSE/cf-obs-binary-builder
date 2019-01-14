@@ -15,7 +15,7 @@ class CfObsBinaryBuilder::Syncer
     # dependencies change (rebuild="local")
     existing.each do |dep|
       can_generate_checksum = dep.respond_to?('generate_checksum')
-      next unless can_generate_checksum
+      next if can_generate_checksum
 
       puts "Syncing dependency #{dep.package_name}"
       begin
@@ -29,7 +29,7 @@ class CfObsBinaryBuilder::Syncer
 
     missing.each do |dep|
       can_generate_checksum = dep.respond_to?('generate_checksum')
-      next unless can_generate_checksum
+      next if can_generate_checksum
 
       puts "Creating package for #{dep.package_name}"
       checksum = CfObsBinaryBuilder::Checksum.for(dep.dependency, dep.version)
