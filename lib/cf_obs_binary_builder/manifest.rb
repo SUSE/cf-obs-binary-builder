@@ -1,12 +1,15 @@
 class CfObsBinaryBuilder::Manifest
   attr_reader :path, :hash
 
-  BASE_STACK = "cflinuxfs2"
+  BASE_STACK = ENV["BASE_STACK"].to_s
   BUILD_STACKS = ENV["BUILD_STACKS"].to_s.split(',').sort
 
   def initialize(path)
     if BUILD_STACKS.empty?
       raise "no BUILD_STACKS environment variable set"
+    end
+    if BASE_STACK.empty?
+      raise "no BASE_STACK environment variable set"
     end
     @path = path
     @hash = YAML.load_file(path)

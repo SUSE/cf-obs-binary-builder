@@ -5,10 +5,14 @@ class CfObsBinaryBuilder::BaseBuildpack
 
   attr_reader :name, :version, :upstream_version, :obs_package, :manifest, :s3_bucket
 
-  BUILD_STACKS = [ "cflinuxfs2", "sle12", "opensuse42" ]
+  BUILD_STACKS = ENV["BUILD_STACKS"].to_s.split(',').sort
   SOURCES_CACHE_DIR = File.expand_path("~/.cf-obs-binary-builder")
 
   def initialize(name, upstream_version, revision = 1)
+    if BUILD_STACKS.empty?
+      raise "no BUILD_STACKS environment variable set"
+    end
+
     @name = name
     @upstream_version = upstream_version
     @version = "#{@upstream_version}.#{revision}"
