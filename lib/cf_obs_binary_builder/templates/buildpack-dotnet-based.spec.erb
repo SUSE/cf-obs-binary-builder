@@ -25,7 +25,8 @@ License:        Apache-2.0
 Group:          Cloud/Platform/scf
 Url:            https://github.com/SUSE/cf-<%= name %>-buildpack
 Source0:        https://github.com/SUSE/cf-<%= name %>-buildpack/archive/v%{version}.tar.gz
-BuildRequires: go
+BuildRequires:  go
+BuildRequires:  go-buildpack-packager
 <% dependencies = manifest.dependencies.first %>
   <%
     dependencies.each do |dependency|
@@ -48,29 +49,18 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 %build
 source ./.envrc
 
-if [ -f go.mod ]; then
-
-  # Starting with Go 1.11 modules
-  # installs buildpack-packager from generated
-  mkdir /tmp/bin
-  export PATH=$PATH:/tmp/bin
-  mv buildpack-packager /tmp/bin/buildpack-packager
-  chmod +x /tmp/bin/buildpack-packager
-
-  if [ ! -f "vendor/modules.txt" ]; then
-    # With go modules, we are building up the vendor/ folder before landing in obs
-    # both for the buildpack-packager and also for the buildpack itself.
-    VENDOR_GOPATH=%{_builddir}/go
-    export GO111MODULE=off # Disable new behavior, needs network access
-    rm -rf go.mod buildpack-packager.go
-    export GOPATH=$VENDOR_GOPATH:$GOPATH
-    mkdir -p $VENDOR_GOPATH/src/
-    mv vendor/* $VENDOR_GOPATH/src/
-    mkdir -p $VENDOR_GOPATH/src/github.com/cloudfoundry/<%= name %>-buildpack
-    cp -rf src/ $VENDOR_GOPATH/src/github.com/cloudfoundry/<%= name %>-buildpack
-  fi
-else
-  (cd src/<%= name %>/vendor/github.com/cloudfoundry/libbuildpack/packager/buildpack-packager && go install)
+# Starting with Go 1.11 modules
+if [ -f go.mod ] && [ ! -f "vendor/modules.txt" ]; then
+  # With go modules, we are building up the vendor/ folder before landing in obs
+  # both for the buildpack-packager and also for the buildpack itself.
+  VENDOR_GOPATH=%{_builddir}/go
+  export GO111MODULE=off # Disable new behavior, needs network access
+  rm -rf go.mod buildpack-packager.go
+  export GOPATH=$VENDOR_GOPATH:$GOPATH
+  mkdir -p $VENDOR_GOPATH/src/
+  mv vendor/* $VENDOR_GOPATH/src/
+  mkdir -p $VENDOR_GOPATH/src/github.com/cloudfoundry/<%= name %>-buildpack
+  cp -rf src/ $VENDOR_GOPATH/src/github.com/cloudfoundry/<%= name %>-buildpack
 fi
 
 buildpack-packager build -any-stack
