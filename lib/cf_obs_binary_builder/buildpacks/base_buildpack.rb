@@ -64,16 +64,32 @@ class CfObsBinaryBuilder::BaseBuildpack
         raise "Found go "+installed_version[1]+"."+installed_version[2]+" . go >=1.11 is required"
       end
 
-      puts "Buildpack contains go.mod. Generating vendor/ and bundling buildpack-packager"
+      puts "Buildpack contains go.mod, bundling buildpack-packager"
 
-      # We have to fetch buildpack-packager as
-      # `go mod vendor` filters out non-modules.
       if !system("cd #{tarball_dir} && wget https://raw.githubusercontent.com/cloudfoundry/libbuildpack/master/packager/buildpack-packager/main.go -O buildpack-packager.go")
         raise "Could not download buildpack-packager"
       end
-      if !system("cd #{tarball_dir} && go mod vendor")
-        raise "Failed while running go mod vendor"
+
+      Dir.mktmpdir() do |tmpdir|
+        ENV['GOPATH'] = tmpdir
+        if !system("go get github.com/google/subcommands")
+          raise "Could not get github.com/google/subcommands"
+        end
+        if !system("go get github.com/cloudfoundry/libbuildpack")
+          raise "Could not download buildpack-packager"
+        end
+        if !system("pushd #{tmpdir}/src/github.com/cloudfoundry/libbuildpack/packager/buildpack-packager && go build && chmod +x buildpack-packager && popd && mv #{tmpdir}/src/github.com/cloudfoundry/libbuildpack/packager/buildpack-packager/buildpack-packager #{tarball_dir}/buildpack-packager")
+          raise "Could not build buildpack-packager"
+        end
       end
+
+      if !File.directory?(File.join(tarball_dir,'vendor'))
+        puts "vendor/ folder absent, generating it"
+        if !system("cd #{tarball_dir} && go mod vendor")
+          raise "Failed while running go mod vendor"
+        end
+      end
+
     end
 
     File.write(File.join(tarball_dir, 'VERSION'), @version)
