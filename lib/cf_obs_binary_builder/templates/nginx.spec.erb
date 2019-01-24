@@ -48,8 +48,10 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
       --without-http_scgi_module \
       --with-pcre \
       --with-pcre-jit \
-      --with-cc-opt="-fPIE -pie" \
-      --with-ld-opt="-fPIE -pie -z now"
+      --with-cc-opt="-fPIC -pie" \
+      --with-ld-opt="-fPIC -pie -z now" \
+      --with-compat \
+      --with-stream=dynamic
 make %{?_smp_mflags}
 make install DESTDIR=%{dependencydir}
 
