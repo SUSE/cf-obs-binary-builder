@@ -1,0 +1,78 @@
+#
+# spec file for SUSE CAP buildpack dependency
+#
+# Copyright (c) 2018 SUSE LINUX GmbH, Nuernberg, Germany.
+#
+# All modifications and additions to the file contributed by third parties
+# remain the property of their copyright owners, unless otherwise agreed
+# upon. The license for this file, and modifications and additions to the
+# file, is the same license as for the pristine package itself (unless the
+# license for the pristine package is not an Open Source License, in which
+# case the license is the MIT License). An "Open Source License" is a
+# license that conforms to the Open Source Definition (Version 1.9)
+# published by the Open Source Initiative.
+
+
+
+Name:           openresty-<%= version %>
+Version:        <%= version %>
+Release:        1
+Summary:        This is a dependency used in SUSE CAP buildpacks
+License:        BSD-2-Clause
+Group:          Cloud/Platform/scf
+Url:            https://openresty.org/
+Source0:        <%= source %>
+Source1:        sources.yml
+BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+
+<%= rpm_macros %>
+%define prefix_path /openresty
+
+%description
+
+%prep
+%setup -q -n %{name}
+
+%build
+export PATH=$PATH:/sbin
+./configure --prefix=/ \
+      --error-log-path=stderr \
+      --with-http_ssl_module \
+      --with-http_realip_module \
+      --with-http_gunzip_module \
+      --with-http_gzip_static_module \
+      --with-http_auth_request_module \
+      --with-http_random_index_module \
+      --with-http_secure_link_module \
+      --with-http_stub_status_module \
+      --without-http_uwsgi_module \
+      --without-http_scgi_module \
+      --with-pcre \
+      --with-pcre-jit \
+      --with-cc-opt="-fPIC -pie" \
+      --with-ld-opt="-fPIC -pie -z now" \
+      --with-compat \
+      --with-stream=dynamic
+make %{?_smp_mflags}
+make install DESTDIR=%{dependencydir}
+
+%install
+pushd %{dependencydir}/
+cp %{SOURCE1} ./
+
+TARBALL=%{otherdir}/%{name}.tgz
+rm -rf nginx/html nginx/conf/*
+rm bin/openresty
+tar czf ${TARBALL} * --owner=0 --group=0
+popd
+
+CHECKSUM=`sha256sum ${TARBALL}`
+NEW_TARBALL=%{otherdir}/%{name}-linux-x64-%{stack}-${CHECKSUM:0:8}.tgz
+mv ${TARBALL} ${NEW_TARBALL}
+
+echo `sha256sum ${NEW_TARBALL}` > %{otherdir}/$(basename ${NEW_TARBALL}).sha256
+
+%files
+%defattr(-,root,root)
+
+%changelog
