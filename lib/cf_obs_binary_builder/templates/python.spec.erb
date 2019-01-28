@@ -46,7 +46,7 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 # Fix ncurses panel issue
 sed -i 's|#include <panel.h>|#include <ncurses/panel.h>|g' Modules/_curses_panel.c
 
-./configure --enable-shared -with-ensurepip=no --with-dbmliborder=bdb:gdbm --prefix=%{destdir} --enable-unicode=ucs4
+./configure --enable-shared -with-ensurepip=yes --with-dbmliborder=bdb:gdbm --prefix=%{destdir} --enable-unicode=ucs4
 make %{?_smp_mflags}
 
 %install
