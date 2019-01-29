@@ -93,8 +93,8 @@ class CfObsBinaryBuilder::Checksum
       raise e
     end
 
-    if result.dig("sha256") || result.dig("md5_digest") || result.dig("md5")
-      result.dig("sha256") || result.dig("md5_digest") || result.dig("md5")
+    if result.dig("sha256") || result.dig("md5_digest") || result.dig("md5") || result.dig("sha1")
+      result.dig("sha256") || result.dig("md5_digest") || result.dig("md5") || result.dig("sha1")
     elsif result.dig("pgp")
       result.dig("pgp")
     else
