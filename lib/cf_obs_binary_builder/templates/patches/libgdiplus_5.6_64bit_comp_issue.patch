@@ -1,0 +1,17 @@
+diff --git a/src/pngcodec.c b/src/pngcodec.c
+index b28a707..ba892fc 100644
+--- a/src/pngcodec.c
++++ b/src/pngcodec.c
+@@ -371,11 +371,8 @@ gdip_load_png_image_from_file_or_stream (FILE *fp, GetBytesDelegate getBytesFunc
+ 
+ 				for (i=0; i < num_trans; i++) {
+ 					png_bytep alpha =
+-#if (PNG_LIBPNG_VER > 10399)
+ 						(png_bytep)trans_alpha[i];
+-#else
+-						info_ptr->trans[i];
+-#endif
++//info_ptr->trans[i];
+ 
+ 					set_pixel_bgra(&palette->Entries[i], 0,
+ 							png_palette[i].blue,
