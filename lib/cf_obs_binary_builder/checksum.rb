@@ -69,6 +69,7 @@ class CfObsBinaryBuilder::Checksum
     return libffi(version) if name == "libffi"
     return libmemcache(version) if name == "libmemcache"
     return scm_dependency(version) if name == "openjdk"
+    return libgdiplus(version) if name == "libgdiplus"
 
     # There are special cases where the type does not match the dependency name.
     # See https://github.com/cloudfoundry/buildpacks-ci/blob/0b54199ecfbe98d085f4e34d224877ee415c5405/pipelines/binary-builder-new.yml#L1 for more information
@@ -120,5 +121,9 @@ class CfObsBinaryBuilder::Checksum
 
   def self.scm_dependency(version)
     # noop - the sources are fetched from an scm repository like hg
+  end
+
+  def self.libgdiplus(version)
+    # noop - the sources are fetched from a GitHub repository
   end
 end
