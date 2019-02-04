@@ -61,6 +61,7 @@ BuildRequires:  readline-devel
 BuildRequires:  libedit-devel
 BuildRequires:  argon2-devel
 BuildRequires:  unixODBC-devel
+BuildRequires:  libzip-devel
 <% end %>
 # re2c is recommended in the build log
 BuildRequires:  re2c
@@ -268,6 +269,7 @@ ln -sf %{temp_destdir}/lib %{temp_destdir}/lib64
 <% else %> \
       --with-password-argon2=%{dependencydir}/lib \
       --with-pdo_sqlsrv=shared \
+      --with-libzip=shared \
 <% end %> \
       --disable-static \
       --enable-shared \
@@ -375,6 +377,7 @@ pushd %{dependencydir}
   cp /usr/lib64/libsybdb.so* lib/
   <% else %>
   cp /usr/lib64/libargon2.so* lib/
+  cp /usr/lib64/libzip.so* lib/
   <% end %>
   cp %{temp_destdir}/lib64/librabbitmq.so* lib/
   cp %{temp_destdir}/lib64/libhiredis.so* lib/
