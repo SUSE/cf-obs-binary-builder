@@ -49,6 +49,9 @@ BuildRequires:  krb5-devel
 BuildRequires:  libopenssl-devel
 BuildRequires:  libcurl-devel
 BuildRequires:  libtidy-devel
+%if 0%{?suse_version} != 1315
+BuildRequires:  libtidy5
+%endif
 BuildRequires:  enchant-devel
 BuildRequires:  libfbclient2-devel
 BuildRequires:  recode-devel
@@ -135,6 +138,15 @@ function build_extension {
     elif [[ $BUILD_DIR == unixODBC* ]]; then
       build_unixodbc
     else
+      # fix gcc7 issue in sle15
+      %if 0%{?suse_version} != 1315
+      if [[ $BUILD_DIR == libmemcached* ]]; then
+        PATCH="$(dirname %{SOURCE0})/libmemcached-gcc7-build.patch"
+        if [[ -e $PATCH ]]; then
+          patch -p1< $PATCH
+        fi
+      fi
+      %endif
       if [[ -e "cmake" ]]; then
         build_cmake "$1"
       elif [[ -f "config.m4" ]]; then
@@ -393,7 +405,13 @@ pushd %{dependencydir}
   cp /usr/lib64/libgpgme.so* lib/
   cp /usr/lib64/libassuan.so* lib/
   cp /usr/lib64/libgpg-error.so* lib/
+
+  %if 0%{?suse_version} == 1315
   cp /usr/lib64/libtidy-*.so* lib/
+  %else
+  cp /usr/lib64/libtidy.so* lib/
+  %endif
+
   cp /usr/lib64/libenchant.so* lib/
   cp /usr/lib64/libfbclient.so* lib/
   cp /usr/lib64/librecode.so* lib/

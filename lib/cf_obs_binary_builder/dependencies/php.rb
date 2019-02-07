@@ -1,10 +1,11 @@
 class CfObsBinaryBuilder::Php < CfObsBinaryBuilder::BaseDependency
-  attr_reader :major_version, :php_extensions
+  attr_reader :major_version, :php_extensions, :patches
 
   def initialize(version)
     @version = version
     @major_version = version[/^(\d).*/,1]
     @php_extensions = extract_extensions
+    @patches = ["libmemcached-gcc7-build.patch"]
 
     super(
       "php",
@@ -43,6 +44,11 @@ class CfObsBinaryBuilder::Php < CfObsBinaryBuilder::BaseDependency
     # Download fix for 64 bit issues in unixODBC version 2.3.7 if needed
     if File.exists?("native_modules-unixodbc-2.3.7.tar.gz")
       File.write("fix-unixodbc-64-bit-issues-2.3.7.patch", open("https://github.com/lurcher/unixODBC/commit/ca226e2e94f68ef7eee5ed9b6368f6550e3ecd56.patch").read)
+    end
+
+    log 'Copying patches'
+    for patch in patches do
+      FileUtils.cp(File.dirname(__FILE__) + "/../templates/patches/#{patch}",".")
     end
   end
 
