@@ -25,6 +25,11 @@ Group:          Cloud/Platform/scf
 Url:            http://libmemcached.org/License.html
 Source0:        <%= source %>
 Source1:        sources.yml
+
+<% patches.each_with_index do |patch, index| %>
+Patch<%=index%>: <%= patch %>
+<% end %>
+
 BuildRequires:  gcc-c++
 # cyrus-sasl build requires
 BuildRequires:  openssl-devel
@@ -38,6 +43,11 @@ BuildRoot:      %{_tmppath}/%{name}-build
 
 %prep
 %setup -q -n libmemcached-%{version}
+%if 0%{?suse_version} != 1315
+<% patches.each_with_index do |patch, index| %>
+%patch<%=index%> -p1
+<% end %>
+%endif
 
 %build
 mkdir -p %{destdir}
