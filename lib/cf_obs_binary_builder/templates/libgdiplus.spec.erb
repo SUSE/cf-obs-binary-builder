@@ -22,6 +22,8 @@ License:        (LGPL-2.1+ or MPL-1.1) and MIT
 Group:          Cloud/Platform/scf
 Url:            https://github.com/mono/libgdiplus
 Source:         <%= source %>
+BuildRequires:  libtool
+BuildRequires:  cairo-devel
 
 <% patches.each_with_index do |patch, index| %>
 Patch<%=index%>: <%= patch %>
