@@ -46,6 +46,19 @@ class CfObsBinaryBuilder::Php < CfObsBinaryBuilder::BaseDependency
       File.write("fix-unixodbc-64-bit-issues-2.3.7.patch", open("https://github.com/lurcher/unixODBC/commit/ca226e2e94f68ef7eee5ed9b6368f6550e3ecd56.patch").read)
     end
 
+    copy_patches()
+  end
+
+  def run(verification_data)
+    basepath = FileUtils.pwd
+    obs_package.create
+    obs_package.checkout do
+      copy_patches()
+      generate_package(verification_data)
+    end
+  end
+
+  def copy_patches()
     log 'Copying patches'
     for patch in patches do
       FileUtils.cp(File.dirname(__FILE__) + "/../templates/patches/#{patch}",".")
