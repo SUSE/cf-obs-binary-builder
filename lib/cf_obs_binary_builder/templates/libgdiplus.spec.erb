@@ -25,9 +25,11 @@ Source:         <%= source %>
 BuildRequires:  libtool
 BuildRequires:  cairo-devel
 
+%if 0%{?suse_version} == 1315
 <% patches.each_with_index do |patch, index| %>
 Patch<%=index%>: <%= patch %>
 <% end %>
+%endif
 BuildRoot:      %{_tmppath}/libgdiplus-%{version}-build
 
 <%= rpm_macros %>
@@ -38,9 +40,11 @@ operating systems.
 
 %prep
 %setup -q -n %{name}
+%if 0%{?suse_version} == 1315
 <% patches.each_with_index do |patch, index| %>
 %patch<%=index%> -p1
 <% end %>
+%endif
 
 %build
 ./autogen.sh --prefix=%{dependencydir}
