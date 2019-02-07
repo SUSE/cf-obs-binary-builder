@@ -26,7 +26,11 @@ License:        MIT
 Group:          Cloud/Platform/scf
 Url:            http://bundler.io
 Source:         http://rubygems.org/gems/%{mod_full_name}.gem
+%if 0%{?suse_version} == 1315
 BuildRequires:  ruby2.3
+%else
+BuildRequires:  ruby
+%endif
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 <%= rpm_macros %>
@@ -36,8 +40,12 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 %prep
 export GEM_HOME=$PWD
 export GEM_PATH=$PWD
+%if 0%{?suse_version} == 1315
 unset RUBYOPT; gem.ruby2.3 install %{_sourcedir}/%{mod_full_name}.gem --no-ri --no-rdoc --env-shebang --no-format-executable
 sed -i 's/ruby\.ruby2\.3/ruby/' bin/bundle*
+%else
+unset RUBYOPT; gem install %{_sourcedir}/%{mod_full_name}.gem --no-ri --no-rdoc --env-shebang --no-format-executable
+%endif
 
 rm -f bundler-%{version}.gem
 rm -rf cache/bundler-%{version}.gem
