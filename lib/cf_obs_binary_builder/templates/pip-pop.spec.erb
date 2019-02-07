@@ -18,11 +18,10 @@ Name:           <%= dependency %>-<%= version %>
 Version:        <%= version %>
 Release:        1
 Summary:        This is a dependency used in SUSE CAP buildpacks
-License:        <%= license %>
+License:        MIT
 Group:          Cloud/Platform/scf
-Url:            <%= url %>
+Url:            https://github.com/djoyahoy/pip-pop
 Source0:        <%= source %>
-Source1:        <%= source1 %>
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 <%= rpm_macros %>
@@ -31,7 +30,7 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 %prep
 mkdir -p %{destdir}
-cp %{SOURCE0} %{SOURCE1} %{destdir}/
+cp %{SOURCE0} %{destdir}/
 
 %build
 TARBALL=%{otherdir}/%{name}.tar.gz
