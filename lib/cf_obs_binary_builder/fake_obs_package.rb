@@ -27,7 +27,7 @@ class FakeObsPackage
     !File.basename(Dir[File.join(@depdir, "#{@dependency}*")].uniq.max.to_s).empty?
   end
 
-  def satifies_stack(stack)
+  def satisfies_stack(stack)
     # Stack is satisfied if we resolved a dep for the stack (thus not empty)
     return true unless resolve_dep(stack).empty?
   end

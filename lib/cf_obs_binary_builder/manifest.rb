@@ -68,7 +68,7 @@ class CfObsBinaryBuilder::Manifest
   def add_dependency(dependency, s3_bucket)
     (BUILD_STACKS-[BASE_STACK]).each do |stack|
       # FIXME: satisfies_check should be done when filtering the dependency list
-      if (dependency.obs_package.respond_to?('satifies_stack') && dependency.obs_package.satifies_stack(stack)) || !dependency.obs_package.respond_to?('satifies_stack')
+      if (dependency.obs_package.respond_to?('satisfies_stack') && dependency.obs_package.satisfies_stack(stack)) || !dependency.obs_package.respond_to?('satisfies_stack')
         artifact = dependency.obs_package.artifact(stack, s3_bucket)
         dependency_manifest_name = name_to_manifest(dependency.dependency)
         element = {
