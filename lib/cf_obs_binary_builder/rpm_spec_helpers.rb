@@ -4,10 +4,14 @@ module RpmSpecHelpers
 # BEGIN shared macros for all dependency packages
 BuildRequires: aaa_stack_build_requires
 
+%if 0%{?suse_version} == 1315
 %if 0%{?is_opensuse}
 %define stack opensuse42
 %else
 %define stack sle12
+%endif
+%else
+%define stack cfsle15fs
 %endif
 
 %define otherdir %{_topdir}/OTHER
