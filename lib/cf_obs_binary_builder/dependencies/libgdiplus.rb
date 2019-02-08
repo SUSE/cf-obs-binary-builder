@@ -10,18 +10,6 @@ class CfObsBinaryBuilder::Libgdiplus < CfObsBinaryBuilder::BaseDependency
       @patches = ["libgdiplus_5.6_64bit_comp_issue.patch"]
     end
 
-    def prepare_sources
-      # noop - the sources are fetched from the github repository (no checksum to check against)
-    end
-
-    def write_sources_yaml
-      # noop - the sources are fetched from the github repository (no checksum to check against)
-    end
-
-    def validate_checksum(_checksum)
-      # noop - the sources are fetched from the github repository (no checksum to check against)
-    end
-
     # Keep patches already in the obs package for libgdiplus
     def regenerate(verification_data)
       obs_package.checkout(reset: true) do
@@ -37,10 +25,6 @@ class CfObsBinaryBuilder::Libgdiplus < CfObsBinaryBuilder::BaseDependency
           copy_patches()
           generate_package(verification_data)
         end
-    end
-
-    def validate_checksum(_checksum)
-      # noop - the sources are fetched from the github repository (no checksum to check against)
     end
 
     def copy_patches()
