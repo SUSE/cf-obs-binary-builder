@@ -89,6 +89,10 @@ module CfObsBinaryBuilder
   end
 
   def self.build_buildpack(args)
+    base_stack = require_env_var("BASE_STACK")
+    build_stacks = require_env_var("BUILD_STACKS").to_s.split(',').sort
+    s3_bucket = require_env_var("STAGING_BUILDPACKS_BUCKET")
+
     if args.length != 3
       abort "Wrong number of arguments, please specify: buildpack, upstream-version and revision"
     end
@@ -97,7 +101,7 @@ module CfObsBinaryBuilder
 
     Dir.mktmpdir(TMP_DIR_SUFFIX) do |tmpdir|
       Dir.chdir tmpdir do
-        result = buildpack.new(args[1], args[2]).run
+        result = buildpack.new(args[1], args[2]).run(base_stack, build_stacks, s3_bucket)
 
         case result
         when :failed
@@ -112,12 +116,14 @@ module CfObsBinaryBuilder
   end
 
   def self.sync(args)
+    base_stack = require_env_var("BASE_STACK")
+
     if args.length != 1
       abort "Wrong number of arguments, please specify: manifest_path"
     end
 
     manifest_path = args.shift
-    unknown = Syncer.new(manifest_path).sync
+    unknown = Syncer.new(manifest_path).sync(base_stack)
     if !unknown.empty?
       puts "Encountered unknown dependencies: #{unknown.join(",")}"
       exit 1
@@ -125,12 +131,14 @@ module CfObsBinaryBuilder
   end
 
   def self.regenerate_specs(args)
+    base_stack = require_env_var("BASE_STACK")
+
     if args.length != 1
       abort "Wrong number of arguments, please specify: manifest_path"
     end
 
     manifest_path = args.shift
-    Syncer.new(manifest_path).regenerate_specs
+    Syncer.new(manifest_path).regenerate_specs(base_stack)
   end
 
   def self.get_build_target(dependency)
@@ -154,5 +162,11 @@ USAGE:
   #{File.basename($0)} regenerate-specs <manifest_path>
     Regenerate the spec files for all (existing) dependencies on OBS.
 EOF
+  end
+
+  private
+
+  def self.require_env_var(env_var_name)
+    return ENV[env_var_name] || raise("no #{env_var_name} environment variable set")
   end
 end

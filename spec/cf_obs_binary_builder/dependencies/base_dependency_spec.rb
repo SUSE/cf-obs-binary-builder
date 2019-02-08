@@ -10,8 +10,8 @@ describe CfObsBinaryBuilder::BaseDependency do
     end
 
     it "doesn't raise if the checksum matches" do
-      expect(Digest::SHA256).to receive_message_chain(:file, :hexdigest).and_return("correctchecksum!!!!!!!!!!!!!!!!!!!!!11111!!!!!1!!!!!!!!!!!111111")
-      expect{ dependency.validate_checksum("correctchecksum!!!!!!!!!!!!!!!!!!!!!11111!!!!!1!!!!!!!!!!!111111") }.to_not raise_error
+      expect(File).to receive(:basename).and_return("spec/fixtures/test_sources.tgz")
+      expect{ dependency.validate_checksum("6fba0488278885cb8ac1442d32bc331c4c850c2b8cf12b98b71098df87e061e7") }.to_not raise_error
     end
   end
 
@@ -21,9 +21,9 @@ describe CfObsBinaryBuilder::BaseDependency do
     end
 
     it "succeeds if validate_checksum has been called successfully" do
-      expect(Digest::SHA256).to receive_message_chain(:file, :hexdigest).and_return("correctchecksum!!!!!!!!!!!!!!!!!!!!!11111!!!!!1!!!!!!!!!!!111111")
+      expect(File).to receive(:basename).twice.and_return("spec/fixtures/test_sources.tgz")
       expect(File).to receive(:write) # Avoid writting the sources.yaml file
-      dependency.validate_checksum("correctchecksum!!!!!!!!!!!!!!!!!!!!!11111!!!!!1!!!!!!!!!!!111111")
+      dependency.validate_checksum("6fba0488278885cb8ac1442d32bc331c4c850c2b8cf12b98b71098df87e061e7")
       expect { dependency.write_sources_yaml }.to_not raise_error
     end
   end

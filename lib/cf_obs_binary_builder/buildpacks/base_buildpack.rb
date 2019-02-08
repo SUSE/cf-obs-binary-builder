@@ -3,31 +3,29 @@ require 'fileutils'
 class CfObsBinaryBuilder::BaseBuildpack
   include RpmSpecHelpers
 
-  attr_reader :name, :version, :upstream_version, :obs_package, :manifest, :s3_bucket
+  attr_reader :name, :version, :upstream_version, :obs_package, :manifest
 
-  BUILD_STACKS = ENV["BUILD_STACKS"].to_s.split(',').sort
   SOURCES_CACHE_DIR = File.expand_path("~/.cf-obs-binary-builder")
 
   def initialize(name, upstream_version, revision = 1)
-    if BUILD_STACKS.empty?
-      raise "no BUILD_STACKS environment variable set"
-    end
-
     @name = name
     @upstream_version = upstream_version
     @version = "#{@upstream_version}.#{revision}"
 
     package_name = "#{name}-buildpack-#{version}"
     obs_project = ENV["OBS_BUILDPACK_PROJECT"] || raise("no OBS_BUILDPACK_PROJECT environment variable set")
-    @s3_bucket = ENV["STAGING_BUILDPACKS_BUCKET"] || raise("no STAGING_BUILDPACKS_BUCKET environment variable set")
     @obs_package = CfObsBinaryBuilder::ObsPackage.new(package_name, obs_project)
   end
 
-  def run
+  # Create or update buildpack package on OBS.
+  # base_stack is the stack to use as a reference to choose dependencies
+  # build_stacks are the stacks to add to the manifest.
+  # s3_bucket is the bucket where the packages from OBS are copied to.
+  def run(base_stack, build_stacks, s3_bucket)
     obs_package.create
     obs_package.checkout do
       @manifest = prepare_sources
-      populate_result = @manifest.populate!(s3_bucket)
+      populate_result = @manifest.populate!(base_stack, build_stacks, s3_bucket)
       return populate_result unless populate_result == :succeeded
 
       @manifest.write("manifest.yml")

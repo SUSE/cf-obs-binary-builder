@@ -1,32 +1,17 @@
 class CfObsBinaryBuilder::Manifest
   attr_reader :path, :hash
 
-  BASE_STACK = ENV["BASE_STACK"].to_s
-  BUILD_STACKS = ENV["BUILD_STACKS"].to_s.split(',').sort
-
   def initialize(path)
-    if BUILD_STACKS.empty?
-      raise "no BUILD_STACKS environment variable set"
-    end
-    if BASE_STACK.empty?
-      raise "no BASE_STACK environment variable set"
-    end
     @path = path
     @hash = YAML.load_file(path)
   end
 
-  def filter_dependencies
-    hash['dependencies'].delete_if do |d|
-      dep = dependency_for(d)
-      if d["uri"].include?("buildpacks.cloudfoundry.org") && dep
-        if dep.respond_to?('needs_to_be_filtered') && dep.needs_to_be_filtered(@hash)
-          true
-        end
-      end
-    end
-  end
-
-  def dependencies
+  # Given a stack, this method returns 4 Arrays containing:
+  # - missing_deps: dependencies for which we don't have a package
+  # - unknown_deps: dependencies for which we don't have a class (so we don't know how to build them)
+  # - existing_deps: dependencies for which we already have a package
+  # - third_party_deps: dependencies which are not hosted on upstream buckets (meaning upstream doesn't build them either)
+  def dependencies(base_stack)
     return @dependencies if @dependencies
 
     filter_dependencies()
@@ -36,7 +21,7 @@ class CfObsBinaryBuilder::Manifest
     existing_deps = []
     third_party_deps = []
 
-    base_dependencies.each do |dep_hash|
+    dependencies_for_stack(base_stack).each do |dep_hash|
       print "Checking #{dep_hash["name"]}-#{dep_hash["version"]}..."
       if dep_hash["uri"].include?("buildpacks.cloudfoundry.org")
         dep = dependency_for(dep_hash)
@@ -65,30 +50,17 @@ class CfObsBinaryBuilder::Manifest
     @dependencies = [existing_deps, missing_deps, unknown_deps.uniq, third_party_deps]
   end
 
-  def add_dependency(dependency, s3_bucket)
-    (BUILD_STACKS-[BASE_STACK]).each do |stack|
-      # FIXME: satisfies_check should be done when filtering the dependency list
-      if (dependency.obs_package.respond_to?('satisfies_stack') && dependency.obs_package.satisfies_stack(stack)) || !dependency.obs_package.respond_to?('satisfies_stack')
-        artifact = dependency.obs_package.artifact(stack, s3_bucket)
-        dependency_manifest_name = name_to_manifest(dependency.dependency)
-        element = {
-          "name" => dependency_manifest_name,
-          "version" => dependency.version,
-          "uri" => artifact[:uri],
-          "sha256" => artifact[:checksum],
-          "cf_stacks" => [stack]
-        }
-        if dependency_manifest_name == "php"
-          element["modules"] = artifact[:modules]
-        end
-        hash["dependencies"] << element
-      end
-    end
-  end
-
-  #FIXME: unstink this
-  def populate!(s3_bucket)
-    existing, missing, unknown, third_party = dependencies
+  # This method uses the base_stack as a reference and makes sure that the hash
+  # of this manifest, includes these dependencies for the build_stacks.
+  # Anything that is not a build_stack stays untouched in the manifest.
+  # E.g. Given a manifest with cflinuxfs3 and cflinuxfs2, if base_stack is cflinuxfs2
+  # and build_stacks are sle12 and opensuse42, the final manifest should have
+  # cflinuxfs2 and cflinuxfs3 deps untouched and the same deps as cflinuxfs2 for
+  # sle12 and opensuse42.
+  # The s3_bucket is the bucket that hosts the dependencies built in OBS and is
+  # needed in order to construct the urls for the deps.
+  def populate!(base_stack, build_stacks, s3_bucket)
+    existing, missing, unknown, third_party = dependencies(base_stack)
 
     if missing.any? || unknown.any?
       missing_deps = missing.map(&:package_name).join(", ")
@@ -109,7 +81,7 @@ class CfObsBinaryBuilder::Manifest
         return :in_process
       when :succeeded
         puts "available"
-        add_dependency(dependency, s3_bucket)
+        add_dependency(dependency, build_stacks, s3_bucket)
       else
         raise "Unknown build status: #{build_status}"
       end
@@ -117,20 +89,53 @@ class CfObsBinaryBuilder::Manifest
 
     third_party.each do |dependency|
       original = hash["dependencies"].find { |d| d["name"] == dependency }
-      original["cf_stacks"] += (BUILD_STACKS-[BASE_STACK])
+      original["cf_stacks"] += build_stacks
     end
 
     :succeeded
   end
 
+  private
+
+  def filter_dependencies
+    hash['dependencies'].delete_if do |d|
+      dep = dependency_for(d)
+      if d["uri"].include?("buildpacks.cloudfoundry.org") && dep
+        if dep.respond_to?('needs_to_be_filtered') && dep.needs_to_be_filtered(@hash)
+          true
+        end
+      end
+    end
+  end
+
+  def add_dependency(dependency, build_stacks, s3_bucket)
+    build_stacks.each do |stack|
+      # FIXME: satisfies_check should be done when filtering the dependency list
+      if (dependency.obs_package.respond_to?('satisfies_stack') && dependency.obs_package.satisfies_stack(stack)) || !dependency.obs_package.respond_to?('satisfies_stack')
+        artifact = dependency.obs_package.artifact(stack, s3_bucket)
+        dependency_manifest_name = name_to_manifest(dependency.dependency)
+        element = {
+          "name" => dependency_manifest_name,
+          "version" => dependency.version,
+          "uri" => artifact[:uri],
+          "sha256" => artifact[:checksum],
+          "cf_stacks" => [stack]
+        }
+        if dependency_manifest_name == "php"
+          element["modules"] = artifact[:modules]
+        end
+        hash["dependencies"] << element
+      end
+    end
+  end
+
+
   def write(path)
     File.write(path, hash.to_yaml)
   end
 
-  private
-
-  def base_dependencies
-    hash["dependencies"].select{ |d| d["cf_stacks"].include?(BASE_STACK) }
+  def dependencies_for_stack(stack)
+    hash["dependencies"].select{ |d| d["cf_stacks"].include?(stack) }
   end
 
   def find_latest_jdk_build(minor_version, update_version)
