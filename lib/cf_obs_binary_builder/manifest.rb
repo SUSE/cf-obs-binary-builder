@@ -12,9 +12,10 @@ class CfObsBinaryBuilder::Manifest
   # - existing_deps: dependencies for which we already have a package
   # - third_party_deps: dependencies which are not hosted on upstream buckets (meaning upstream doesn't build them either)
   def dependencies(base_stack)
-    return @dependencies if @dependencies
+    @dependencies = {} if @dependencies.nil?
+    return @dependencies[base_stack] if @dependencies[base_stack]
 
-    filter_dependencies()
+    filter_dependencies
 
     missing_deps = []
     unknown_deps = []
@@ -47,49 +48,56 @@ class CfObsBinaryBuilder::Manifest
       end
     end
 
-    @dependencies = [existing_deps, missing_deps, unknown_deps.uniq, third_party_deps]
+    @dependencies[base_stack] = [existing_deps, missing_deps, unknown_deps.uniq, third_party_deps]
   end
 
-  # This method uses the base_stack as a reference and makes sure that the hash
-  # of this manifest, includes these dependencies for the build_stacks.
-  # Anything that is not a build_stack stays untouched in the manifest.
-  # E.g. Given a manifest with cflinuxfs3 and cflinuxfs2, if base_stack is cflinuxfs2
-  # and build_stacks are sle12 and opensuse42, the final manifest should have
-  # cflinuxfs2 and cflinuxfs3 deps untouched and the same deps as cflinuxfs2 for
-  # sle12 and opensuse42.
+  # This method takes a hash of mappings like the one below, and makes sure that the hash
+  # of this manifest, includes dependencies for the stacks in the stack_mappings keys.
+  # All other stacks in the manifest stays untouched.
+  # E.g. Given a manifest with cflinuxfs3 and cflinuxfs2 and the stack_mapppings below,
+  # the final manifest should have cflinuxfs2 and cflinuxfs3 deps untouched and the same deps as cflinuxfs2 for
+  # sle12 and opensuse42 and the same deps as cflinuxfs3 for sle15.
+  # Example stack_mappings:
+  #{
+  #  "sle12": "cflinuxfs2",
+  #  "opensuse42": "cflinxufs2",
+  #  "sle15": "cflinuxfs3"
+  #}
   # The s3_bucket is the bucket that hosts the dependencies built in OBS and is
   # needed in order to construct the urls for the deps.
-  def populate!(base_stack, build_stacks, s3_bucket)
-    existing, missing, unknown, third_party = dependencies(base_stack)
+  def populate!(stack_mappings, s3_bucket)
+    stack_mappings.each do |stack, base_stack|
+      existing, missing, unknown, third_party = dependencies(base_stack)
 
-    if missing.any? || unknown.any?
-      missing_deps = missing.map(&:package_name).join(", ")
-      unknown_deps = unknown.join(", ")
-      raise("Missing or unknown dependencies encountered.\nMissing: #{missing_deps}\nUnknown: #{unknown_deps}")
-    end
-
-    existing.each do |dependency|
-      print "Checking #{dependency.package_name}... "
-      build_status = dependency.obs_package.build_status
-
-      case build_status
-      when :failed
-        puts "failed"
-        return :failed
-      when :in_process
-        puts "in process"
-        return :in_process
-      when :succeeded
-        puts "available"
-        add_dependency(dependency, build_stacks, s3_bucket)
-      else
-        raise "Unknown build status: #{build_status}"
+      if missing.any? || unknown.any?
+        missing_deps = missing.map(&:package_name).join(", ")
+        unknown_deps = unknown.join(", ")
+        raise("Missing or unknown dependencies encountered.\nMissing: #{missing_deps}\nUnknown: #{unknown_deps}")
       end
-    end
 
-    third_party.each do |dependency|
-      original = hash["dependencies"].find { |d| d["name"] == dependency }
-      original["cf_stacks"] += build_stacks
+      existing.each do |dependency|
+        print "Checking #{dependency.package_name}... "
+        build_status = dependency.obs_package.build_status
+
+        case build_status
+        when :failed
+          puts "failed"
+          return :failed
+        when :in_process
+          puts "in process"
+          return :in_process
+        when :succeeded
+          puts "available"
+          add_dependency(dependency, stack, s3_bucket)
+        else
+          raise "Unknown build status: #{build_status}"
+        end
+      end
+
+      third_party.each do |dependency|
+        original = hash["dependencies"].find { |d| d["name"] == dependency }
+        original["cf_stacks"] = original["cf_stacks"] | [stack]
+      end
     end
 
     :succeeded
@@ -108,27 +116,24 @@ class CfObsBinaryBuilder::Manifest
     end
   end
 
-  def add_dependency(dependency, build_stacks, s3_bucket)
-    build_stacks.each do |stack|
-      # FIXME: satisfies_check should be done when filtering the dependency list
-      if (dependency.obs_package.respond_to?('satisfies_stack') && dependency.obs_package.satisfies_stack(stack)) || !dependency.obs_package.respond_to?('satisfies_stack')
-        artifact = dependency.obs_package.artifact(stack, s3_bucket)
-        dependency_manifest_name = name_to_manifest(dependency.dependency)
-        element = {
-          "name" => dependency_manifest_name,
-          "version" => dependency.version,
-          "uri" => artifact[:uri],
-          "sha256" => artifact[:checksum],
-          "cf_stacks" => [stack]
-        }
-        if dependency_manifest_name == "php"
-          element["modules"] = artifact[:modules]
-        end
-        hash["dependencies"] << element
+  def add_dependency(dependency, stack, s3_bucket)
+    # FIXME: satisfies_check should be done when filtering the dependency list
+    if (dependency.obs_package.respond_to?('satisfies_stack') && dependency.obs_package.satisfies_stack(stack)) || !dependency.obs_package.respond_to?('satisfies_stack')
+      artifact = dependency.obs_package.artifact(stack, s3_bucket)
+      dependency_manifest_name = name_to_manifest(dependency.dependency)
+      element = {
+        "name" => dependency_manifest_name,
+        "version" => dependency.version,
+        "uri" => artifact[:uri],
+        "sha256" => artifact[:checksum],
+        "cf_stacks" => [stack]
+      }
+      if dependency_manifest_name == "php"
+        element["modules"] = artifact[:modules]
       end
+      hash["dependencies"] << element
     end
   end
-
 
   def write(path)
     File.write(path, hash.to_yaml)

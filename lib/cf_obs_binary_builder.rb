@@ -89,8 +89,7 @@ module CfObsBinaryBuilder
   end
 
   def self.build_buildpack(args)
-    base_stack = require_env_var("BASE_STACK")
-    build_stacks = require_env_var("BUILD_STACKS").to_s.split(',').sort
+    stack_mappings = parse_stack_mappings!(ENV["STACK_MAPPINGS"])
     s3_bucket = require_env_var("STAGING_BUILDPACKS_BUCKET")
 
     if args.length != 3
@@ -101,7 +100,7 @@ module CfObsBinaryBuilder
 
     Dir.mktmpdir(TMP_DIR_SUFFIX) do |tmpdir|
       Dir.chdir tmpdir do
-        result = buildpack.new(args[1], args[2]).run(base_stack, build_stacks, s3_bucket)
+        result = buildpack.new(args[1], args[2]).run(stack_mappings, s3_bucket)
 
         case result
         when :failed
@@ -168,5 +167,11 @@ EOF
 
   def self.require_env_var(env_var_name)
     return ENV[env_var_name] || raise("no #{env_var_name} environment variable set")
+  end
+
+  def self.parse_stack_mappings!(mapping_json)
+    raise("no STACK_MAPPINGS environment variable set") if mapping_json.strip.empty?
+
+    JSON.parse(mapping_json.strip)
   end
 end

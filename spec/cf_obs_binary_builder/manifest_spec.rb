@@ -50,6 +50,10 @@ describe CfObsBinaryBuilder::Manifest do
   end
 
   describe "#populate!" do
+    let(:stack_mappings) do
+      { 'sle12' => 'cflinuxfs2', 'opensuse42' => 'cflinuxfs2', 'sle15' => 'cflinuxfs3' }
+    end
+
     it "raises if some dependencies are missing or unknown" do
       allow_any_instance_of(CfObsBinaryBuilder::ObsPackage).to receive(:exists?) do |obj|
         obj.name != "bundler-1.17.3"
@@ -62,24 +66,56 @@ describe CfObsBinaryBuilder::Manifest do
         end
       end
 
-      expect { subject.populate!(base_stack, build_stacks, "buildpacks-staging") }.to raise_error(/Missing: bundler-1.17.3.*Unknown: node/m)
+      expect { subject.populate!(stack_mappings, "buildpacks-staging") }.to raise_error(/Missing: bundler-1.17.3.*Unknown: node/m)
     end
 
     it "adds dependencies for sle12 and opensuse42" do
       allow_any_instance_of(CfObsBinaryBuilder::ObsPackage).to receive(:exists?).and_return(true)
       allow_any_instance_of(CfObsBinaryBuilder::ObsPackage).to receive(:build_status).and_return(:succeeded)
-      allow_any_instance_of(CfObsBinaryBuilder::ObsPackage).to receive(:artifact).and_return({uri: "https://foo", checksum: "abcde12345"})
+      # The only dependency where the uri is important it openjdk (to find the "update" version).
+      # Stub it to this value for every dependency to avoid calling the internetz from the tests.
+      # The uri value should match the one from the fixture manifest yml file.
+      allow_any_instance_of(CfObsBinaryBuilder::ObsPackage).to receive(:artifact).and_return(
+        {
+          uri: "https://buildpacks.cloudfoundry.org/dependencies/manual-binaries/jruby/openjdk-1.8.0_192-6254bacb.tar.gz",
+          checksum: "abcde12345"
+        })
 
-      subject.populate!(base_stack, build_stacks, "buildpacks-staging")
+      subject.populate!(stack_mappings, "buildpacks-staging")
+      base_stack_deps = subject.hash["dependencies"].
+          select { |d| d["cf_stacks"].include?("cflinuxfs2") }.map { |d| "#{d["name"]}-#{d["version"]}" }
+      # TODO: Remove the gsub hack when we remove the OBS part from the openjdk version
+      added_stack_deps = subject.hash["dependencies"].
+          select { |d| d["cf_stacks"].include?("sle12") }.map { |d| "#{d["name"]}-#{d["version"]}".gsub(/_\d{3}$/,"") }
+      expect(base_stack_deps.sort).to eq(added_stack_deps.sort)
 
-      stack_deps = build_stacks.map do |stack|
-        subject.hash["dependencies"].
-          select { |d| d["cf_stacks"].include?(stack) }.map { |d| d["name"] }
-      end
+      added_stack_deps = subject.hash["dependencies"].
+          select { |d| d["cf_stacks"].include?("opensuse42") }.map { |d| "#{d["name"]}-#{d["version"]}".gsub(/_\d{3}$/,"")  }
+      expect(base_stack_deps.sort).to eq(added_stack_deps.sort)
 
-      (1..(stack_deps.count-1)).each do |index|
-        expect(stack_deps[index]).to match_array(stack_deps[0])
-      end
+      base_stack_deps = subject.hash["dependencies"].
+          select { |d| d["cf_stacks"].include?("cflinuxfs3") }.map { |d| "#{d["name"]}-#{d["version"]}" }
+      added_stack_deps = subject.hash["dependencies"].
+          select { |d| d["cf_stacks"].include?("sle15") }.map { |d| "#{d["name"]}-#{d["version"]}".gsub(/_\d{3}$/,"") }
+      expect(base_stack_deps.sort).to eq(added_stack_deps.sort)
+    end
+
+    it "leaves the base stack dependencies intact" do
+      allow_any_instance_of(CfObsBinaryBuilder::ObsPackage).to receive(:exists?).and_return(true)
+      allow_any_instance_of(CfObsBinaryBuilder::ObsPackage).to receive(:build_status).and_return(:succeeded)
+      allow_any_instance_of(CfObsBinaryBuilder::ObsPackage).to receive(:artifact).and_return(
+        {
+          uri: "https://buildpacks.cloudfoundry.org/dependencies/manual-binaries/jruby/openjdk-1.8.0_192-6254bacb.tar.gz",
+          checksum: "abcde12345"
+        })
+
+
+      base_stack_deps_before = subject.hash["dependencies"].
+          select { |d| d["cf_stacks"].include?("cflinuxfs2") }.map { |d| "#{d["name"]}-#{d["version"]}" }
+      subject.populate!(stack_mappings, "buildpacks-staging")
+      base_stack_deps_after = subject.hash["dependencies"].
+          select { |d| d["cf_stacks"].include?("cflinuxfs2") }.map { |d| "#{d["name"]}-#{d["version"]}" }
+      expect(base_stack_deps_before.sort).to eq(base_stack_deps_after.sort)
     end
   end
 end

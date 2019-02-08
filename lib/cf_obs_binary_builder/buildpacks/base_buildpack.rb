@@ -21,11 +21,11 @@ class CfObsBinaryBuilder::BaseBuildpack
   # base_stack is the stack to use as a reference to choose dependencies
   # build_stacks are the stacks to add to the manifest.
   # s3_bucket is the bucket where the packages from OBS are copied to.
-  def run(base_stack, build_stacks, s3_bucket)
+  def run(stack_mappings, s3_bucket)
     obs_package.create
     obs_package.checkout do
       @manifest = prepare_sources
-      populate_result = @manifest.populate!(base_stack, build_stacks, s3_bucket)
+      populate_result = @manifest.populate!(stack_mappings, s3_bucket)
       return populate_result unless populate_result == :succeeded
 
       @manifest.write("manifest.yml")

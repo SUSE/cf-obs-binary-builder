@@ -30,4 +30,19 @@ describe CfObsBinaryBuilder do
       end
     end
   end
+
+  describe ".parse_stack_mappings!" do
+    let(:json_mapping) do
+      '{"sle12": "cflinuxfs2", "opensuse42": "cflinuxfs2", "sle15": "cflinuxfs3"}'
+    end
+    let(:expected_mapping) do
+      {'sle12' => "cflinuxfs2", 'opensuse42' => "cflinuxfs2", "sle15" => "cflinuxfs3"}
+    end
+    it 'returns a proper hash' do
+      expect(described_class.parse_stack_mappings!(json_mapping)).to eq(expected_mapping)
+    end
+    it 'raises an error' do
+      expect{ described_class.parse_stack_mappings!('') }.to raise_error('no STACK_MAPPINGS environment variable set')
+    end
+  end
 end
