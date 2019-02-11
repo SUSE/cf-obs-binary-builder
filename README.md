@@ -30,25 +30,84 @@ The relevant information is returned on STDERR.
 
 ## Usage
 
+### Set environment variables
 Define the OBS project using
 
 ```
 export OBS_PROJECT=the:project
 ```
 
-Then create a bundler package
+Define the stack mappings (needed for `buildpack`, `sync` and `regenerate_specs` command) e.g.
 
 ```
-bin/cf-obs-binary-builder bundler 1.15.1 the_checksum_of_the_sources
+export STACK_MAPPINGS='{ "sle12":"cflinuxfs2", "opensuse42": "cflinuxfs2", "sle15": "cflinuxfs3" }'
 ```
 
-After the package has been built you can download the binaries incl. the tarball using
+This instructs the `cf_obs_binary_builder` to use certain stacks in the manifest when picking depencencies for the stacks to add.
+In the example above, the cflinuxfs2 stack will be used to pick dependencies for the sle12 stack. In the same way, the cflinuxfs3 will be used
+to select dependencies for sle15 and so on.
+
+### `cf_obs_binary_builder dependency`
+
+This command will create a new package on obs. This command is interally used by the sync command (see below). Run manually for testing purposes only.
+You can find the required checksum by running the depwatcher as described above.
 
 ```
-osc getbinaries the:project bundler-1.15.1 openSUSE_Leap_42.2 x86_64
+cf_obs_binary_builder dependency <dependency> <version> <checksum>
 ```
 
-Alternatively you can build a gem:
+**Example:**
+
+```
+cf_obs_binary_builder dependency node 6.16.0 5432c6cba59bfef5794951193e93dbbd1707960b6c722925afcdb4517f4dc742
+```
+
+
+### `cf_obs_binary_builder buildpack`
+
+This creates a new buildpack on obs. you need to set the `STACK_MAPPINGS` variable as described above. Revision is a number used to create a version string for our releases (usually it is the upstream version appended with SUSE revision number e.g. `1.17.0` => `1.17.0.1`). This number is incremented with every release on a certain upstream version.
+The upstream version tags have to be synced into our fork of buildpack (e.g. https://github.com/SUSE/cf-dotnet-core-buildpack/tags) for this to work.
+
+```
+  cf_obs_binary_builder buildpack <buildpack> <upstream-version> <revision>
+```
+
+**Example:**
+
+```
+  cf_obs_binary_builder buildpack dotnet-core 2.2.5 1
+```
+
+### `cf_obs_binary_builder sync`
+
+This command creates missing OBS packages for all the stacks in `STACK_MAPPINGS` keys using the given manifest. Again the `STACK_MAPPINGS` needs to be set for this to work. For existing dependencies it will internally run the `regenerate` command as mentioned on the paragraph below. In the end if there are unknown dependencies it will exit with an error.
+The manifest argument needs to point to a file on the local filesystem.
+
+```
+cf_obs_binary_builder sync <manifest_path>
+```
+
+**Example:**
+
+If `STACK_MAPPINGS` is this:
+
+```
+export STACK_MAPPINGS='{ "sle12":"cflinuxfs2", "opensuse42": "cflinuxfs2", "sle15": "cflinuxfs3" }'
+```
+
+the command will create packages for all the cflinuxfs2 and cflinuxfs3 depedencies in the given manifest file (because these are the reference stacks for the stacks we want to add).
+
+### `cf_obs_binary_builder regenerate-specs`
+
+Regenerates the spec files for all (existing) dependencies on OBS. The `STACK_MAPPINGS` needs to be set for this to work (Mappings work as described in the `sync` section above). The manifest argument needs to point to a file on the local filesystem. This will not genereate packages for missing dependencies, it will only regenerate spec-files for existing dependencies.
+
+```
+cf_obs_binary_builder regenerate-specs <manifest_path>
+```
+
+### Building
+
+If you don't want to use the `cf_obs_binary_builder` as a script in `$(pwd)/bin` you can build it as a rubygem
 
 ```
 gem build cf_obs_binary_builder.gemspec
