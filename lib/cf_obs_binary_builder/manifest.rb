@@ -103,6 +103,10 @@ class CfObsBinaryBuilder::Manifest
     :succeeded
   end
 
+  def write(path)
+    File.write(path, hash.to_yaml)
+  end
+
   private
 
   def filter_dependencies
@@ -133,10 +137,6 @@ class CfObsBinaryBuilder::Manifest
       end
       hash["dependencies"] << element
     end
-  end
-
-  def write(path)
-    File.write(path, hash.to_yaml)
   end
 
   def dependencies_for_stack(stack)
