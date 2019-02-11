@@ -104,6 +104,8 @@ EOF
       "SLE_12_SP3"
     when "opensuse42"
       "openSUSE_Leap_42.3"
+    when "sle15"
+      "SLE_15"
     else
       raise "unknown stack: #{stack}"
     end
