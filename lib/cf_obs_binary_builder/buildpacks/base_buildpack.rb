@@ -29,9 +29,12 @@ class CfObsBinaryBuilder::BaseBuildpack
       return populate_result unless populate_result == :succeeded
 
       @manifest.write("manifest.yml")
+      dependencies = []
+      stack_mappings.each_key { |stack| dependencies += @manifest.dependencies(stack).first }
+      dependencies.uniq!{|dep| "#{dep.dependency}-#{dep.version}"}
 
       update_source_tarball
-      write_spec_file
+      write_spec_file(dependencies)
       obs_package.commit
     end
     log 'Done!'
@@ -79,12 +82,12 @@ class CfObsBinaryBuilder::BaseBuildpack
     FileUtils.rm_r(tarball_dir)
   end
 
-  def write_spec_file
+  def write_spec_file(dependencies)
     log 'Render the spec template and put it in the package dir'
-    File.write("#{name}-buildpack.spec", render_spec_template)
+    File.write("#{name}-buildpack.spec", render_spec_template(dependencies))
   end
 
-  def render_spec_template
+  def render_spec_template(dependencies)
     spec_template = File.read(
       File.expand_path(File.dirname(__FILE__) + "/../templates/buildpack-go-based.spec.erb"))
     ERB.new(spec_template).result(binding)

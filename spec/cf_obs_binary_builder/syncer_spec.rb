@@ -1,7 +1,7 @@
 require_relative "../spec_helper.rb"
 
 describe CfObsBinaryBuilder::Syncer do
-  let(:base_stack) { "cflinuxfs2" }
+  let(:base_stacks) { ['cflinuxfs2', 'cflinuxfs3'] }
   let(:manifest_path) { File.expand_path("../fixtures/ruby-buildpack-manifest.yml", __dir__) }
   subject { described_class.new(manifest_path) }
 
@@ -20,7 +20,7 @@ describe CfObsBinaryBuilder::Syncer do
         expect(obj.dependency).to eq("bundler")
       end
 
-      subject.sync(base_stack)
+      subject.sync(base_stacks)
     end
   end
 end

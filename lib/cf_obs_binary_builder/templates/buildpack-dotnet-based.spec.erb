@@ -27,7 +27,6 @@ Url:            https://github.com/SUSE/cf-<%= name %>-buildpack
 Source0:        https://github.com/SUSE/cf-<%= name %>-buildpack/archive/v%{version}.tar.gz
 BuildRequires:  go
 BuildRequires:  go-buildpack-packager
-<% dependencies = manifest.dependencies.first %>
   <%
     dependencies.each do |dependency|
       if !dependency.package_name.match(/^dotnet.*/)

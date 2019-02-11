@@ -28,7 +28,6 @@ Source0:        https://github.com/SUSE/cf-<%= name %>-buildpack/archive/v%{vers
 BuildRequires:  ruby2.5-rubygem-buildpack-packager
 BuildRequires:  compile-extensions-tarball
 BuildRequires:  zip
-<% dependencies = manifest.dependencies.first %>
 <% dependencies.each do |dependency| %>
 BuildRequires: <%= dependency.package_name %>
 <% end %>

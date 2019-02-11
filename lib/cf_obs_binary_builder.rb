@@ -115,14 +115,13 @@ module CfObsBinaryBuilder
   end
 
   def self.sync(args)
-    base_stack = require_env_var("BASE_STACK")
-
+    base_stacks = parse_stack_mappings!(ENV['STACK_MAPPINGS']).values
     if args.length != 1
       abort "Wrong number of arguments, please specify: manifest_path"
     end
 
     manifest_path = args.shift
-    unknown = Syncer.new(manifest_path).sync(base_stack)
+    unknown = Syncer.new(manifest_path).sync(base_stacks)
     if !unknown.empty?
       puts "Encountered unknown dependencies: #{unknown.join(",")}"
       exit 1
@@ -130,14 +129,13 @@ module CfObsBinaryBuilder
   end
 
   def self.regenerate_specs(args)
-    base_stack = require_env_var("BASE_STACK")
-
+    base_stacks = parse_stack_mappings!(ENV['STACK_MAPPINGS']).values
     if args.length != 1
       abort "Wrong number of arguments, please specify: manifest_path"
     end
 
     manifest_path = args.shift
-    Syncer.new(manifest_path).regenerate_specs(base_stack)
+    Syncer.new(manifest_path).regenerate_specs(base_stacks)
   end
 
   def self.get_build_target(dependency)

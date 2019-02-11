@@ -7,7 +7,7 @@ class CfObsBinaryBuilder::DotnetcoreBuildpack < CfObsBinaryBuilder::BaseBuildpac
 
   # Render specific template for dotnet-* which filters the base_dependencies
   # from BuildRequires
-  def render_spec_template
+  def render_spec_template(dependencies)
     spec_template = File.read(
       File.expand_path(File.dirname(__FILE__) + '/../templates/buildpack-dotnet-based.spec.erb'))
     ERB.new(spec_template).result(binding)
