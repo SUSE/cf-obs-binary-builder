@@ -51,7 +51,7 @@ describe CfObsBinaryBuilder::Manifest do
 
   describe "#populate!" do
     let(:stack_mappings) do
-      { 'sle12' => 'cflinuxfs2', 'opensuse42' => 'cflinuxfs2', 'sle15' => 'cflinuxfs3' }
+      { 'sle12' => 'cflinuxfs2', 'opensuse42' => 'cflinuxfs2', 'cfsle15fs' => 'cflinuxfs3' }
     end
 
     it "raises if some dependencies are missing or unknown" do
@@ -96,7 +96,7 @@ describe CfObsBinaryBuilder::Manifest do
       base_stack_deps = subject.hash["dependencies"].
           select { |d| d["cf_stacks"].include?("cflinuxfs3") }.map { |d| "#{d["name"]}-#{d["version"]}" }
       added_stack_deps = subject.hash["dependencies"].
-          select { |d| d["cf_stacks"].include?("sle15") }.map { |d| "#{d["name"]}-#{d["version"]}".gsub(/_\d{3}$/,"") }
+          select { |d| d["cf_stacks"].include?("cfsle15fs") }.map { |d| "#{d["name"]}-#{d["version"]}".gsub(/_\d{3}$/,"") }
       expect(base_stack_deps.sort).to eq(added_stack_deps.sort)
     end
 

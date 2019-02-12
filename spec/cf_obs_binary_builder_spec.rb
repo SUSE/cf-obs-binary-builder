@@ -33,10 +33,10 @@ describe CfObsBinaryBuilder do
 
   describe ".parse_stack_mappings!" do
     let(:json_mapping) do
-      '{"sle12": "cflinuxfs2", "opensuse42": "cflinuxfs2", "sle15": "cflinuxfs3"}'
+      '{"sle12": "cflinuxfs2", "opensuse42": "cflinuxfs2", "cfsle15fs": "cflinuxfs3"}'
     end
     let(:expected_mapping) do
-      {'sle12' => "cflinuxfs2", 'opensuse42' => "cflinuxfs2", "sle15" => "cflinuxfs3"}
+      {'sle12' => "cflinuxfs2", 'opensuse42' => "cflinuxfs2", "cfsle15fs" => "cflinuxfs3"}
     end
     it 'returns a proper hash' do
       expect(described_class.parse_stack_mappings!(json_mapping)).to eq(expected_mapping)
