@@ -59,7 +59,7 @@ EOF
 EOF
   end
 
-  let(:stacks){ ["sle12","sle15"] }
+  let(:stacks){ ["sle12","cfsle15fs"] }
 
     it "returns :succeeded if all the statuses are 'succeeded'" do
       expect(Open3).to receive(:capture2e).and_return([succeeded_output, double(exitstatus: 0)])
