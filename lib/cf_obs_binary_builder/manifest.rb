@@ -77,7 +77,7 @@ class CfObsBinaryBuilder::Manifest
 
       existing.each do |dependency|
         print "Checking #{dependency.package_name}... "
-        build_status = dependency.obs_package.build_status(stack_mappings.keys)
+        build_status = dependency.obs_package.build_status(stack)
 
         case build_status
         when :failed

@@ -18,7 +18,7 @@ describe CfObsBinaryBuilder::ObsPackage do
       <status package="bundler-1.16.2" code="failed" />
     </result>
     <result  project="Cloud:Platform:buildpacks:dependencies" repository="SLE_12_SP3" arch="x86_64" code="published" state="published">
-      <status package="bundler-1.16.2" code="succeeded" />
+      <status package="bundler-1.16.2" code="failed" />
     </result>
     <result  project="Cloud:Platform:buildpacks:dependencies" repository="IRRELEVANT_STACK" arch="x86_64" code="published" state="published">
       <status package="bundler-1.16.2" code="failed" />
@@ -34,7 +34,7 @@ EOF
       <status package="bundler-1.16.2" code="succeeded" />
     </result>
     <result  project="Cloud:Platform:buildpacks:dependencies" repository="SLE_12_SP3" arch="x86_64" code="published" state="published">
-      <status package="bundler-1.16.2" code="succeeded" />
+      <status package="bundler-1.16.2" code="failed" />
     </result>
     <result  project="Cloud:Platform:buildpacks:dependencies" repository="IRRELEVANT_STACK" arch="x86_64" code="published" state="published">
       <status package="bundler-1.16.2" code="failed" />
@@ -59,21 +59,21 @@ EOF
 EOF
   end
 
-  let(:stacks){ ["sle12","cfsle15fs"] }
+  let(:stack){ "cfsle15fs" }
 
     it "returns :succeeded if all the statuses are 'succeeded'" do
       expect(Open3).to receive(:capture2e).and_return([succeeded_output, double(exitstatus: 0)])
-      expect(subject.build_status(stacks)).to eq(:succeeded)
+      expect(subject.build_status(stack)).to eq(:succeeded)
     end
 
     it "returns :failed if one or more statuses are 'failed'" do
       expect(Open3).to receive(:capture2e).and_return([failed_output, double(exitstatus: 0)])
-      expect(subject.build_status(stacks)).to eq(:failed)
+      expect(subject.build_status(stack)).to eq(:failed)
     end
 
     it "returns :in_process if it is not :succeeded or :failed" do
       expect(Open3).to receive(:capture2e).and_return([in_process_output, double(exitstatus: 0)])
-      expect(subject.build_status(stacks)).to eq(:in_process)
+      expect(subject.build_status(stack)).to eq(:in_process)
     end
   end
 

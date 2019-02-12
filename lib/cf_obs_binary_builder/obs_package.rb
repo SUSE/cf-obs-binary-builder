@@ -61,12 +61,13 @@ EOF
     system("osc search --package #{name} | grep '#{obs_project} ' > /dev/null")
   end
 
-  # Checks the build status for the stacks we are interested in (and ignores all others).
-  def build_status(stacks)
+  # Checks the build status for the stack we are interested in (and ignores all others).
+  def build_status(stack)
     output, status = Open3.capture2e("osc prjresults #{obs_project} --xml")
     raise "Error getting project results: #{output}" unless status.exitstatus == 0
 
     doc = Nokogiri::XML(output)
+    stacks = [stack]
     repositories = stacks.map{|stack| repository_for_stack(stack) }
     xpath = repositories.map do |repository|
       "//result[@repository='#{repository}']/status[@package='#{name}']"
