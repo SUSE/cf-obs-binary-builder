@@ -1,7 +1,13 @@
+require "nokogiri"
 class CfObsBinaryBuilder::ObsPackage
   attr_reader :name, :obs_project
 
   ARTIFACT_EXTENSION_REGEXP=".tgz|.tar.gz|.tbz|tar.bz|.zip|.phar"
+  STACK_TO_OBS_REPOSITORY = {
+    "sle12" => "SLE_12_SP3",
+    "cfsle15fs" => "SLE_15",
+    "opensuse42" => "openSUSE_Leap_42.3",
+  }
 
   def initialize(name, obs_project)
     @name = name
@@ -55,10 +61,17 @@ EOF
     system("osc search --package #{name} | grep '#{obs_project} ' > /dev/null")
   end
 
-  def build_status
-    output, status = Open3.capture2e("osc prjresults #{obs_project} -c | grep #{name}\\;")
+  # Checks the build status for the stacks we are interested in (and ignores all others).
+  def build_status(stacks)
+    output, status = Open3.capture2e("osc prjresults #{obs_project} --xml")
     raise "Error getting project results: #{output}" unless status.exitstatus == 0
-    results = output.split(";")[1..-1]
+
+    doc = Nokogiri::XML(output)
+    repositories = stacks.map{|stack| repository_for_stack(stack) }
+    xpath = repositories.map do |repository|
+      "//result[@repository='#{repository}']/status[@package='#{name}']"
+    end.join("|")
+    results = doc.xpath(xpath).map{|status| status["code"]}
 
     return :failed if results.any? { |r| r.strip == "failed" }
     return :succeeded if results.all? { |r| r.strip == "succeeded" }
@@ -99,16 +112,7 @@ EOF
   private
 
   def repository_for_stack(stack)
-    obs_repository = case stack
-    when "sle12"
-      "SLE_12_SP3"
-    when "opensuse42"
-      "openSUSE_Leap_42.3"
-    when "sle15"
-      "SLE_15"
-    else
-      raise "unknown stack: #{stack}"
-    end
+    STACK_TO_OBS_REPOSITORY[stack] || raise('unknown stack: #{stack}')
   end
 
   def artifact_filenames(stack)

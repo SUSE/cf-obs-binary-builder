@@ -17,6 +17,7 @@ Gem::Specification.new do |s|
   s.license       = 'MIT'
 
   s.add_runtime_dependency 'tetra', '>= 2.0.5'
+  s.add_runtime_dependency 'nokogiri'
 
   %w(pry pry-nav rspec).each { |gem| s.add_development_dependency gem }
 end
