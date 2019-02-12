@@ -20,8 +20,6 @@ end
 # We consume dotnet-sdk-2.0.3 and dotnet-runtime-2.0.7 from Pivotal.
 # This is a very special case, and we should be able to drop this in the
 # future.
-
-# Drop this as well
 class RuntimePackage
   def exists?
     true
@@ -31,7 +29,7 @@ class RuntimePackage
     true
   end
 
-  def build_status
+  def build_status(stacks)
     return :succeeded
   end
 
