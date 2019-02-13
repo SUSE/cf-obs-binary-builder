@@ -1,0 +1,27 @@
+---
+language: ruby
+pre_package: scripts/build.sh
+url_to_dependency_map: []
+dependencies:
+- name: bundler
+  version: 1.17.3
+  uri: https://buildpacks.cloudfoundry.org/dependencies/bundler/bundler-1.17.3-any-stack-b7502506.tgz
+  sha256: b7502506bb8ab5312d4efa208d39dca4a5830762ba6b4b094a72e9aa69702341
+  cf_stacks:
+  - cflinuxfs3
+  source: http://github.com/bundler/bundler/tree/v1.17.3
+include_files:
+- CHANGELOG
+- CONTRIBUTING.md
+- ISSUE_TEMPLATE
+- LICENSE
+- NOTICE
+- PULL_REQUEST_TEMPLATE
+- README.md
+- VERSION
+- bin/compile
+- bin/detect
+- bin/finalize
+- bin/release
+- bin/supply
+- manifest.yml

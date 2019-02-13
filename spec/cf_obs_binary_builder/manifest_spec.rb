@@ -4,11 +4,93 @@ describe CfObsBinaryBuilder::Manifest do
   let(:base_stack) { "cflinuxfs2" }
   let(:build_stacks) { ["sle12","opensuse42"] }
   let(:manifest_path) { File.expand_path("../fixtures/ruby-buildpack-manifest.yml", __dir__) }
+  let(:small_manifest_path) { File.expand_path("../fixtures/ruby-buildpack-small-manifest.yml", __dir__) }
   subject { described_class.new(manifest_path) }
 
   before(:each) do
     allow_any_instance_of(CfObsBinaryBuilder::ObsPackage).to receive(:exists?) do |obj|
       obj.name != "bundler-1.17.3"
+    end
+  end
+
+  describe "#dependencies_status" do
+    subject { described_class.new(small_manifest_path) }
+
+    let(:arg_for_failed) do
+      {
+        "cfsle15fs"=>{"bundler-1.17.3"=>"failed"},
+        "sle12"=>{"bundler-1.17.3"=>"failed"}
+      }
+    end
+
+    let(:arg_for_in_process) do
+      {
+        "cfsle15fs"=>{"bundler-1.17.3"=>"in_process"},
+        "sle12"=>{"bundler-1.17.3"=>"failed", }
+      }
+    end
+
+    let(:arg_for_succeeded) do
+      {
+        "cfsle15fs"=>{"bundler-1.17.3"=>"succeeded"},
+        "sle12"=>{"bundler-1.17.3"=>"failed", }
+      }
+    end
+
+    let(:stack_mappings) do
+      # sle12 will be ignored because cflinuxfs2 has no deps in the yaml
+      { "sle12" => "cflinuxfs2", "cfsle15fs" => "cflinuxfs3" }
+    end
+
+    it "returns failed when there are failed dependencies" do
+      allow_any_instance_of(CfObsBinaryBuilder::ObsPackage).to receive(:exists?).
+        and_return(true)
+
+      expect(subject.dependencies_status(arg_for_failed, stack_mappings)).
+             to eq(:failed)
+    end
+
+    it "returns in_process when there are no failed but in_process dependencies" do
+      allow_any_instance_of(CfObsBinaryBuilder::ObsPackage).to receive(:exists?).
+        and_return(true)
+
+      expect(subject.dependencies_status(arg_for_in_process, stack_mappings)).
+             to eq(:in_process)
+    end
+
+    it "returns succeeded when there all dependencies are succeeded" do
+      allow_any_instance_of(CfObsBinaryBuilder::ObsPackage).to receive(:exists?).
+        and_return(true)
+
+      expect(subject.dependencies_status(arg_for_succeeded, stack_mappings)).
+             to eq(:succeeded)
+    end
+
+    it "raises when there is a dependency with unknown status" do
+      allow_any_instance_of(CfObsBinaryBuilder::ObsPackage).to receive(:exists?).
+        and_return(true)
+
+      expect{ subject.dependencies_status({}, stack_mappings) }.to raise_error(/Unknown build status: /)
+    end
+
+    it "raises if some dependencies are missing" do
+      allow_any_instance_of(CfObsBinaryBuilder::ObsPackage).to receive(:exists?) do |obj|
+        obj.name != "bundler-1.17.3"
+      end
+
+      expect { subject.dependencies_status(arg_for_succeeded, stack_mappings) }.to raise_error(/Missing: bundler-1.17.3/m)
+    end
+
+    it "raises if some dependencies are missing" do
+      allow_any_instance_of(described_class).to receive(:dependency_for).and_wrap_original do |original, *args|
+        if args[0]["name"] == "bundler"
+          nil
+        else
+          original.call(*args)
+        end
+      end
+
+      expect { subject.dependencies_status(arg_for_succeeded, stack_mappings) }.to raise_error(/Unknown: bundler/m)
     end
   end
 
@@ -54,24 +136,8 @@ describe CfObsBinaryBuilder::Manifest do
       { 'sle12' => 'cflinuxfs2', 'opensuse42' => 'cflinuxfs2', 'cfsle15fs' => 'cflinuxfs3' }
     end
 
-    it "raises if some dependencies are missing or unknown" do
-      allow_any_instance_of(CfObsBinaryBuilder::ObsPackage).to receive(:exists?) do |obj|
-        obj.name != "bundler-1.17.3"
-      end
-      allow_any_instance_of(described_class).to receive(:dependency_for).and_wrap_original do |original, *args|
-        if args[0]["name"] == "node"
-          nil
-        else
-          original.call(*args)
-        end
-      end
-
-      expect { subject.populate!(stack_mappings, "buildpacks-staging") }.to raise_error(/Missing: bundler-1.17.3.*Unknown: node/m)
-    end
-
     it "adds dependencies for sle12 and opensuse42" do
       allow_any_instance_of(CfObsBinaryBuilder::ObsPackage).to receive(:exists?).and_return(true)
-      allow_any_instance_of(CfObsBinaryBuilder::ObsPackage).to receive(:build_status).and_return(:succeeded)
       # The only dependency where the uri is important it openjdk (to find the "update" version).
       # Stub it to this value for every dependency to avoid calling the internetz from the tests.
       # The uri value should match the one from the fixture manifest yml file.

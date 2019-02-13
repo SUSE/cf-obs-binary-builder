@@ -3,7 +3,7 @@ require 'fileutils'
 class CfObsBinaryBuilder::BaseBuildpack
   include RpmSpecHelpers
 
-  attr_reader :name, :version, :upstream_version, :obs_package, :manifest
+  attr_reader :name, :version, :upstream_version, :obs_package, :obs_project, :manifest
 
   SOURCES_CACHE_DIR = File.expand_path("~/.cf-obs-binary-builder")
 
@@ -13,8 +13,8 @@ class CfObsBinaryBuilder::BaseBuildpack
     @version = "#{@upstream_version}.#{revision}"
 
     package_name = "#{name}-buildpack-#{version}"
-    obs_project = ENV["OBS_BUILDPACK_PROJECT"] || raise("no OBS_BUILDPACK_PROJECT environment variable set")
-    @obs_package = CfObsBinaryBuilder::ObsPackage.new(package_name, obs_project)
+    @obs_project = ENV["OBS_BUILDPACK_PROJECT"] || raise("no OBS_BUILDPACK_PROJECT environment variable set")
+    @obs_package = CfObsBinaryBuilder::ObsPackage.new(package_name, @obs_project)
   end
 
   # Create or update buildpack package on OBS.
@@ -25,9 +25,11 @@ class CfObsBinaryBuilder::BaseBuildpack
     obs_package.create
     obs_package.checkout do
       @manifest = prepare_sources
-      populate_result = @manifest.populate!(stack_mappings, s3_bucket)
-      return populate_result unless populate_result == :succeeded
+      package_statuses = CfObsBinaryBuilder::ObsPackage.project_package_statuses(obs_project)
+      dependencies_status = @manifest.dependencies_status(package_statuses, stack_mappings)
+      return dependencies_status unless dependencies_status == :succeeded
 
+      @manifest.populate!(stack_mappings, s3_bucket)
       @manifest.write("manifest.yml")
       dependencies = []
       stack_mappings.each_key { |stack| dependencies += @manifest.dependencies(stack).first }

@@ -9,6 +9,25 @@ class CfObsBinaryBuilder::ObsPackage
     "opensuse42" => "openSUSE_Leap_42.3",
   }
 
+  def self.project_package_statuses(obs_project)
+    output, status = Open3.capture2e("osc prjresults #{obs_project} --xml")
+    raise "Error getting project results: #{output}" unless status.exitstatus == 0
+
+    doc = Nokogiri::XML(output)
+    result = {}
+    doc.xpath("//result").each do |repository_results|
+      repository = repository_results["repository"]
+      stack = STACK_TO_OBS_REPOSITORY.invert[repository]
+      next unless stack
+      result[stack] = {}
+      repository_results.xpath("//result[@repository='#{repository}']//status").each do |package_status|
+        result[stack][package_status["package"]] = package_status["code"]
+      end
+    end
+
+    result
+  end
+
   def initialize(name, obs_project)
     @name = name
     @obs_project = obs_project
