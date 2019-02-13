@@ -51,6 +51,10 @@ class CfObsBinaryBuilder::Manifest
     @dependencies[base_stack] = [existing_deps, missing_deps, unknown_deps.uniq, third_party_deps]
   end
 
+  def dependency_statuses(package_statuses)
+    # TODO: Write test, implement
+  end
+
   # This method takes a hash of mappings like the one below, and makes sure that the hash
   # of this manifest, includes dependencies for the stacks in the stack_mappings keys.
   # All other stacks in the manifest stays untouched.
