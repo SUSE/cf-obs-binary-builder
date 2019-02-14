@@ -89,7 +89,7 @@ module CfObsBinaryBuilder
   end
 
   def self.build_buildpack(args)
-    stack_mappings = parse_stack_mappings!(ENV["STACK_MAPPINGS"])
+    stack_mappings = parse_stack_mappings!(require_env_var("STACK_MAPPINGS"))
     s3_bucket = require_env_var("STAGING_BUILDPACKS_BUCKET")
 
     if args.length != 3
@@ -115,13 +115,16 @@ module CfObsBinaryBuilder
   end
 
   def self.sync(args)
+    obs_project = require_env_var("OBS_DEPENDENCY_PROJECT")
+
     base_stacks = parse_stack_mappings!(ENV['STACK_MAPPINGS']).values
     if args.length != 1
       abort "Wrong number of arguments, please specify: manifest_path"
     end
 
     manifest_path = args.shift
-    unknown = Syncer.new(manifest_path).sync(base_stacks)
+    package_statuses = CfObsBinaryBuilder::ObsPackage.project_package_statuses(obs_project)
+    unknown = Syncer.new(manifest_path).sync(base_stacks, package_statuses)
     if !unknown.empty?
       puts "Encountered unknown dependencies: #{unknown.join(",")}"
       exit 1
@@ -129,13 +132,16 @@ module CfObsBinaryBuilder
   end
 
   def self.regenerate_specs(args)
+    obs_project = require_env_var("OBS_DEPENDENCY_PROJECT")
+
     base_stacks = parse_stack_mappings!(ENV['STACK_MAPPINGS']).values
     if args.length != 1
       abort "Wrong number of arguments, please specify: manifest_path"
     end
 
     manifest_path = args.shift
-    Syncer.new(manifest_path).regenerate_specs(base_stacks)
+    package_statuses = CfObsBinaryBuilder::ObsPackage.project_package_statuses(obs_project)
+    Syncer.new(manifest_path).regenerate_specs(base_stacks, package_statuses)
   end
 
   def self.get_build_target(dependency)

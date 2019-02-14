@@ -30,7 +30,7 @@ class SDKPackage
     true
   end
 
-  def build_status(stacks)
+  def build_status(stack)
     return :succeeded
   end
 

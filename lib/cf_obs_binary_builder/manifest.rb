@@ -11,7 +11,7 @@ class CfObsBinaryBuilder::Manifest
   # - unknown_deps: dependencies for which we don't have a class (so we don't know how to build them)
   # - existing_deps: dependencies for which we already have a package
   # - third_party_deps: dependencies which are not hosted on upstream buckets (meaning upstream doesn't build them either)
-  def dependencies(base_stack)
+  def dependencies(base_stack, package_statuses)
     @dependencies = {} if @dependencies.nil?
     return @dependencies[base_stack] if @dependencies[base_stack]
 
@@ -27,7 +27,8 @@ class CfObsBinaryBuilder::Manifest
       if dep_hash["uri"].include?("buildpacks.cloudfoundry.org")
         dep = dependency_for(dep_hash)
         if dep
-          if !dep.obs_package.exists?
+          # Check in the list of all the packages in package_statuses
+          if !package_statuses.values.map(&:keys).flatten.include?(dep.package_name)
             if !dep.respond_to?('ignore_missing') or (dep.respond_to?('ignore_missing') and !dep.ignore_missing)
               puts " doesn't exist"
               missing_deps << dep
@@ -51,6 +52,43 @@ class CfObsBinaryBuilder::Manifest
     @dependencies[base_stack] = [existing_deps, missing_deps, unknown_deps.uniq, third_party_deps]
   end
 
+  # This method combines the information from 3 different sources to return
+  # one combined status for the whole manifest.
+  # package_statuses: the information from OBS regarding packages
+  # stack_mappings: the information from the user on which stacks she wants to add
+  # dependencies (method): the information from the manifest itself
+  def dependencies_status(package_statuses, stack_mappings)
+    stack_mappings.each do |stack, base_stack|
+      existing, missing, unknown, third_party = dependencies(base_stack, package_statuses)
+
+      if missing.any? || unknown.any?
+        missing_deps = missing.map(&:package_name).join(", ")
+        unknown_deps = unknown.join(", ")
+        raise("Missing or unknown dependencies encountered.\nMissing: #{missing_deps}\nUnknown: #{unknown_deps}")
+      end
+
+      existing.each do |dependency|
+        print "#{dependency.package_name}: "
+        build_status = package_statuses.dig(stack,dependency.package_name)&.to_sym
+
+        case build_status
+        when :failed
+          puts "failed"
+          return :failed
+        when :in_process
+          puts "in process"
+          return :in_process
+        when :succeeded
+          puts "available"
+        else
+          raise "Unknown build status: #{build_status}"
+        end
+      end
+    end
+
+    :succeeded
+  end
+
   # This method takes a hash of mappings like the one below, and makes sure that the hash
   # of this manifest, includes dependencies for the stacks in the stack_mappings keys.
   # All other stacks in the manifest stays untouched.
@@ -65,33 +103,16 @@ class CfObsBinaryBuilder::Manifest
   #}
   # The s3_bucket is the bucket that hosts the dependencies built in OBS and is
   # needed in order to construct the urls for the deps.
-  def populate!(stack_mappings, s3_bucket)
+  # Before calling this method, the `dependencies_status` method has to be called
+  # to make sure all the dependencies are available.
+  # This method assumes all dependencies exist on OBS and they build successfully
+  # for their respective stacks.
+  def populate!(stack_mappings, package_statuses, s3_bucket)
     stack_mappings.each do |stack, base_stack|
-      existing, missing, unknown, third_party = dependencies(base_stack)
-
-      if missing.any? || unknown.any?
-        missing_deps = missing.map(&:package_name).join(", ")
-        unknown_deps = unknown.join(", ")
-        raise("Missing or unknown dependencies encountered.\nMissing: #{missing_deps}\nUnknown: #{unknown_deps}")
-      end
+      existing, missing, unknown, third_party = dependencies(base_stack, package_statuses)
 
       existing.each do |dependency|
-        print "Checking #{dependency.package_name}... "
-        build_status = dependency.obs_package.build_status(stack_mappings.keys)
-
-        case build_status
-        when :failed
-          puts "failed"
-          return :failed
-        when :in_process
-          puts "in process"
-          return :in_process
-        when :succeeded
-          puts "available"
-          add_dependency(dependency, stack, s3_bucket)
-        else
-          raise "Unknown build status: #{build_status}"
-        end
+        add_dependency(dependency, stack, s3_bucket)
       end
 
       third_party.each do |dependency|
@@ -99,8 +120,6 @@ class CfObsBinaryBuilder::Manifest
         original["cf_stacks"] = original["cf_stacks"] | [stack]
       end
     end
-
-    :succeeded
   end
 
   def write(path)
