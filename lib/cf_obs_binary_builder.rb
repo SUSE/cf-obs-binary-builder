@@ -89,7 +89,7 @@ module CfObsBinaryBuilder
   end
 
   def self.build_buildpack(args)
-    stack_mappings = parse_stack_mappings!(ENV["STACK_MAPPINGS"])
+    stack_mappings = parse_stack_mappings!(require_env_var("STACK_MAPPINGS"))
     s3_bucket = require_env_var("STAGING_BUILDPACKS_BUCKET")
 
     if args.length != 3
