@@ -29,11 +29,11 @@ class CfObsBinaryBuilder::BaseBuildpack
       dependencies_status = @manifest.dependencies_status(package_statuses, stack_mappings)
       return dependencies_status unless dependencies_status == :succeeded
 
-      @manifest.populate!(stack_mappings, s3_bucket)
+      @manifest.populate!(stack_mappings, package_statuses, s3_bucket)
       @manifest.write("manifest.yml")
       dependencies = []
-      stack_mappings.each_key { |stack| dependencies += @manifest.dependencies(stack).first }
-      dependencies.uniq!{|dep| "#{dep.dependency}-#{dep.version}"}
+      stack_mappings.each_key { |stack| dependencies += @manifest.dependencies(stack, package_statuses).first }
+      dependencies.uniq!(&:package_name)
 
       update_source_tarball
       write_spec_file(dependencies)

@@ -6,8 +6,8 @@ class CfObsBinaryBuilder::Syncer
   end
 
   # Returns a list of unknown dependencies (for which a class should be created)
-  def sync(base_stacks)
-    existing_dependencies, missing_dependencies, unknown_dependencies = unique_deps_for_stacks(base_stacks)
+  def sync(base_stacks, package_statuses)
+    existing_dependencies, missing_dependencies, unknown_dependencies = unique_deps_for_stacks(base_stacks, package_statuses)
 
     # Regenerate existing packages to make sure that they got all the new spec
     # changes and extensions
@@ -42,8 +42,8 @@ class CfObsBinaryBuilder::Syncer
   # Re-generates the spec files for all (existing) dependencies on OBS.
   # Should be only used when it is sure that nothing but the spec has
   # changed in any of the dependencies
-  def regenerate_specs(base_stacks)
-    existing_deps, _, _ = unique_deps_for_stacks(base_stacks)
+  def regenerate_specs(base_stacks, package_statuses)
+    existing_deps, _, _ = unique_deps_for_stacks(base_stacks, package_statuses)
 
     existing_deps.each do |dep|
       dep.regenerate_spec
@@ -52,11 +52,11 @@ class CfObsBinaryBuilder::Syncer
 
   private
 
-  def unique_deps_for_stacks(base_stacks)
+  def unique_deps_for_stacks(base_stacks, package_statuses)
     existing_dependencies, missing_dependencies, unknown_dependencies = [],[],[]
 
     base_stacks.each do |base_stack|
-      existing, missing, unknown = manifest.dependencies(base_stack)
+      existing, missing, unknown = manifest.dependencies(base_stack, package_statuses)
       existing_dependencies += existing
       missing_dependencies += missing
       unknown_dependencies += unknown

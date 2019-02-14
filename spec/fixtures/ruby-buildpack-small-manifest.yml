@@ -10,6 +10,13 @@ dependencies:
   cf_stacks:
   - cflinuxfs3
   source: http://github.com/bundler/bundler/tree/v1.17.3
+- name: Miniconda2
+  version: 4.3.30
+  uri: http://repo.continuum.io/miniconda/Miniconda2-4.3.30-Linux-x86_64.sh
+  sha256: '0891000ca28359e63aa77e613c01f7a88855dedfc0ddc8be31829f3139318cf3'
+  cf_stacks:
+  - cflinuxfs2
+  - cflinuxfs3
 include_files:
 - CHANGELOG
 - CONTRIBUTING.md

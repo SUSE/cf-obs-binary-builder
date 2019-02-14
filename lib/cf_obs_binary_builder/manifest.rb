@@ -11,7 +11,7 @@ class CfObsBinaryBuilder::Manifest
   # - unknown_deps: dependencies for which we don't have a class (so we don't know how to build them)
   # - existing_deps: dependencies for which we already have a package
   # - third_party_deps: dependencies which are not hosted on upstream buckets (meaning upstream doesn't build them either)
-  def dependencies(base_stack)
+  def dependencies(base_stack, package_statuses)
     @dependencies = {} if @dependencies.nil?
     return @dependencies[base_stack] if @dependencies[base_stack]
 
@@ -27,7 +27,8 @@ class CfObsBinaryBuilder::Manifest
       if dep_hash["uri"].include?("buildpacks.cloudfoundry.org")
         dep = dependency_for(dep_hash)
         if dep
-          if !dep.obs_package.exists?
+          # Check in the list of all the packages in package_statuses
+          if !package_statuses.values.map(&:keys).flatten.include?(dep.package_name)
             if !dep.respond_to?('ignore_missing') or (dep.respond_to?('ignore_missing') and !dep.ignore_missing)
               puts " doesn't exist"
               missing_deps << dep
@@ -58,8 +59,7 @@ class CfObsBinaryBuilder::Manifest
   # dependencies (method): the information from the manifest itself
   def dependencies_status(package_statuses, stack_mappings)
     stack_mappings.each do |stack, base_stack|
-      # TODO: Use the package_statuses in `dependencies` method below
-      existing, missing, unknown, third_party = dependencies(base_stack)
+      existing, missing, unknown, third_party = dependencies(base_stack, package_statuses)
 
       if missing.any? || unknown.any?
         missing_deps = missing.map(&:package_name).join(", ")
@@ -107,9 +107,9 @@ class CfObsBinaryBuilder::Manifest
   # to make sure all the dependencies are available.
   # This method assumes all dependencies exist on OBS and they build successfully
   # for their respective stacks.
-  def populate!(stack_mappings, s3_bucket)
+  def populate!(stack_mappings, package_statuses, s3_bucket)
     stack_mappings.each do |stack, base_stack|
-      existing, missing, unknown, third_party = dependencies(base_stack)
+      existing, missing, unknown, third_party = dependencies(base_stack, package_statuses)
 
       existing.each do |dependency|
         add_dependency(dependency, stack, s3_bucket)
