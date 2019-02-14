@@ -35,6 +35,9 @@ BuildRequires:  libbz2-devel
 BuildRequires:  readline-devel
 BuildRequires:  -post-build-checks
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+%if 0%{?suse_version} == 1315
+BuildRequires:  libffi-devel
+%endif
 
 <%= rpm_macros %>
 
