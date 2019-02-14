@@ -22,7 +22,13 @@ License:        MIT
 Group:          Cloud/Platform/scf
 Url:            https://github.com/djoyahoy/pip-pop
 Source0:        <%= source %>
+# KISS: docopt is not receiving any updates lately (last tag is 4 years ago)
+# so we chosen to not generate a _service file with obs-binary-builder, as
+# previously was vendored with the python-buildpack
+# https://github.com/cloudfoundry/python-buildpack/commit/47c40ce086ee10287c28719fde3647f152a16b35#diff-ebe308d3b3e798df4e9120c8535d16d8
+Source1:        https://github.com/docopt/docopt/archive/0.6.2.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+BuildRequires:	python-setuptools
 
 <%= rpm_macros %>
 
@@ -34,18 +40,33 @@ cp %{SOURCE0} %{destdir}/
 
 %build
 TARBALL=%{otherdir}/%{name}.tar.gz
+pushd %{destdir}/
+	mkdir build
+	tar xvf v%{version}.tar.gz -C build
+	rm -rf v%{version}.tar.gz
+	pushd build/%{name}
+	python setup.py sdist
+	mv dist/%{name}.tar.gz ../../
+	popd
+	rm -rf build
 
-pushd %{destdir}
-# The upstream binary-builder is using `cp -r` which has the same effect
-# as the --hard-dereference flag here.
-# (https://github.com/cloudfoundry/binary-builder/blob/master/lib/archive_recipe.rb#L20)
-tar czf ${TARBALL} --hard-dereference * --owner=0 --group=0
+	mkdir build
+	tar xvf %{SOURCE1} -C build
+	pushd build/docopt-0.6.2
+	python setup.py sdist
+	mv dist/docopt-0.6.2.tar.gz ../../
+	popd
+	rm -rf build
+
+	# The upstream binary-builder is using `cp -r` which has the same effect
+	# as the --hard-dereference flag here.
+	# (https://github.com/cloudfoundry/binary-builder/blob/master/lib/archive_recipe.rb#L20)
+	tar czf ${TARBALL} --hard-dereference * --owner=0 --group=0
 popd
 
 CHECKSUM=`sha256sum ${TARBALL}`
 NEW_TARBALL=%{otherdir}/%{name}-${CHECKSUM:0:8}.tar.gz
 mv ${TARBALL} ${NEW_TARBALL}
-
 pushd $(dirname ${NEW_TARBALL})
 sha256sum $(basename ${NEW_TARBALL}) > ${NEW_TARBALL}.sha256
 popd
