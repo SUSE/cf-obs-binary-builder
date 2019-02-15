@@ -26,14 +26,15 @@ Url:            https://rubyjs.org/
 Source0:        <%= source %>
 Source1:        sources.yml
 BuildRequires:  gcc
-BuildRequires:  openssl-devel
 BuildRequires:  graphviz
 <% if version =~ /^2\.[23]/ %>
 # Ruby 2.2 and 2.3 do not support openssl 1.1
 %if 0%{?sle_version} == 150000 
-BuildRequires:  -openssl-devel
+BuildRequires:  -libopenssl-devel
 BuildRequires:  -openssl-1_1
 BuildRequires:  libopenssl-1_0_0-devel
+%else
+BuildRequires:  openssl-devel
 %endif
 <% end %>
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
