@@ -4,7 +4,7 @@ class CfObsBinaryBuilder::Pippop < CfObsBinaryBuilder::BaseDependency
     super(
       "pip-pop",
       version,
-      "https://github.com/djoyahoy/pip-pop/archive/v#{version}.tar.gz"
+      "https://github.com/cloudfoundry/pip-pop/archive/v#{version}.tar.gz"
     )
   end
 
