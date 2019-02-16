@@ -62,7 +62,9 @@ TARBALL=%{otherdir}/%{name}-linux-x64.tgz
 # The upstream binary-builder is using `cp -r` which has the same effect
 # as the --hard-dereference flag here.
 # (https://github.com/cloudfoundry/binary-builder/blob/master/lib/archive_recipe.rb#L20)
-tar czf ${TARBALL} --hard-dereference -C ${APP_PATH} . --owner=0 --group=0
+pushd ${APP_PATH}
+tar czf ${TARBALL} --hard-dereference * --owner=0 --group=0
+popd
 
 CHECKSUM=`sha256sum ${TARBALL}`
 NEW_TARBALL=%{otherdir}/%{name}-linux-x64-%{stack}-${CHECKSUM:0:8}.tgz
