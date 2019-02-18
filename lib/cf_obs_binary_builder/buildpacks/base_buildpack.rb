@@ -3,7 +3,7 @@ require 'fileutils'
 class CfObsBinaryBuilder::BaseBuildpack
   include RpmSpecHelpers
 
-  attr_reader :name, :version, :upstream_version, :obs_package, :obs_project, :manifest
+  attr_reader :name, :version, :upstream_version, :obs_package, :obs_project, :manifest, :obs_dependencies_project
 
   SOURCES_CACHE_DIR = File.expand_path("~/.cf-obs-binary-builder")
 
@@ -13,6 +13,11 @@ class CfObsBinaryBuilder::BaseBuildpack
     @version = "#{@upstream_version}.#{revision}"
 
     package_name = "#{name}-buildpack-#{version}"
+
+    # Used to read from OBS_DEPENDENCY_PROJECT project the dependencies built against the stacks
+    @obs_dependencies_project = ENV["OBS_DEPENDENCY_PROJECT"] || raise("no OBS_DEPENDENCY_PROJECT environment variable set")
+
+    # Used to commit buildpacks in OBS_BUILDPACK_PROJECT
     @obs_project = ENV["OBS_BUILDPACK_PROJECT"] || raise("no OBS_BUILDPACK_PROJECT environment variable set")
     @obs_package = CfObsBinaryBuilder::ObsPackage.new(package_name, @obs_project)
   end
@@ -25,7 +30,7 @@ class CfObsBinaryBuilder::BaseBuildpack
     obs_package.create
     obs_package.checkout do
       @manifest = prepare_sources
-      package_statuses = CfObsBinaryBuilder::ObsPackage.project_package_statuses(obs_project)
+      package_statuses = CfObsBinaryBuilder::ObsPackage.project_package_statuses(obs_dependencies_project)
       dependencies_status = @manifest.dependencies_status(package_statuses, stack_mappings)
       return dependencies_status unless dependencies_status == :succeeded
 
