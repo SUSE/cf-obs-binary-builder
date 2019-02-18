@@ -78,6 +78,12 @@ class CfObsBinaryBuilder::Manifest
         when :in_process
           puts "in process"
           return :in_process
+        when :signing
+          puts "signing"
+          return :in_process
+        when :finished
+          puts "finished"
+          return :in_process
         when :succeeded
           puts "available"
         else
