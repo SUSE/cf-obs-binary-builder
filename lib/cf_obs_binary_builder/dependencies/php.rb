@@ -121,7 +121,7 @@ class CfObsBinaryBuilder::Php < CfObsBinaryBuilder::BaseDependency
 
   class PeclRecipe < BaseRecipe
     def url
-      "http://pecl.php.net/get/#{name}-#{version}.tgz"
+      "https://pecl.php.net/get/#{name}-#{version}.tgz"
     end
   end
 
@@ -184,7 +184,7 @@ class CfObsBinaryBuilder::Php < CfObsBinaryBuilder::BaseDependency
 
   class LuaRecipe < BaseRecipe
     def url
-      "http://www.lua.org/ftp/lua-#{version}.tar.gz"
+      "https://www.lua.org/ftp/lua-#{version}.tar.gz"
     end
   end
 
@@ -238,7 +238,7 @@ class CfObsBinaryBuilder::Php < CfObsBinaryBuilder::BaseDependency
 
   class XcachePeclRecipe < PeclRecipe
     def url
-      "http://xcache.lighttpd.net/pub/Releases/#{version}/xcache-#{version}.tar.gz"
+      "https://xcache.lighttpd.net/pub/Releases/#{version}/xcache-#{version}.tar.gz"
     end
   end
 
