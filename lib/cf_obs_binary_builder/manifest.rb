@@ -28,7 +28,7 @@ class CfObsBinaryBuilder::Manifest
         dep = dependency_for(dep_hash)
         if dep
           # Check in the list of all the packages in package_statuses
-          if !package_statuses.values.map(&:keys).flatten.include?(dep.package_name)
+          if !dep.obs_package.exists_in_status?(package_statuses)
             if !dep.respond_to?('ignore_missing') or (dep.respond_to?('ignore_missing') and !dep.ignore_missing)
               puts " doesn't exist"
               missing_deps << dep
@@ -69,7 +69,7 @@ class CfObsBinaryBuilder::Manifest
 
       existing.each do |dependency|
         print "#{dependency.package_name}: "
-        build_status = package_statuses.dig(stack,dependency.package_name)&.to_sym
+        build_status = dependency.obs_package.build_status_in_package_statuses(stack, package_statuses)
 
         case build_status
         when :failed
@@ -165,6 +165,7 @@ class CfObsBinaryBuilder::Manifest
   end
 
   def dependencies_for_stack(stack)
+    puts "==== Checking dependencies for stack #{stack} ===="
     hash["dependencies"].select{ |d| d["cf_stacks"].include?(stack) }
   end
 

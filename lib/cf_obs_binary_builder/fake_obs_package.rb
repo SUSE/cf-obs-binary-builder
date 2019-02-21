@@ -13,10 +13,18 @@ class FakeObsPackage
     available?
   end
 
-  def build_status(stacks)
+  def exists_in_status?(package_status)
+    available?
+  end
+
+  def build_status(stack)
     return :succeeded if available?
 
     :failed
+  end
+
+  def build_status_in_package_statuses(stack, package_statuses)
+    build_status(stack)
   end
 
   def resolve_dep(stack)

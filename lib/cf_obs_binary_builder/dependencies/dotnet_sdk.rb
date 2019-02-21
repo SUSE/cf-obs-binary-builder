@@ -26,11 +26,19 @@ class SDKPackage
     true
   end
 
+  def exists_in_status?(package_statuses)
+    true
+  end
+
   def available?
     true
   end
 
   def build_status(stack)
+    return :succeeded
+  end
+
+  def build_status_in_package_statuses(stack, package_statuses)
     return :succeeded
   end
 
