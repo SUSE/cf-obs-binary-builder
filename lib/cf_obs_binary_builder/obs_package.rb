@@ -80,6 +80,14 @@ EOF
     system("osc search --package #{name} | grep '#{obs_project} ' > /dev/null")
   end
 
+  def exists_in_status?(package_statuses)
+    package_statuses.values.map(&:keys).flatten.include?("#{name}")
+  end
+
+  def build_status_in_package_statuses(stack, package_statuses)
+    package_statuses.dig(stack,@name)&.to_sym
+  end
+
   # Checks the build status for the stack we are interested in (and ignores all others).
   def build_status(stack)
     output, status = Open3.capture2e("osc prjresults #{obs_project} --xml")
