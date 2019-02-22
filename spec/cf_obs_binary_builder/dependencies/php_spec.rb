@@ -17,6 +17,6 @@ describe CfObsBinaryBuilder::Php::PeclRecipe do
     expect(apcu.name).to eq("apcu")
     expect(apcu.version).to eq("4.0.11")
     expect(apcu.checksum).to eq("13c0c0dd676e5a7905d54fa985d0ee62")
-    expect(apcu.url).to eq("http://pecl.php.net/get/apcu-4.0.11.tgz")
+    expect(apcu.url).to eq("https://pecl.php.net/get/apcu-4.0.11.tgz")
   end
 end
