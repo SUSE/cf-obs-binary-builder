@@ -11,7 +11,7 @@ BuildRequires: aaa_stack_build_requires
 %define stack sle12
 %endif
 %else
-%define stack cfsle15fs
+%define stack sle15
 %endif
 
 %define otherdir %{_topdir}/OTHER

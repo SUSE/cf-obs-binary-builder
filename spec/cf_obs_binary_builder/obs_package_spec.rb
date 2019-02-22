@@ -23,7 +23,7 @@ XML
       expect(Open3).to receive(:capture2e).and_return([osc_xml_output, double(exitstatus: 0)])
 
       expect(described_class.project_package_statuses("Cloud:Platform:buildpacks:dependencies")).to eq(
-        {"cfsle15fs"=>{"bundler-1.16.2"=>"succeeded"}, "sle12"=>{"bundler-1.16.2"=>"failed"}})
+        {"sle15"=>{"bundler-1.16.2"=>"succeeded"}, "sle12"=>{"bundler-1.16.2"=>"failed"}})
     end
   end
 
@@ -83,7 +83,7 @@ EOF
 EOF
   end
 
-  let(:stack){ "cfsle15fs" }
+  let(:stack){ "sle15" }
 
     it "returns :succeeded if all the statuses are 'succeeded'" do
       expect(Open3).to receive(:capture2e).and_return([succeeded_output, double(exitstatus: 0)])

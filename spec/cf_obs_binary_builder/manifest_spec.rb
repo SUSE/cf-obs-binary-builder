@@ -5,7 +5,7 @@ describe CfObsBinaryBuilder::Manifest do
   let(:build_stacks) { ["sle12","opensuse42"] }
   let(:manifest_path) { File.expand_path("../fixtures/ruby-buildpack-manifest.yml", __dir__) }
   let(:stack_mappings) do
-    { 'sle12' => 'cflinuxfs2', 'opensuse42' => 'cflinuxfs2', 'cfsle15fs' => 'cflinuxfs3' }
+    { 'sle12' => 'cflinuxfs2', 'opensuse42' => 'cflinuxfs2', 'sle15' => 'cflinuxfs3' }
   end
   let(:small_manifest_path) { File.expand_path("../fixtures/ruby-buildpack-small-manifest.yml", __dir__) }
 
@@ -22,35 +22,35 @@ describe CfObsBinaryBuilder::Manifest do
 
     let(:arg_for_failed) do
       {
-        "cfsle15fs"=>{"bundler-1.17.3"=>"failed"},
+        "sle15"=>{"bundler-1.17.3"=>"failed"},
         "sle12"=>{"bundler-1.17.3"=>"failed"}
       }
     end
 
     let(:arg_for_in_process) do
       {
-        "cfsle15fs"=>{"bundler-1.17.3"=>"in_process"},
+        "sle15"=>{"bundler-1.17.3"=>"in_process"},
         "sle12"=>{"bundler-1.17.3"=>"failed", }
       }
     end
 
     let(:arg_for_unknown) do
       {
-        "cfsle15fs"=>{"bundler-1.17.3"=>"unknown_status"},
+        "sle15"=>{"bundler-1.17.3"=>"unknown_status"},
         "sle12"=>{"bundler-1.17.3"=>"failed", }
       }
     end
 
     let(:arg_for_succeeded) do
       {
-        "cfsle15fs"=>{"bundler-1.17.3"=>"succeeded"},
+        "sle15"=>{"bundler-1.17.3"=>"succeeded"},
         "sle12"=>{"bundler-1.17.3"=>"failed", }
       }
     end
 
     let(:stack_mappings) do
       # sle12 will be ignored because cflinuxfs2 has no deps in the yaml
-      { "sle12" => "cflinuxfs2", "cfsle15fs" => "cflinuxfs3" }
+      { "sle12" => "cflinuxfs2", "sle15" => "cflinuxfs3" }
     end
 
     it "returns failed when there are failed dependencies" do
@@ -109,14 +109,14 @@ describe CfObsBinaryBuilder::Manifest do
     subject { described_class.new(small_manifest_path) }
 
     let(:package_statuses) do
-      { "cfsle15fs" => { "bundler-1.17.3" => :succeeded }}
+      { "sle15" => { "bundler-1.17.3" => :succeeded }}
     end
     let(:base_stack) { "cflinuxfs3" }
 
     it "returns missing dependencies" do
       _, missing_deps, _, _ = subject.dependencies(
         base_stack,
-        { "cfsle15fs" => { "something-else-2.0" => :succeeded }}
+        { "sle15" => { "something-else-2.0" => :succeeded }}
       )
       expect(missing_deps.length).to eq(1)
       expect(missing_deps.first).to be_a(CfObsBinaryBuilder::Bundler)
@@ -146,7 +146,7 @@ describe CfObsBinaryBuilder::Manifest do
   describe "#populate!" do
     subject { described_class.new(small_manifest_path) }
     let(:package_statuses) do
-      { "cfsle15fs" => { "bundler-1.17.3" => :succeeded }}
+      { "sle15" => { "bundler-1.17.3" => :succeeded }}
     end
 
     it "adds dependencies for sle12 and opensuse42" do
@@ -166,7 +166,7 @@ describe CfObsBinaryBuilder::Manifest do
       base_stack_deps = subject.hash["dependencies"].
         select { |d| d["cf_stacks"].include?("cflinuxfs3") }.map { |d| "#{d["name"]}-#{d["version"]}" }
       added_stack_deps = subject.hash["dependencies"].
-        select { |d| d["cf_stacks"].include?("cfsle15fs") }.map { |d| "#{d["name"]}-#{d["version"]}".gsub(/_\d{3}$/,"") }
+        select { |d| d["cf_stacks"].include?("sle15") }.map { |d| "#{d["name"]}-#{d["version"]}".gsub(/_\d{3}$/,"") }
       expect(base_stack_deps.sort).to eq(added_stack_deps.sort)
     end
 
