@@ -127,7 +127,7 @@ class CfObsBinaryBuilder::BaseBuildpack
       # is the one that lists all the dependencies we need and no more.
       File.write(
         File.join(tmpdir, "manifest.yml"),
-        open("https://raw.githubusercontent.com/SUSE/cf-#{name}-buildpack/v#{upstream_version}/manifest.yml").read)
+        open("https://raw.githubusercontent.com/SUSE/cf-#{name}-buildpack/#{upstream_version}/manifest.yml").read)
 
       CfObsBinaryBuilder::Manifest.new(File.join(tmpdir, "manifest.yml"))
     end
