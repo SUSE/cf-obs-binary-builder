@@ -148,6 +148,12 @@ function build_extension {
         fi
       fi
       %endif
+      if [[ $BUILD_DIR == mailparse-3.0.2 ]]; then
+        PATCH="$(dirname %{SOURCE0})/mailparse-php-7.3.patch"
+        if [[ -e $PATCH ]]; then
+          patch -p1< $PATCH
+        fi
+      fi
       if [[ -e "cmake" ]]; then
         build_cmake "$1"
       elif [[ -f "config.m4" ]]; then
