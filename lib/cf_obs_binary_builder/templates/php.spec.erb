@@ -136,23 +136,19 @@ function build_extension {
       build_phpiredis $BUILD_DIR
     elif [[ $BUILD_DIR == redis* ]]; then
       build_php_extension "--enable-redis-igbinary --enable-redis-lzf --with-liblzf=no"
-    elif [[ $BUILD_DIR == unixODBC* ]]; then
-      build_unixodbc
     else
-      # fix gcc7 issue in sle15
+      # fix issues in php modules and extensions
+      if [[ $BUILD_DIR == unixODBC-2.3.7 ]]; then
+        # fix 64 bit portability issues in unixODBC 2.3.7
+        patch_extension "fix-unixodbc-64-bit-issues-2.3.7.patch"
+      elif [[ $BUILD_DIR == mailparse-3.0.2 ]]; then
+        # fix build issue against php 7.3.x
+        patch_extension "mailparse-php-7.3.patch"
       %if 0%{?suse_version} != 1315
-      if [[ $BUILD_DIR == libmemcached* ]]; then
-        PATCH="$(dirname %{SOURCE0})/libmemcached-gcc7-build.patch"
-        if [[ -e $PATCH ]]; then
-          patch -p1< $PATCH
-        fi
-      fi
+      elif [[ $BUILD_DIR == libmemcached-1.0.18 ]]; then
+        # fix gcc7 issue in sle15
+        patch_extension "libmemcached-gcc7-build.patch"
       %endif
-      if [[ $BUILD_DIR == mailparse-3.0.2 ]]; then
-        PATCH="$(dirname %{SOURCE0})/mailparse-php-7.3.patch"
-        if [[ -e $PATCH ]]; then
-          patch -p1< $PATCH
-        fi
       fi
       if [[ -e "cmake" ]]; then
         build_cmake "$1"
@@ -168,6 +164,10 @@ function build_extension {
   popd
   popd
   rm -r "$TEMPDIR"
+}
+
+function patch_extension {
+  patch -p1 < "$(dirname %{SOURCE0})/$1"
 }
 
 function build {
@@ -203,15 +203,6 @@ function build_phpiredis {
   #  sed -i 's/redisReplyReaderFeed/redisReaderFeed/g' phpiredis.c
   #fi
   build_php_extension "--enable-phpiredis --with-hiredis-dir=%{temp_destdir}"
-}
-
-function build_unixodbc {
-  # fix 64 bit portability issues in unixODBC 2.3.7
-  PATCH="$(dirname %{SOURCE0})/fix-unixodbc-64-bit-issues-2.3.7.patch"
-  if [[ -e $PATCH ]]; then
-    patch -p1< $PATCH
-  fi
-  build
 }
 
 function build_librdkafka {
