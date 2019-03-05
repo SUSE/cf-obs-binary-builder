@@ -100,12 +100,6 @@ class CfObsBinaryBuilder::Checksum
       raise e
     end
 
-    # Fix issue with different checksum in composer 1.8.3 (Pivotal has a different one)
-    # This checksum is from https://getcomposer.org/download/
-    if name == "composer" && version == "1.8.3"
-      return "5733ae9516e9185b7c3328d16dac75f3475f8ef137572dfb497f0f298157df33"
-    end
-
     if result.dig("sha256") || result.dig("md5_digest") || result.dig("md5") || result.dig("sha1")
       result.dig("sha256") || result.dig("md5_digest") || result.dig("md5") || result.dig("sha1")
     elsif result.dig("pgp")
