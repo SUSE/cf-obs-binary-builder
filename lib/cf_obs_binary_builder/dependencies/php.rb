@@ -85,6 +85,12 @@ class CfObsBinaryBuilder::Php < CfObsBinaryBuilder::BaseDependency
           metadata["version"] = "5.6.0"
           metadata["md5"] = "8ab9ae9af6d9f9a24bf31bd6058656b2"
         end
+        # sqlsrv 5.3.0 is not compatible with PHP 7.3.x
+        if metadata["name"] == "sqlsrv" && metadata["version"] == "5.3.0"
+          metadata["version"] = "5.6.0"
+          metadata["md5"] = "73ea717bd9e3deb72c773f2a82186327"
+        end
+
         url = extract_url(metadata)
         if url
           suffix = url[/(\.[a-zA-Z]{1,4}\.{0,1}[a-zA-Z]{0,3})$/,1]
