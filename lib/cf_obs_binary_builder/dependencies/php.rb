@@ -5,7 +5,7 @@ class CfObsBinaryBuilder::Php < CfObsBinaryBuilder::BaseDependency
     @version = version
     @major_version = version[/^(\d).*/,1]
     @php_extensions = extract_extensions
-    @patches = ["libmemcached-gcc7-build.patch", "mailparse-php-7.3.patch", "fix-unixodbc-64-bit-issues-2.3.7.patch"]
+    @patches = ["libmemcached-gcc7-build.patch", "mailparse-php-7.3.patch", "fix-unixodbc-64-bit-issues-2.3.7.patch", "yaf-3.0.7-php73.patch"]
 
     super(
       "php",

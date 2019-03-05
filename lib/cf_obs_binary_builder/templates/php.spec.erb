@@ -144,6 +144,9 @@ function build_extension {
       elif [[ $BUILD_DIR == mailparse-3.0.2 ]]; then
         # fix build issue against php 7.3.x
         patch_extension "mailparse-php-7.3.patch"
+      elif [[ $BUILD_DIR == yaf-3.0.7 ]]; then
+        # fix build issue against php 7.3.x
+        patch_extension "yaf-3.0.7-php73.patch"
       %if 0%{?suse_version} != 1315
       elif [[ $BUILD_DIR == libmemcached-1.0.18 ]]; then
         # fix gcc7 issue in sle15
