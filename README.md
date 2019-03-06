@@ -40,7 +40,7 @@ export OBS_PROJECT=the:project
 Define the stack mappings (needed for `buildpack`, `sync` and `regenerate_specs` command) e.g.
 
 ```
-export STACK_MAPPINGS='{ "sle12":"cflinuxfs2", "opensuse42": "cflinuxfs2", "sle15": "cflinuxfs3" }'
+export STACK_MAPPINGS='{ "sle12":"cflinuxfs2", "sle15": "cflinuxfs3" }'
 ```
 
 This instructs the `cf_obs_binary_builder` to use certain stacks in the manifest when picking depencencies for the stacks to add.
@@ -92,7 +92,7 @@ cf_obs_binary_builder sync <manifest_path>
 If `STACK_MAPPINGS` is this:
 
 ```
-export STACK_MAPPINGS='{ "sle12":"cflinuxfs2", "opensuse42": "cflinuxfs2", "sle15": "cflinuxfs3" }'
+export STACK_MAPPINGS='{ "sle12":"cflinuxfs2", "sle15": "cflinuxfs3" }'
 ```
 
 the command will create packages for all the cflinuxfs2 and cflinuxfs3 depedencies in the given manifest file (because these are the reference stacks for the stacks we want to add).

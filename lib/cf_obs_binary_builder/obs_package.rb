@@ -6,7 +6,6 @@ class CfObsBinaryBuilder::ObsPackage
   STACK_TO_OBS_REPOSITORY = {
     "sle12" => "SLE_12_SP3",
     "sle15" => "SLE_15",
-    "opensuse42" => "openSUSE_Leap_42.3",
   }
 
   def self.project_package_statuses(obs_project)
