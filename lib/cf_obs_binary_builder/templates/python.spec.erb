@@ -73,7 +73,7 @@ tar czf ${TARBALL} --hard-dereference * --owner=0 --group=0
 popd
 
 CHECKSUM=`sha256sum ${TARBALL}`
-NEW_TARBALL=%{otherdir}/%{name}-linux-amd64-%{stack}-${CHECKSUM:0:8}.tgz
+NEW_TARBALL=%{otherdir}/%{name}-linux-x64-%{stack}-${CHECKSUM:0:8}.tgz
 mv ${TARBALL} ${NEW_TARBALL}
 
 pushd $(dirname ${NEW_TARBALL})
