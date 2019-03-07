@@ -135,6 +135,43 @@ class CfObsBinaryBuilder::Manifest
     File.write(path, hash.to_yaml)
   end
 
+  # Prints the dependencies per stack in a human readable format
+  def info
+    dependencies = hash["dependencies"]
+
+    if dependencies.empty?
+      puts "No dependencies found."
+      return false
+    end
+
+    dependencies_per_stack = Hash.new { |h, k| h[k] = [] }
+
+    dependencies.each do |dependency|
+      dependencies_per_stack["#{dependency['name']}-#{dependency['version']}"] |= dependency["cf_stacks"]
+    end
+
+    all_stacks_in_manifest = dependencies.map{|d| d["cf_stacks"]}.flatten.uniq.sort
+
+    # Calculate cell sizes from names and headers
+    dependency_cell_size = (dependencies_per_stack.map(&:first) << ["Dependency"]).map{|d| d.length + 3}.max
+    stack_cell_size = all_stacks_in_manifest.map{|s| s.length + 3}.max
+
+    # Print headers
+    print "%#{dependency_cell_size}s" % "Dependency  "
+    print "%#{stack_cell_size* all_stacks_in_manifest.count}s" % "Stacks  "
+    puts "\n"
+    puts ("-" * dependency_cell_size) + ("-" * stack_cell_size * all_stacks_in_manifest.count)
+
+    # Print dependencies
+    dependencies_per_stack.sort_by(&:first).each do |name,stacks|
+      print "%#{dependency_cell_size}s" % "#{name} | "
+      all_stacks_in_manifest.each do |stack|
+        print "%#{stack_cell_size}s" % "#{(stacks & [stack]).first} | "
+      end
+      puts "\n"
+    end
+  end
+
   private
 
   def filter_dependencies

@@ -105,6 +105,16 @@ Regenerates the spec files for all (existing) dependencies on OBS. The `STACK_MA
 cf_obs_binary_builder regenerate-specs <manifest_path>
 ```
 
+### `cf_obs_binary_builder manifest-info`
+
+This command prints the dependencies of a manifest.yaml file in a human readable format. It can be used for inspection of a produced manifest.
+
+**Example:**
+
+```
+cf_obs_binary_builder manifest-info <manifest_path>
+```
+
 ### Building
 
 If you don't want to use the `cf_obs_binary_builder` as a script in `$(pwd)/bin` you can build it as a rubygem

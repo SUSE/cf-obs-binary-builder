@@ -69,6 +69,8 @@ module CfObsBinaryBuilder
       sync(args)
     when "regenerate-specs"
       regenerate_specs(args)
+    when "manifest-info"
+      manifest_info(args)
     else
       print_usage
     end
@@ -144,6 +146,15 @@ module CfObsBinaryBuilder
     Syncer.new(manifest_path).regenerate_specs(base_stacks, package_statuses)
   end
 
+  def self.manifest_info(args)
+    if args.length != 1
+      puts "Wrong number of arguments. Please only specify the path you the buildpacks manifest.yaml file"
+      exit 1
+    end
+
+    Manifest.new(args[0]).info
+  end
+
   def self.get_build_target(dependency)
     const_get(dependency)
   rescue NameError
@@ -164,6 +175,9 @@ USAGE:
 
   #{File.basename($0)} regenerate-specs <manifest_path>
     Regenerate the spec files for all (existing) dependencies on OBS.
+
+  #{File.basename($0)} manifest-info <manifest_path>
+    Prints the dependencies per stack in a human readable format.
 EOF
   end
 

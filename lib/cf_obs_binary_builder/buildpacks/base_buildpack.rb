@@ -36,6 +36,7 @@ class CfObsBinaryBuilder::BaseBuildpack
 
       @manifest.populate!(stack_mappings, package_statuses, s3_bucket)
       @manifest.write("manifest.yml")
+      @manifest.info
       dependencies = []
       stack_mappings.each_value { |stack| dependencies += @manifest.dependencies(stack, package_statuses).first }
       dependencies.uniq!(&:package_name)
