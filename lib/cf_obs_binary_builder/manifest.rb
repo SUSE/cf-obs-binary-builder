@@ -103,11 +103,10 @@ class CfObsBinaryBuilder::Manifest
   # All other stacks in the manifest stays untouched.
   # E.g. Given a manifest with cflinuxfs3 and cflinuxfs2 and the stack_mapppings below,
   # the final manifest should have cflinuxfs2 and cflinuxfs3 deps untouched and the same deps as cflinuxfs2 for
-  # sle12 and opensuse42 and the same deps as cflinuxfs3 for sle15 (sle15).
+  # sle12 and the same deps as cflinuxfs3 for sle15 (sle15).
   # Example stack_mappings:
   #{
   #  "sle12": "cflinuxfs2",
-  #  "opensuse42": "cflinxufs2",
   #  "sle15": "cflinuxfs3"
   #}
   # The s3_bucket is the bucket that hosts the dependencies built in OBS and is

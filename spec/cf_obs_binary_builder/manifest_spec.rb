@@ -2,10 +2,10 @@ require_relative "../spec_helper.rb"
 
 describe CfObsBinaryBuilder::Manifest do
   let(:base_stack) { "cflinuxfs2" }
-  let(:build_stacks) { ["sle12","opensuse42"] }
+  let(:build_stacks) { ["sle12"] }
   let(:manifest_path) { File.expand_path("../fixtures/ruby-buildpack-manifest.yml", __dir__) }
   let(:stack_mappings) do
-    { 'sle12' => 'cflinuxfs2', 'opensuse42' => 'cflinuxfs2', 'sle15' => 'cflinuxfs3' }
+    { 'sle12' => 'cflinuxfs2', 'sle15' => 'cflinuxfs3' }
   end
   let(:small_manifest_path) { File.expand_path("../fixtures/ruby-buildpack-small-manifest.yml", __dir__) }
 
@@ -149,7 +149,7 @@ describe CfObsBinaryBuilder::Manifest do
       { "sle15" => { "bundler-1.17.3" => :succeeded }}
     end
 
-    it "adds dependencies for sle12 and opensuse42" do
+    it "adds dependencies for sle12" do
       # The only dependency where the uri is important it openjdk
       # (to find the "update" version). Stub it to this value for every
       # dependency to avoid calling the internetz from the tests.
