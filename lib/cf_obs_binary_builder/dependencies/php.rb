@@ -64,10 +64,8 @@ class CfObsBinaryBuilder::Php < CfObsBinaryBuilder::BaseDependency
     php_extensions_yml = {}
     Dir.mktmpdir("cf-obs-binary-builder-php") do |tmpdir|
       case @version
-      when /^5\./
-        filename = "php-extensions.yml"
-      when /^7\.[01]\./
-        filename = "php7-extensions.yml"
+      when /^7\.1\./
+        filename = "php71-extensions.yml"
       else
         filename = "php72-extensions.yml"
       end

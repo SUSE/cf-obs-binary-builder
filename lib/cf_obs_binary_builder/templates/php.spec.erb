@@ -55,17 +55,11 @@ BuildRequires:  enchant-devel
 BuildRequires:  libfbclient2-devel
 BuildRequires:  recode-devel
 BuildRequires:  libtommath-devel
-<% if version[0,1] == "5" %>
-BuildRequires:  freetds-devel
-BuildRequires:  libgearman-devel
-BuildRequires:  readline-devel
-<% else %>
 BuildRequires:  libedit-devel
 BuildRequires:  argon2-devel
 BuildRequires:  unixODBC-devel
 BuildRequires:  libmaxminddb-devel
 BuildRequires:  libzip-devel
-<% end %>
 BuildRequires:  imap-devel
 # re2c is recommended in the build log
 BuildRequires:  re2c
@@ -273,17 +267,9 @@ mkdir -p %{temp_destdir}/lib
 ln -sf %{temp_destdir}/lib %{temp_destdir}/lib64
 
 ./configure --prefix=%{dependencydir} \
-<% if version[0,1] == "5" %> \
-      --with-mhash=shared \
-      --with-mysql=shared \
-      --with-mssql=shared \
-      --with-pdo-dblib=shared \
-      --with-readline=shared \
-<% else %> \
       --with-password-argon2=%{dependencydir}/lib \
       --with-pdo_sqlsrv=shared \
       --with-libzip=shared \
-<% end %> \
       --disable-static \
       --enable-shared \
       --enable-ftp=shared \
@@ -365,12 +351,6 @@ for EXTENSION in odbc readline pdo_odbc sodium enchant interbase pdo_firebird re
         export C_INCLUDE_PATH=/usr/include/firebird
         build_php_extension
         unset C_INCLUDE_PATH
-      elif [[ $EXTENSION == "readline" ]]; then
-        <% if version[0,1] == "7" %>
-          build_php_extension
-        <% else %>
-          echo "Readline not supported on php 5"
-        <% end %>
       else
         build_php_extension
       fi
@@ -385,14 +365,9 @@ pushd %{dependencydir}
   cp %{SOURCE1} ../
 
   # Copy libs
-  <% if version[0,1] == "5" %>
-  cp /usr/lib64/libgearman.so* lib/
-  cp /usr/lib64/libsybdb.so* lib/
-  <% else %>
   cp /usr/lib64/libargon2.so* lib/
   cp /usr/lib64/libzip.so* lib/
   cp /usr/lib64/libmaxminddb.so* lib/
-  <% end %>
   cp %{temp_destdir}/lib64/librabbitmq.so* lib/
   cp %{temp_destdir}/lib64/libhiredis.so* lib/
   cp %{temp_destdir}/lib64/libmemcached.so* lib/
