@@ -48,6 +48,13 @@ describe CfObsBinaryBuilder::Manifest do
       }
     end
 
+    let(:arg_for_unknown) do
+      {
+        "sle15"=>{"bundler-1.17.3"=>"unknown"},
+        "sle12"=>{"bundler-1.17.3"=>"failed", }
+      }
+    end
+
     let(:stack_mappings) do
       # sle12 will be ignored because cflinuxfs2 has no deps in the yaml
       { "sle12" => "cflinuxfs2", "sle15" => "cflinuxfs3" }
@@ -77,11 +84,12 @@ describe CfObsBinaryBuilder::Manifest do
              to eq(:succeeded)
     end
 
-    it "raises when there is a dependency with unknown status" do
+    it "returns in_process when there is a dependency with an unknown status" do
       allow_any_instance_of(CfObsBinaryBuilder::ObsPackage).to receive(:exists?).
         and_return(true)
 
-      expect{ subject.dependencies_status(arg_for_unknown, stack_mappings) }.to raise_error(/Unknown build status: /)
+      expect(subject.dependencies_status(arg_for_unknown, stack_mappings)).
+             to eq(:in_process)
     end
 
     it "raises if some dependencies are missing" do

@@ -90,7 +90,8 @@ class CfObsBinaryBuilder::Manifest
         when :succeeded
           puts "available"
         else
-          raise "Unknown build status: #{build_status}"
+          puts build_status
+          return :in_process
         end
       end
     end
