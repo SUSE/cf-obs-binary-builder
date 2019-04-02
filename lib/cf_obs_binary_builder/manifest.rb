@@ -81,6 +81,9 @@ class CfObsBinaryBuilder::Manifest
         when :signing
           puts "signing"
           return :in_process
+        when :blocked
+          puts "blocked"
+          return :in_process
         when :building
           puts "building"
           return :in_process
