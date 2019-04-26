@@ -10,8 +10,8 @@ class CfObsBinaryBuilder::Httpd < CfObsBinaryBuilder::BaseDependency
   def prepare_sources
     additional_sources = [
       {
-        url: "https://www.apache.org/dist/apr/apr-1.6.5.tar.bz2",
-        checksum: "a67ca9fcf9c4ff59bce7f428a323c8b5e18667fdea7b0ebad47d194371b0a105"
+        url: "https://www.apache.org/dist/apr/apr-1.7.0.tar.gz",
+        checksum: "48e9dbf45ae3fdc7b491259ffb6ccf7d63049ffacbc1c0977cced095e4c2d5a2"
       },
       {
         url: "https://www.apache.org/dist/apr/apr-iconv-1.2.2.tar.bz2",
