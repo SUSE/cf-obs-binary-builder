@@ -220,7 +220,7 @@ class CfObsBinaryBuilder::Manifest
   def version_from_manifest(dep_hash)
     if dep_hash["name"] == "openjdk1.8-latest"
       minor_version = 8
-      update_version = dep_hash["uri"][/openjdk-1.8.0_(\d+)-/, 1]
+      update_version = dep_hash["uri"][/openjdk-jdk-1.8.0_(\d+)-/, 1]
       build = find_latest_jdk_build(minor_version, update_version)
       "jdk#{minor_version}u#{update_version}-b#{build}"
     else
