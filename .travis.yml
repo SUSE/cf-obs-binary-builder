@@ -1,0 +1,9 @@
+branches:
+  only:
+  - master
+language: ruby
+env:
+  global:
+  - OBS_BUILDPACK_PROJECT='Cloud:Platform:buildpacks'
+  - OBS_DEPENDENCY_PROJECT='Cloud:Platform:buildpacks:dependencies'
+script: bundle exec rspec spec
