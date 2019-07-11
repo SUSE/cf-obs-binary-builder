@@ -4,7 +4,7 @@ class CfObsBinaryBuilder::ObsPackage
 
   ARTIFACT_EXTENSION_REGEXP=".tgz|.tar.gz|.tbz|tar.bz|.zip|.phar"
   STACK_TO_OBS_REPOSITORY = {
-    "sle12" => "SLE_12_SP3",
+    "sle12" => "SLE_12_SP4",
     "sle15" => "SLE_15",
   }
 

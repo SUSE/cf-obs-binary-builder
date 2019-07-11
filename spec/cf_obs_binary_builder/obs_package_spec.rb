@@ -10,7 +10,7 @@ describe CfObsBinaryBuilder::ObsPackage do
     <result  project="Cloud:Platform:buildpacks:dependencies" repository="SLE_15" arch="x86_64" code="published" state="published">
       <status package="bundler-1.16.2" code="succeeded" />
     </result>
-    <result  project="Cloud:Platform:buildpacks:dependencies" repository="SLE_12_SP3" arch="x86_64" code="published" state="published">
+    <result  project="Cloud:Platform:buildpacks:dependencies" repository="SLE_12_SP4" arch="x86_64" code="published" state="published">
       <status package="bundler-1.16.2" code="failed" />
     </result>
     <result  project="Cloud:Platform:buildpacks:dependencies" repository="IRRELEVANT_STACK" arch="x86_64" code="published" state="published">
@@ -41,7 +41,7 @@ XML
     <result  project="Cloud:Platform:buildpacks:dependencies" repository="SLE_15" arch="x86_64" code="published" state="published">
       <status package="bundler-1.16.2" code="failed" />
     </result>
-    <result  project="Cloud:Platform:buildpacks:dependencies" repository="SLE_12_SP3" arch="x86_64" code="published" state="published">
+    <result  project="Cloud:Platform:buildpacks:dependencies" repository="SLE_12_SP4" arch="x86_64" code="published" state="published">
       <status package="bundler-1.16.2" code="failed" />
     </result>
     <result  project="Cloud:Platform:buildpacks:dependencies" repository="IRRELEVANT_STACK" arch="x86_64" code="published" state="published">
@@ -57,7 +57,7 @@ EOF
     <result  project="Cloud:Platform:buildpacks:dependencies" repository="SLE_15" arch="x86_64" code="published" state="published">
       <status package="bundler-1.16.2" code="succeeded" />
     </result>
-    <result  project="Cloud:Platform:buildpacks:dependencies" repository="SLE_12_SP3" arch="x86_64" code="published" state="published">
+    <result  project="Cloud:Platform:buildpacks:dependencies" repository="SLE_12_SP4" arch="x86_64" code="published" state="published">
       <status package="bundler-1.16.2" code="failed" />
     </result>
     <result  project="Cloud:Platform:buildpacks:dependencies" repository="IRRELEVANT_STACK" arch="x86_64" code="published" state="published">
@@ -73,7 +73,7 @@ EOF
     <result  project="Cloud:Platform:buildpacks:dependencies" repository="SLE_15" arch="x86_64" code="published" state="published">
       <status package="bundler-1.16.2" code="scheduled" />
     </result>
-    <result  project="Cloud:Platform:buildpacks:dependencies" repository="SLE_12_SP3" arch="x86_64" code="published" state="published">
+    <result  project="Cloud:Platform:buildpacks:dependencies" repository="SLE_12_SP4" arch="x86_64" code="published" state="published">
       <status package="bundler-1.16.2" code="succeeded" />
     </result>
     <result  project="Cloud:Platform:buildpacks:dependencies" repository="IRRELEVANT_STACK" arch="x86_64" code="published" state="published">
