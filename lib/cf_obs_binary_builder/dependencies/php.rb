@@ -1,3 +1,5 @@
+require_relative "../../build-binary-new/merge-extensions"
+
 class CfObsBinaryBuilder::Php < CfObsBinaryBuilder::BaseDependency
   attr_reader :major_version, :php_extensions, :patches
 
@@ -62,17 +64,32 @@ class CfObsBinaryBuilder::Php < CfObsBinaryBuilder::BaseDependency
 
   def extract_extensions
     php_extensions_yml = {}
+    url_base = "https://raw.githubusercontent.com/cloudfoundry/buildpacks-ci/master/tasks/build-binary-new/"
     Dir.mktmpdir("cf-obs-binary-builder-php") do |tmpdir|
       case @version
       when /^7\.1\./
-        filename = "php71-extensions.yml"
+        patch_filename = "php71-extensions-patch.yml"
+      when /^7\.2\./
+        patch_filename = "php72-extensions-patch.yml"
       else
-        filename = "php72-extensions.yml"
+        patch_filename = "php73-extensions-patch.yml"
       end
 
-      source = "https://raw.githubusercontent.com/cloudfoundry/buildpacks-ci/master/tasks/build-binary-new/#{filename}"
-      File.write(File.join(tmpdir, File.basename(source)), open(source).read)
-      php_extensions_yml = YAML.load_file(File.join(tmpdir, filename))
+      base_path = File.join(tmpdir, "php7-base-extensions.yml")
+      patch_path = File.join(tmpdir, patch_filename)
+      final_path = File.join(tmpdir, "php7-extensions.yml")
+
+      File.write(
+        base_path, open(File.join(url_base, "php7-base-extensions.yml")).read
+      )
+      File.write(
+        patch_path, open(File.join(url_base, patch_filename)).read
+      )
+
+      base_extensions = BaseExtensions.new(base_path)
+      base_extensions.patch(patch_path).write_yml(final_path)
+
+      php_extensions_yml = YAML.load_file(final_path)
     end
 
     extensions = {}
