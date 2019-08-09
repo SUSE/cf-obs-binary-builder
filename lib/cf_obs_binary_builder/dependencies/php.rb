@@ -177,7 +177,7 @@ class CfObsBinaryBuilder::Php < CfObsBinaryBuilder::BaseDependency
 
   class LibSodiumRecipe < BaseRecipe
     def url
-      "https://github.com/jedisct1/libsodium/releases/download/#{version}/libsodium-#{version}.tar.gz"
+      "https://download.libsodium.org/libsodium/releases/libsodium-#{version}.tar.gz"
     end
   end
 
