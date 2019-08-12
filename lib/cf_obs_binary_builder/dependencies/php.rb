@@ -95,22 +95,6 @@ class CfObsBinaryBuilder::Php < CfObsBinaryBuilder::BaseDependency
     extensions = {}
     php_extensions_yml.each do |key, elements|
       elements.each do |metadata|
-        # pdo_sqlsrv 5.3.0 is not compatible with PHP 7.3.x
-        if metadata["name"] == "pdo_sqlsrv" && metadata["version"] == "5.3.0"
-          metadata["version"] = "5.6.0"
-          metadata["md5"] = "8ab9ae9af6d9f9a24bf31bd6058656b2"
-        end
-        # sqlsrv 5.3.0 is not compatible with PHP 7.3.x
-        if metadata["name"] == "sqlsrv" && metadata["version"] == "5.3.0"
-          metadata["version"] = "5.6.0"
-          metadata["md5"] = "73ea717bd9e3deb72c773f2a82186327"
-        end
-        # xdebug 2.6.0 is not compatible with PHP 7.3.x
-        if metadata["name"] == "xdebug" && metadata["version"] == "2.6.1"
-          metadata["version"] = "2.7.0RC2"
-          metadata["md5"] = "e8cabe003d6990b157d0d8caee374844"
-        end
-
         url = extract_url(metadata)
         if url
           suffix = url[/(\.[a-zA-Z]{1,4}\.{0,1}[a-zA-Z]{0,3})$/,1]
