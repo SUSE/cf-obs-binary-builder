@@ -62,11 +62,20 @@ if [ -f go.mod ] && [ ! -f "vendor/modules.txt" ]; then
   cp -rf src/ $VENDOR_GOPATH/src/github.com/cloudfoundry/<%= name %>-buildpack
 fi
 
+%if %_repository == "buildpacks"
 buildpack-packager build -any-stack
+%else
+buildpack-packager build -stack %_repository
+%endif
 
 %install
+%if %_repository == "buildpacks"
 CHECKSUM=`sha1sum *buildpack-v%{version}.zip | cut -d' ' -f1`
 mv *buildpack-v%{version}.zip %{otherdir}/<%= name %>-buildpack-v%{version}-%{release}-pre-${CHECKSUM:0:8}.zip
+%else
+CHECKSUM=`sha1sum *buildpack-%{_repository}-v%{version}.zip | cut -d' ' -f1`
+mv *buildpack-%{_repository}-v%{version}.zip %{otherdir}/<%= name %>-buildpack-%{_repository}-v%{version}-%{release}-pre-${CHECKSUM:0:8}.zip
+%endif
 
 %post
 %postun
