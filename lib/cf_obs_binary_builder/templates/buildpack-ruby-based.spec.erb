@@ -43,9 +43,9 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 %build
 tar --strip-components=1 -xf /usr/share/compile-extensions/compile-extensions.tar.gz -C compile-extensions
 %if %_repository == "buildpacks"
-buildpack-packager build -any-stack
+buildpack-packager --uncached --any-stack
 %else
-buildpack-packager build -stack %_repository
+buildpack-packager --uncached --stack=%_repository
 %endif
 
 %install
