@@ -70,6 +70,7 @@ class CfObsBinaryBuilder::Checksum
     return libmemcache(version) if name == "libmemcache"
     return scm_dependency(version) if name == "openjdk"
     return libunwind(version) if name == "libunwind"
+    return libgdiplus(version) if name == "libgdiplus"
 
     # There are special cases where the type does not match the dependency name.
     # See https://github.com/cloudfoundry/buildpacks-ci/blob/0b54199ecfbe98d085f4e34d224877ee415c5405/pipelines/binary-builder-new.yml#L1 for more information
@@ -128,6 +129,15 @@ class CfObsBinaryBuilder::Checksum
   end
 
   def self.libgdiplus(version)
-    # noop - the sources are fetched from a GitHub repository
+    case version
+    when "6.0"
+      "1c739e0d137b82aeecad52001a1b0d02dd403638ce792949c5228094a8945257"
+    when "6.0.1"
+      "169f920ec461801f7f7eb51543d679e71b2452e88932592d5aadef3a14987c23"
+    when "6.0.2"
+      "d605bf548affd29bd0418001ffb1bb8c1bf9962c1c37c23744abb0194a099232"
+    else
+      raise "Error, unknown libgdiplus version."
+    end
   end
 end
