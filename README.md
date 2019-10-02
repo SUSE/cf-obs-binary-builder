@@ -21,9 +21,10 @@ $ mv depwatcher /usr/local/bin
 Example usage of `depwatcher`:
 
 ```
-$ echo '{"source":{"name":"ruby","type":"ruby"},"version":{"ref":"2.5.1"}}' | depwatcher /tmp > /dev/null
-{"source":{"name":"ruby","type":"ruby"},"version":{"ref":"2.5.1"}}
-{"ref":"2.5.1","url":"https://cache.ruby-lang.org/pub/ruby/2.5/ruby-2.5.1.tar.gz","sha256":"dac81822325b79c3ba9532b048c2123357d3310b2b40024202f360251d9829b1"}
+$ echo '{"source":{"name":"nginx","type":"nginx"},"version":{"ref":"1.17.4"}}' | depwatcher /tmp
+{"source":{"name":"nginx","type":"nginx"},"version":{"ref":"1.17.4"}}
+{"ref":"1.17.4","url":"http://nginx.org/download/nginx-1.17.4.tar.gz","pgp":"http://nginx.org/download/nginx-1.17.4.tar.gz.asc","sha256":"62854b365e66670ef4f1f8cc79124f914551444da974207cd5fe22d85710e555"}
+{"version":{"ref":"1.17.4"}
 ```
 
 The relevant information is returned on STDERR.
