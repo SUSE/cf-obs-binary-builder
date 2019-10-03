@@ -56,7 +56,7 @@ class CfObsBinaryBuilder::BaseDependency
   end
 
   def validate_checksum(verification_data)
-    if verification_data[/^https?:/]
+    if verification_data && verification_data[/^https?:/]
       verify_gpg_signature(source, verification_data)
     else
       verify_checksum(source, verification_data)
@@ -92,6 +92,12 @@ class CfObsBinaryBuilder::BaseDependency
   end
 
   def verify_checksum(source, checksum)
+    # depwatcher couldn't find a checksum. Nothing we can do about it. We just continue.
+    if checksum.nil?
+      @file_verified = true
+      return
+    end
+
     actual_checksum = case checksum.length
     when 32
       md5 = Digest::MD5.file File.basename(source)
