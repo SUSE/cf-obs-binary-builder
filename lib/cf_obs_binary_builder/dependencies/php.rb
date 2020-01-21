@@ -71,8 +71,10 @@ class CfObsBinaryBuilder::Php < CfObsBinaryBuilder::BaseDependency
         patch_filename = "php71-extensions-patch.yml"
       when /^7\.2\./
         patch_filename = "php72-extensions-patch.yml"
-      else
+      when /^7\.3\./
         patch_filename = "php73-extensions-patch.yml"
+      when /^7\.4\./
+        patch_filename = "php74-extensions-patch.yml"
       end
 
       base_path = File.join(tmpdir, "php7-base-extensions.yml")
