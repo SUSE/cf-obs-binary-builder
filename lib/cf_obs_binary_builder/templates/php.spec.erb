@@ -269,7 +269,6 @@ ln -sf %{temp_destdir}/lib %{temp_destdir}/lib64
 
 ./configure --prefix=%{dependencydir} \
       --with-password-argon2=%{dependencydir}/lib \
-      --with-pdo_sqlsrv=shared \
       --with-libzip=shared \
       --disable-static \
       --enable-shared \
