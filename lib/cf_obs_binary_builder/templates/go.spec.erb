@@ -22,7 +22,6 @@ License:        BSD-3-Clause
 Group:          Cloud/Platform/scf
 Url:            http://golang.org
 Source0:        <%= source %>
-Source1:        sources.yml
 BuildRequires:  go1.4
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
@@ -39,13 +38,11 @@ export GOBIN=%{_builddir}/go/bin
 ./make.bash
 
 %install
-cp %{SOURCE1} ../../
-
 TARBALL=%{otherdir}/%{name}-linux-amd64.tgz
 # The upstream binary-builder is using `cp -r` which has the same effect
 # as the --hard-dereference flag here.
 # (https://github.com/cloudfoundry/binary-builder/blob/master/lib/archive_recipe.rb#L20)
-tar czf ${TARBALL} --hard-dereference -C ../../ go sources.yml --owner=0 --group=0
+tar czf ${TARBALL} --hard-dereference -C ../ --owner=0 --group=0 .
 
 CHECKSUM=`sha256sum ${TARBALL}`
 NEW_TARBALL=%{otherdir}/%{name}-linux-amd64-%{stack}-${CHECKSUM:0:8}.tgz
