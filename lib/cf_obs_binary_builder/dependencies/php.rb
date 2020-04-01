@@ -100,7 +100,7 @@ class CfObsBinaryBuilder::Php < CfObsBinaryBuilder::BaseDependency
         url = extract_url(metadata)
         if url
           suffix = url[/(\.[a-zA-Z]{1,4}\.{0,1}[a-zA-Z]{0,3})$/,1]
-          filename = key + "-" + metadata["name"] + "-" + metadata["version"] + suffix
+          filename = key + "-" + metadata["name"] + "-" + metadata["version"].to_s + suffix
 
           extensions[filename] = {
             md5: metadata["md5"],
