@@ -62,6 +62,7 @@ BuildRequires:  libmaxminddb-devel
 BuildRequires:  libzip-devel
 BuildRequires:  imap-devel
 BuildRequires:  oniguruma-devel
+BuildRequires:  libssh2-devel
 # re2c is recommended in the build log
 BuildRequires:  re2c
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -368,6 +369,7 @@ pushd %{dependencydir}
   cp /usr/lib64/libargon2.so* lib/
   cp /usr/lib64/libzip.so* lib/
   cp /usr/lib64/libmaxminddb.so* lib/
+  cp /usr/lib64/libssh2.so* lib/
   cp %{temp_destdir}/lib64/librabbitmq.so* lib/
   cp %{temp_destdir}/lib64/libhiredis.so* lib/
   cp %{temp_destdir}/lib64/libmemcached.so* lib/
