@@ -1,11 +1,11 @@
 require_relative "../../build-binary-new/merge-extensions"
 
 class CfObsBinaryBuilder::Php < CfObsBinaryBuilder::BaseDependency
-  attr_reader :major_version, :php_extensions, :patches
+  attr_reader :minor_version, :php_extensions, :patches
 
   def initialize(version)
     @version = version
-    @major_version = version[/^(\d).*/,1]
+    @minor_version = version[/\.(\d)\./,1].to_i
     @php_extensions = extract_extensions
     @patches = ["libmemcached-gcc7-build.patch", "fix-unixodbc-64-bit-issues-2.3.7.patch"]
 
@@ -97,6 +97,17 @@ class CfObsBinaryBuilder::Php < CfObsBinaryBuilder::BaseDependency
     extensions = {}
     php_extensions_yml.each do |key, elements|
       elements.each do |metadata|
+        # pdo_sqlsrv 5.6.1 is not compatible with PHP 7.4.x
+        if minor_version == 4 && metadata["name"] == "pdo_sqlsrv" && metadata["version"] == "5.6.1"
+          metadata["version"] = "5.8.0"
+          metadata["md5"] = "19c44361407c2fed6a9d9eb50332c8ed"
+        end
+        # sqlsrv 5.6.1 is not compatible with PHP 7.4.x
+        if minor_version == 4 && metadata["name"] == "sqlsrv" && metadata["version"] == "5.6.1"
+          metadata["version"] = "5.8.0"
+          metadata["md5"] = "a0c032e41ae06d1fcc2be31584ae49ed"
+        end
+
         url = extract_url(metadata)
         if url
           suffix = url[/(\.[a-zA-Z]{1,4}\.{0,1}[a-zA-Z]{0,3})$/,1]
