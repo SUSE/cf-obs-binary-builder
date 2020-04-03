@@ -119,7 +119,8 @@ class CfObsBinaryBuilder::Php < CfObsBinaryBuilder::BaseDependency
             url: url,
           }
         else
-          if metadata["version"] == "nil" && metadata["md5"] == "nil"
+          # Consider empty meta data internal versions with the exception of Oracle extensions
+          if metadata["version"] == "nil" && metadata["md5"] == "nil" &&  metadata["name"] != "pdo_oci"
             internal_extensions << metadata["name"]
           end
         end
