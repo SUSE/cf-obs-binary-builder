@@ -377,35 +377,34 @@ pushd %{dependencydir}
   cp %{SOURCE1} ../
 
   # Copy libs
-  cp /usr/lib64/libargon2.so* lib/
-  cp /usr/lib64/libzip.so* lib/
-  cp /usr/lib64/libmaxminddb.so* lib/
-  cp /usr/lib64/libssh2.so* lib/
   cp %{temp_destdir}/lib64/librabbitmq.so* lib/
   cp %{temp_destdir}/lib64/libhiredis.so* lib/
-  cp %{temp_destdir}/lib64/libmemcached.so* lib/
   cp /usr/lib64/libc-client.so* lib/
   cp /usr/lib64/libmcrypt.so* lib/
   cp /usr/lib64/libaspell.so* lib/
   cp /usr/lib64/libpspell.so* lib/
+  cp %{temp_destdir}/lib64/libmemcached.so* lib/
   cp %{temp_destdir}/lib/libcassandra.so* lib/
   cp /usr/lib64/libuv.so* lib/
+  cp /usr/lib64/libargon2.so* lib/
   cp %{temp_destdir}/lib64/librdkafka.so* lib/
+  cp /usr/lib64/libzip.so* lib/
   cp /usr/lib64/libGeoIP.so* lib/
   cp /usr/lib64/libgpgme.so* lib/
   cp /usr/lib64/libassuan.so* lib/
   cp /usr/lib64/libgpg-error.so* lib/
-
   %if 0%{?suse_version} == 1315
   cp /usr/lib64/libtidy-*.so* lib/
   %else
   cp /usr/lib64/libtidy.so* lib/
   %endif
-
   cp /usr/lib64/libenchant.so* lib/
   cp /usr/lib64/libfbclient.so* lib/
   cp /usr/lib64/librecode.so* lib/
   cp /usr/lib64/libtommath.so* lib/
+  cp /usr/lib64/libmaxminddb.so* lib/
+  cp /usr/lib64/libssh2.so* lib/
+
   cp %{temp_destdir}/lib/libodbc.so* lib/
   cp %{temp_destdir}/lib/libodbcinst.so* lib/
   if [[ -e %{temp_destdir}/lib/libsodium.so ]]; then
