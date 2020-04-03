@@ -63,6 +63,9 @@ BuildRequires:  libzip-devel
 BuildRequires:  imap-devel
 BuildRequires:  oniguruma-devel
 BuildRequires:  libssh2-devel
+BuildRequires:  gd-devel
+BuildRequires:  libXpm-devel
+BuildRequires:  libwebp-devel
 # re2c is recommended in the build log
 BuildRequires:  re2c
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -279,7 +282,6 @@ ln -sf %{temp_destdir}/lib %{temp_destdir}/lib64
       --enable-calendar \
       --enable-intl \
       --with-kerberos \
-      --enable-zip=shared \
       --with-bz2=shared \
       --with-curl=shared \
       --enable-dba=shared \
@@ -290,10 +292,6 @@ ln -sf %{temp_destdir}/lib %{temp_destdir}/lib64
       --enable-pdo=shared \
       --with-pdo-sqlite=shared,/usr \
       --with-pdo-mysql=shared,mysqlnd \
-      --with-gd=shared \
-      --with-jpeg-dir=/usr \
-      --with-freetype-dir=/usr \
-      --enable-gd-native-ttf \
       --with-pdo-pgsql=shared \
       --with-pgsql=shared \
       --with-pspell=shared \
@@ -351,6 +349,20 @@ for EXTENSION in <%= @php_internal_extensions.join(" ") %>; do
         export C_INCLUDE_PATH=/usr/include/firebird
         build_php_extension
         unset C_INCLUDE_PATH
+      elif [[ $EXTENSION == "gd" ]]; then
+<%=
+    if minor_version < 4
+      build_options = "--with-jpeg-dir --with-png-dir --with-xpm-dir --with-freetype-dir --with-webp-dir --with-zlib-dir"
+      if minor_version == 2
+        build_options += " --enable-gd-jis-conv"
+      else
+        build_options += " --with-gd-jis-conv"
+      end
+    else
+      build_options = "--with-external-gd"
+    end
+    "        build_php_extension \"#{build_options}\""
+%>
       else
         build_php_extension
       fi
