@@ -6,7 +6,7 @@ class CfObsBinaryBuilder::Php < CfObsBinaryBuilder::BaseDependency
   def initialize(version)
     @version = version
     @minor_version = version[/\.(\d)\./,1].to_i
-    @php_extensions = extract_extensions
+    @php_extensions, @php_internal_extensions = extract_extensions
     @patches = ["libmemcached-gcc7-build.patch", "fix-unixodbc-64-bit-issues-2.3.7.patch"]
 
     super(
@@ -95,6 +95,7 @@ class CfObsBinaryBuilder::Php < CfObsBinaryBuilder::BaseDependency
     end
 
     extensions = {}
+    internal_extensions = []
     php_extensions_yml.each do |key, elements|
       elements.each do |metadata|
         # pdo_sqlsrv 5.6.1 is not compatible with PHP 7.4.x
@@ -117,11 +118,15 @@ class CfObsBinaryBuilder::Php < CfObsBinaryBuilder::BaseDependency
             md5: metadata["md5"],
             url: url,
           }
+        else
+          if metadata["version"] == "nil" && metadata["md5"] == "nil"
+            internal_extensions << metadata["name"]
+          end
         end
       end
     end
 
-    extensions
+    return extensions, internal_extensions
   end
 
   def extract_url(metadata)

@@ -330,7 +330,7 @@ pushd $SOURCES_DIR
 popd
 
 # Make "FakePeclRecipes"
-for EXTENSION in odbc readline pdo_odbc sodium enchant interbase pdo_firebird recode tidy wddx xmlrpc; do
+for EXTENSION in <%= @php_internal_extensions.join(" ") %>; do
   if [[ -d ext/$EXTENSION ]]; then
     pushd ext/$EXTENSION
       if [[ $EXTENSION == "pdo_odbc" ]]; then
