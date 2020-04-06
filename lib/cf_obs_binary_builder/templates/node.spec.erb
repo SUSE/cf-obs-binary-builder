@@ -37,7 +37,7 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 python configure --prefix=/ --openssl-use-def-ca-store
 
 %install
-export DESTDIR=%{destdir}/node-v%{version}-linux-x64
+export DESTDIR=%{destdir}
 
 mkdir -p "$DESTDIR"
 cp LICENSE $DESTDIR/
