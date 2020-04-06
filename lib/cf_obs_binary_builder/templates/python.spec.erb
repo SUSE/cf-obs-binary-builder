@@ -22,7 +22,6 @@ License:        Python-2.0
 Group:          Cloud/Platform/scf
 Url:            http://www.python.org/
 Source0:        <%= source %>
-Source1:        sources.yml
 BuildRequires:  db-devel
 BuildRequires:  gdbm-devel
 BuildRequires:  tk-devel
@@ -73,8 +72,6 @@ popd
 
 mkdir -p %{destdir}/usr/lib/tcltk/x86_64-linux-gnu/tk8.6
 cp -a /usr/lib64/tcl/tk8.6/pkgIndex.tcl %{destdir}/usr/lib/tcltk/x86_64-linux-gnu/tk8.6/
-
-cp %{SOURCE1} %{destdir}/
 
 TARBALL=%{otherdir}/%{name}-linux-x64.tgz
 

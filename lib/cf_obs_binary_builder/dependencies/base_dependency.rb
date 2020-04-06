@@ -32,14 +32,6 @@ class CfObsBinaryBuilder::BaseDependency
     end
   end
 
-  def write_sources_yaml
-    if !@file_verified
-      raise "Checksum not validated, won't write to yaml"
-    end
-
-    File.write("sources.yml", self.to_yaml)
-  end
-
   def write_spec_file
     log 'Render the spec template and put it in the package dir'
     File.write("#{dependency}.spec", render_spec_template)
@@ -126,7 +118,6 @@ class CfObsBinaryBuilder::BaseDependency
     write_spec_file
     prepare_sources
     validate_checksum(verification_data)
-    write_sources_yaml
     obs_package.commit
     log 'Done!'
   end

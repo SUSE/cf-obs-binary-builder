@@ -22,7 +22,6 @@ License:        MIT
 Group:          Cloud/Platform/scf
 Url:            https://nodejs.org/
 Source0:        <%= source %>
-Source1:        sources.yml
 BuildRequires:  python
 BuildRequires:  gcc-c++
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -41,7 +40,6 @@ python configure --prefix=/ --openssl-use-def-ca-store
 export DESTDIR=%{destdir}/node-v%{version}-linux-x64
 
 mkdir -p "$DESTDIR"
-cp %{SOURCE1} %{destdir}
 cp LICENSE $DESTDIR/
 
 make install %{?_smp_mflags} PORTABLE=1

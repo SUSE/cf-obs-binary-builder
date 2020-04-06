@@ -22,7 +22,6 @@ License:        BSD-2-Clause
 Group:          Cloud/Platform/scf
 Url:            https://openresty.org/
 Source0:        <%= source %>
-Source1:        sources.yml
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 <%= rpm_macros %>
@@ -58,7 +57,6 @@ make install DESTDIR=%{dependencydir}
 
 %install
 pushd %{dependencydir}/
-cp %{SOURCE1} ./
 
 TARBALL=%{otherdir}/%{name}.tgz
 rm -rf nginx/html nginx/conf/*

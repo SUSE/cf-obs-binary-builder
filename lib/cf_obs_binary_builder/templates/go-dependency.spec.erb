@@ -20,7 +20,6 @@ License:        BSD-3-Clause
 Group:          Cloud/Platform/scf
 Url:            https://<%= import_path %>
 Source0:        <%= source %>
-Source1:        sources.yml
 BuildRequires:  golang-packaging
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
@@ -37,7 +36,6 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 %install
 mkdir -p bin
-cp %{SOURCE1} ./
 cp ../go/bin/<%= dependency %> bin/
 # Allow also license files with different writing like License
 cp `find -iname LICENSE -maxdepth 1` bin/
@@ -46,7 +44,7 @@ TARBALL=%{otherdir}/%{name}-linux-x64.tgz
 # The upstream binary-builder is using `cp -r` which has the same effect
 # as the --hard-dereference flag here.
 # (https://github.com/cloudfoundry/binary-builder/blob/master/lib/archive_recipe.rb#L20)
-tar czf ${TARBALL} --hard-dereference bin sources.yml --owner=0 --group=0
+tar czf ${TARBALL} --hard-dereference bin --owner=0 --group=0
 
 CHECKSUM=`sha256sum ${TARBALL}`
 NEW_TARBALL=%{otherdir}/%{name}-linux-x64-%{stack}-${CHECKSUM:0:8}.tgz

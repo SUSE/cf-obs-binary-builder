@@ -21,7 +21,6 @@ License:        PHP-3.01
 Group:          Cloud/Platform/scf
 Url:            http://php.net/
 Source0:        <%= source %>
-Source1:        sources.yml
 Source2:        https://raw.githubusercontent.com/cloudfoundry/binary-builder/master/bin/download_geoip_db.rb
 Source3:        https://raw.githubusercontent.com/cloudfoundry/binary-builder/master/lib/geoip_downloader.rb
 BuildRequires:  libuv-devel > 1.6.1
@@ -373,8 +372,6 @@ done
 
 %install
 pushd %{dependencydir}
-  # Copy sources.yml
-  cp %{SOURCE1} ../
 
   # Copy libs
   cp %{temp_destdir}/lib64/librabbitmq.so* lib/

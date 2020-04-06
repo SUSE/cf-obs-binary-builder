@@ -12,10 +12,6 @@ class CfObsBinaryBuilder::SCMDependency < CfObsBinaryBuilder::BaseDependency
     # noop - the sources are fetched from the hg repository
   end
 
-  def write_sources_yaml
-    # noop - the sources are fetched from the hg repository
-  end
-
   def validate_checksum(_checksum)
     # noop - the sources are fetched from the hg repository
   end
