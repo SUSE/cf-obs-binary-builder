@@ -23,6 +23,8 @@ Group:          Cloud/Platform/scf
 Url:            <%= url %>
 Source:         <%= source %>
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+BuildRequires:  unzip
+BuildRequires:  zip
 
 %define otherdir %{_topdir}/OTHER
 
@@ -31,13 +33,32 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 %prep
 
 %build
-CHECKSUM=`sha256sum %{SOURCE0}`
 EXTENSION=$(echo "%{SOURCE0}" | perl -lne 'print $& if /(\.[a-zA-Z]{1,4}\.{0,1}[a-zA-Z]{0,3})/')
-NEW_TARBALL=%{otherdir}/%{name}-${CHECKSUM:0:8}${EXTENSION}
 
-cp %{SOURCE0} ${NEW_TARBALL}
-pushd $(dirname ${NEW_TARBALL})
-sha256sum $(basename ${NEW_TARBALL}) > ${NEW_TARBALL}.sha256
+if echo "${EXTENSION}" | grep -iq "tar" || echo "${EXTENSION}" | grep -iq "tgz"; then
+    # Strip top level directory
+    OLD_FILE_NAME=${PWD}/temp.${EXTENSION}
+    mkdir content
+    tar -C content --transform 's:^\./::' --strip-components 1 -xf "%{SOURCE0}"
+    tar -C content -czf ${OLD_FILE_NAME} .
+elif echo "${EXTENSION}" | grep -iq "zip"; then
+    # Strip top level directory
+    OLD_FILE_NAME=${PWD}/temp.${EXTENSION}
+    mkdir content
+    unzip -d content "%{SOURCE0}"
+    pushd content/*
+        zip -r "${OLD_FILE_NAME}" .
+    popd
+else
+    OLD_FILE_NAME=%{SOURCE0}
+fi
+
+CHECKSUM=`sha256sum ${OLD_FILE_NAME}`
+NEW_FILE_NAME=%{otherdir}/%{name}-${CHECKSUM:0:8}${EXTENSION}
+
+cp ${OLD_FILE_NAME} ${NEW_FILE_NAME}
+pushd $(dirname ${NEW_FILE_NAME})
+sha256sum $(basename ${NEW_FILE_NAME}) > ${NEW_FILE_NAME}.sha256
 popd
 
 %files
