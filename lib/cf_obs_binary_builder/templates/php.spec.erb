@@ -70,7 +70,6 @@ BuildRequires:  re2c
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 <%= rpm_macros %>
-%define dependencydir %{destdir}/php
 
 %define phpize %{dependencydir}/bin/phpize
 %define phpconfig %{dependencydir}/bin/php-config
@@ -245,18 +244,18 @@ function build_snmp_mibs_downloader {
   # copy mibs downloader & smistrip, will download un-free mibs
   cp download-mibs %{dependencydir}/bin
   cp /usr/bin/smistrip %{dependencydir}/bin
-  sed -i "s|^CONFDIR=/etc/snmp-mibs-downloader|CONFDIR=\$HOME/php/mibs/conf|" %{dependencydir}/bin/download-mibs
-  sed -i "s|^SMISTRIP=/usr/bin/smistrip|SMISTRIP=\$HOME/php/bin/smistrip|" %{dependencydir}/bin/download-mibs
+  sed -i "s|^CONFDIR=/etc/snmp-mibs-downloader|CONFDIR=\$HOME/mibs/conf|" %{dependencydir}/bin/download-mibs
+  sed -i "s|^SMISTRIP=/usr/bin/smistrip|SMISTRIP=\$HOME/bin/smistrip|" %{dependencydir}/bin/download-mibs
   # copy mibs download config
   cp iana.conf ianalist ianarfc.conf ianarfclist rfc.conf rfclist rfcmibs.diff simplelist simpleweb.conf snmp-mibs-downloader.conf %{dependencydir}/mibs/conf
   pushd %{dependencydir}
-    sed -i "s|^DIR=/usr/share/doc|DIR=\$HOME/php/mibs/originals|" mibs/conf/iana.conf
+    sed -i "s|^DIR=/usr/share/doc|DIR=\$HOME/mibs/originals|" mibs/conf/iana.conf
     sed -i "s|^DEST=iana|DEST=|" mibs/conf/iana.conf
     sed -i "s|^DIR=/usr/share/doc|DIR=\$HOME/php/mibs/originals|" mibs/conf/ianarfc.conf
     sed -i "s|^DEST=iana|DEST=|" mibs/conf/ianarfc.conf
-    sed -i "s|^DIR=/usr/share/doc|DIR=\$HOME/php/mibs/originals|" mibs/conf/rfc.conf
+    sed -i "s|^DIR=/usr/share/doc|DIR=\$HOME/mibs/originals|" mibs/conf/rfc.conf
     sed -i "s|^DEST=ietf|DEST=|" mibs/conf/rfc.conf
-    sed -i "s|^BASEDIR=/var/lib/mibs|BASEDIR=\$HOME/php/mibs|" mibs/conf/snmp-mibs-downloader.conf
+    sed -i "s|^BASEDIR=/var/lib/mibs|BASEDIR=\$HOME/mibs|" mibs/conf/snmp-mibs-downloader.conf
   popd
   # copy data files
   mkdir -p %{dependencydir}/mibs/originals
@@ -372,7 +371,6 @@ done
 
 %install
 pushd %{dependencydir}
-
   # Copy libs
   cp %{temp_destdir}/lib64/librabbitmq.so* lib/
   cp %{temp_destdir}/lib64/libhiredis.so* lib/
@@ -423,7 +421,6 @@ pushd %{dependencydir}
     echo "- $(echo -n $EXTENSION | cut -d. -f1)" >> "$EXTENSIONS_FILE"
   done
 
-  cd ..
   TARBALL=%{otherdir}/%{name}-linux-x64.tgz
 
   tar czf ${TARBALL} --hard-dereference * --owner=0 --group=0
