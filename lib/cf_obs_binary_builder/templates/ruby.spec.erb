@@ -46,6 +46,10 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 %setup -q -n ruby-%{version}
 
 %build
+<% if version == "2.4.8" %>
+# patch rbinstall issue
+sed -i "s/File\.umask(0222)/File\.umask(022)/" tool/rbinstall.rb
+<% end %>
 ./configure --enable-load-relative --disable-install-doc debugflags=-g --prefix=%{prefix_path} --without-gmp
 make %{?_smp_mflags}
 
