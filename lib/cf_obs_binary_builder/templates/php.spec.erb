@@ -399,6 +399,14 @@ pushd %{dependencydir}
   cp /usr/lib64/libtommath.so* lib/
   cp /usr/lib64/libmaxminddb.so* lib/
   cp /usr/lib64/libssh2.so* lib/
+  # Temporary workaround until the stack provides the gd library
+  cp /usr/lib64/libgd.so* lib/
+  cp /usr/lib64/libXpm.so* lib/
+  cp /usr/lib64/libwebp.so* lib/
+  cp /usr/lib64/libtiff.so* lib/
+  cp /usr/lib64/libz.so* lib/
+  cp /usr/lib64/libfreetype.so* lib/
+  cp /usr/lib64/libjpeg.so* lib/
 
   cp %{temp_destdir}/lib/libodbc.so* lib/
   cp %{temp_destdir}/lib/libodbcinst.so* lib/
