@@ -21,10 +21,10 @@ class CfObsBinaryBuilder::Syncer
       begin
         checksum = CfObsBinaryBuilder::Checksum.for(dep.dependency, dep.version)
       rescue JSON::ParserError
-        puts 'Depwatcher does not support this dependency anymore, it will not be regenerated.'
-      else
-        dep.regenerate(checksum)
+        puts "Depwatcher does not support this dependency anymore and we have to checksum to validate. Will continue without validation."
+        checksum = nil
       end
+      dep.regenerate(checksum)
     end
 
     missing_dependencies.each do |dep|
