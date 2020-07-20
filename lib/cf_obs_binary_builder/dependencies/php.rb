@@ -40,8 +40,8 @@ class CfObsBinaryBuilder::Php < CfObsBinaryBuilder::BaseDependency
     verify_checksum(filename, "3001ef3fad46959084cc13a923c98d30")
 
     # Download geolite ruby scripts
-    File.write("download_geoip_db.rb", URI.open("https://raw.githubusercontent.com/cloudfoundry/binary-builder/master/bin/download_geoip_db.rb").read)
-    File.write("geoip_downloader.rb", URI.open("https://raw.githubusercontent.com/cloudfoundry/binary-builder/master/lib/geoip_downloader.rb").read)
+    File.write("download_geoip_db.rb", URI.open("https://raw.githubusercontent.com/cloudfoundry/binary-builder/main/bin/download_geoip_db.rb").read)
+    File.write("geoip_downloader.rb", URI.open("https://raw.githubusercontent.com/cloudfoundry/binary-builder/main/lib/geoip_downloader.rb").read)
 
     copy_patches()
   end
