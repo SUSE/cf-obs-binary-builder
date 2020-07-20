@@ -213,7 +213,7 @@ class CfObsBinaryBuilder::Manifest
   end
 
   def find_latest_jdk_build(minor_version, update_version)
-    openjdk_html = open("http://hg.openjdk.java.net/jdk8u/jdk8u/tags").read
+    openjdk_html = URI.open("http://hg.openjdk.java.net/jdk8u/jdk8u/tags").read
     openjdk_html.scan(/jdk#{minor_version}u#{update_version}-b(\d+)/).flatten.map(&:to_i).max
   end
 

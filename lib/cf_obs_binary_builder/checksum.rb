@@ -113,7 +113,7 @@ class CfObsBinaryBuilder::Checksum
   end
 
   def self.libmemcache(version)
-    md5sum = open("https://launchpad.net/libmemcached/1.0/#{version}/+download/libmemcached-#{version}.tar.gz/+md5").read
+    md5sum = URI.open("https://launchpad.net/libmemcached/1.0/#{version}/+download/libmemcached-#{version}.tar.gz/+md5").read
     checksum = md5sum.split.first
     raise "Could not determine checksum for libmemcached-#{version}.tar.gz. The checksum file content was:\n\n#{md5sum}" if !checksum
 

@@ -11,6 +11,6 @@ class CfObsBinaryBuilder::Libffi < CfObsBinaryBuilder::BaseDependency
     super
 
     patch_url = "https://raw.githubusercontent.com/p3ck/restraint/master/third-party/libffi-3.1-toolexeclibdir.patch"
-    File.write(File.basename(patch_url), open(patch_url).read)
+    File.write(File.basename(patch_url), URI.open(patch_url).read)
   end
 end

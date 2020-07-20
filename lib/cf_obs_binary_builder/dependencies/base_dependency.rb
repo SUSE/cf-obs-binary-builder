@@ -61,7 +61,7 @@ class CfObsBinaryBuilder::BaseDependency
     Dir.mktmpdir("cf-obs-gpg-verification") do |tmpdir|
       Dir.chdir tmpdir do
         signature_file = File.basename(gpg_signature_url)
-        File.write(signature_file, open(gpg_signature_url).read)
+        File.write(signature_file, URI.open(gpg_signature_url).read)
         gpg_call = "gpg --homedir=#{tmpdir}"
         Dir.glob("#{gpg_keys_dir}/*.asc") do |key|
           system("#{gpg_call} --import #{key}")
@@ -80,7 +80,7 @@ class CfObsBinaryBuilder::BaseDependency
 
   def download_source(source)
     log "Downloading the sources in the package directory... (#{source})"
-    File.write(File.basename(source), open(source).read)
+    File.write(File.basename(source), URI.open(source).read)
   end
 
   def verify_checksum(source, checksum)

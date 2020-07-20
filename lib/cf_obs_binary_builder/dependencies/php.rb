@@ -29,19 +29,19 @@ class CfObsBinaryBuilder::Php < CfObsBinaryBuilder::BaseDependency
       source = metadata[:url]
 
       log "Downloading the sources in the package directory... (#{source})"
-      File.write(filename, open(source).read)
+      File.write(filename, URI.open(source).read)
       verify_checksum(filename, metadata[:md5])
     end
 
     # Download snmp-mibs-downloader
     additional_source = "http://archive.ubuntu.com/ubuntu/pool/multiverse/s/snmp-mibs-downloader/snmp-mibs-downloader_1.1.tar.gz"
     filename = "extensions-"+ File.basename(additional_source)
-    File.write(filename, open(additional_source).read)
+    File.write(filename, URI.open(additional_source).read)
     verify_checksum(filename, "3001ef3fad46959084cc13a923c98d30")
 
     # Download geolite ruby scripts
-    File.write("download_geoip_db.rb", open("https://raw.githubusercontent.com/cloudfoundry/binary-builder/master/bin/download_geoip_db.rb").read)
-    File.write("geoip_downloader.rb", open("https://raw.githubusercontent.com/cloudfoundry/binary-builder/master/lib/geoip_downloader.rb").read)
+    File.write("download_geoip_db.rb", URI.open("https://raw.githubusercontent.com/cloudfoundry/binary-builder/master/bin/download_geoip_db.rb").read)
+    File.write("geoip_downloader.rb", URI.open("https://raw.githubusercontent.com/cloudfoundry/binary-builder/master/lib/geoip_downloader.rb").read)
 
     copy_patches()
   end
@@ -82,10 +82,10 @@ class CfObsBinaryBuilder::Php < CfObsBinaryBuilder::BaseDependency
       final_path = File.join(tmpdir, "php7-extensions.yml")
 
       File.write(
-        base_path, open(File.join(url_base, "php7-base-extensions.yml")).read
+        base_path, URI.open(File.join(url_base, "php7-base-extensions.yml")).read
       )
       File.write(
-        patch_path, open(File.join(url_base, patch_filename)).read
+        patch_path, URI.open(File.join(url_base, patch_filename)).read
       )
 
       base_extensions = BaseExtensions.new(base_path)
