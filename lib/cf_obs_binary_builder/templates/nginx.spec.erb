@@ -60,7 +60,8 @@ make install DESTDIR=%{dependencydir}
 pushd %{dependencydir}/
 
 TARBALL=%{otherdir}/%{name}.tgz
-rm -rf nginx/html nginx/conf/*
+rm -rf html conf
+mkdir conf
 tar czf ${TARBALL} * --owner=0 --group=0
 popd
 
