@@ -1,0 +1,46 @@
+#
+# spec file for SUSE CAP buildpack dependency
+#
+# Copyright (c) 2018 SUSE LINUX GmbH, Nuernberg, Germany.
+#
+# All modifications and additions to the file contributed by third parties
+# remain the property of their copyright owners, unless otherwise agreed
+# upon. The license for this file, and modifications and additions to the
+# file, is the same license as for the pristine package itself (unless the
+# license for the pristine package is not an Open Source License, in which
+# case the license is the MIT License). An "Open Source License" is a
+# license that conforms to the Open Source Definition (Version 1.9)
+# published by the Open Source Initiative.
+
+
+
+Name:           <%= dependency %>-<%= version %>
+Version:        <%= version %>
+Release:        1
+Summary:        This is a dependency used in SUSE CAP buildpacks
+License:        <%= license %>
+Group:          Cloud/Platform/kubecf
+Url:            <%= url %>
+Source:         <%= source %>
+BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+
+%define otherdir %{_topdir}/OTHER
+
+%description
+
+%prep
+
+%build
+cp %{SOURCE0} %{otherdir}/
+
+FILENAME=$(basename %{SOURCE0})
+
+pushd %{otherdir}/
+sha256sum ${FILENAME} > ${FILENAME}.sha256
+popd
+
+%files
+%defattr(-,root,root)
+
+%changelog
+

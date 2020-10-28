@@ -2,7 +2,7 @@ require "nokogiri"
 class CfObsBinaryBuilder::ObsPackage
   attr_reader :name, :obs_project
 
-  ARTIFACT_EXTENSION_REGEXP=".tgz|.tar.gz|.tbz|tar.bz|.zip|.phar"
+  ARTIFACT_EXTENSION_REGEXP=".tgz|.tar.gz|.tbz|tar.bz|tar.xz|.zip|.phar"
   STACK_TO_OBS_REPOSITORY = {
     "sle12" => "SLE_12_SP4",
     "sle15" => "SLE_15",
