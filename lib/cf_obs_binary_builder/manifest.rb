@@ -241,6 +241,10 @@ class CfObsBinaryBuilder::Manifest
       dep_class = CfObsBinaryBuilder.get_build_target("CfObsBinaryBuilder::#{hash_from_manifest["name"].capitalize.tr("-","")}")
     end
 
-    dep_class.nil? ? nil : dep_class.new(version)
+    if hash_from_manifest["name"] =~ /^dotnet-/
+      dep_class.nil? ? nil : dep_class.new(version, hash_from_manifest["sha256"])
+    else
+      dep_class.nil? ? nil : dep_class.new(version)
+    end
   end
 end
