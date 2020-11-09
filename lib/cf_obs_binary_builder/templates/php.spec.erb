@@ -341,6 +341,7 @@ for EXTENSION in <%= @php_internal_extensions.join(" ") %>; do
         build_php_extension "--with-unixODBC=shared,%{temp_destdir}"
       elif [[ $EXTENSION == "sodium" ]]; then
         export LDFLAGS="-L%{temp_destdir}lib"
+        export PKG_CONFIG_PATH="%{temp_destdir}lib/pkgconfig"
         build_php_extension "--with-sodium=%{temp_destdir}"
         unset LDFLAGS
       elif [[ $EXTENSION == "interbase" || $EXTENSION == "pdo_firebird" ]]; then
