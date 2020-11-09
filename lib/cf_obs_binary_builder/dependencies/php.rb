@@ -98,6 +98,12 @@ class CfObsBinaryBuilder::Php < CfObsBinaryBuilder::BaseDependency
     internal_extensions = []
     php_extensions_yml.each do |key, elements|
       elements.each do |metadata|
+        # hiredis 1.0.0 has 64bit-portability-issue, downgrading to the previously working version
+        if metadata["name"] == "hiredis" && metadata["version"] == "1.0.0"
+          metadata["version"] = "0.13.3"
+          metadata["md5"] = "43dca1445ec6d3b702821dba36000279"
+        end
+
         # pdo_sqlsrv 5.6.1 is not compatible with PHP 7.4.x
         if minor_version == 4 && metadata["name"] == "pdo_sqlsrv" && metadata["version"] == "5.6.1"
           metadata["version"] = "5.8.0"
