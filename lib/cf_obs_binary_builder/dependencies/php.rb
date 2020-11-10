@@ -157,6 +157,12 @@ class CfObsBinaryBuilder::Php < CfObsBinaryBuilder::BaseDependency
   class AmqpPeclRecipe < PeclRecipe
   end
 
+  class PsrRecipe < PeclRecipe
+    def url
+      "https://github.com/jbboehr/php-psr/archive/v#{version}.tar.gz"
+    end
+  end
+
   class MaxMindRecipe < BaseRecipe
     def url
       "https://github.com/maxmind/MaxMind-DB-Reader-php/archive/v#{version}.tar.gz"
