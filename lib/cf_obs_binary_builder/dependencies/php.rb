@@ -103,6 +103,11 @@ class CfObsBinaryBuilder::Php < CfObsBinaryBuilder::BaseDependency
           metadata["version"] = "0.13.3"
           metadata["md5"] = "43dca1445ec6d3b702821dba36000279"
         end
+        # also downgrading phpiredis because the newer version does not work with hiredis < 1.0.0
+        if metadata["name"] == "phpiredis" && metadata["version"] == "1.0.1"
+          metadata["version"] = "1.0.0"
+          metadata["md5"] = "d84a6e7e3a54744269fd776d7be80be1"
+        end
 
         # pdo_sqlsrv 5.6.1 is not compatible with PHP 7.4.x
         if minor_version == 4 && metadata["name"] == "pdo_sqlsrv" && metadata["version"] == "5.6.1"
