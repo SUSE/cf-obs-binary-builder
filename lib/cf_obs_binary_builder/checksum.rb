@@ -121,6 +121,10 @@ class CfObsBinaryBuilder::Checksum
   end
 
   def self.libunwind(version)
+    # fix cases where the version is reported as for example 1.5 while it is 1.5.0
+    if version.count('.') == 1
+      version += ".0"
+    end
     "http://download.savannah.nongnu.org/releases/libunwind/libunwind-#{version}.tar.gz.sig"
   end
 

@@ -14,7 +14,13 @@
 
 
 Name:           libunwind-<%= version %>
-Version:        <%= version %>
+Version:        <%=
+if version.count('.') == 1
+  "#{version}.0"
+else
+  version
+end
+%>
 Release:        1
 Summary:        This is a dependency used in SUSE CAP buildpacks
 License:        MIT
@@ -30,7 +36,7 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 %description
 
 %prep
-%setup -q -n %{name}
+%setup -q -n libunwind-%{version}
 
 %build
 ./configure --prefix=/ \
